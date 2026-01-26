@@ -14,7 +14,7 @@ public function up(): void
     Schema::create('ticket_comments', function (Blueprint $table) {
         $table->id();
         $table->foreignId('ticket_id')->constrained()->cascadeOnDelete(); // Chat ini milik Tiket mana?
-        $table->foreignId('user_id')->constrained()->cascadeOnDelete();   // Siapa yang ngetik?
+        $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete(); // Boleh NULL (Tamu)
         $table->text('content'); // Apa isi chatnya?
         $table->timestamps();
     });

@@ -27,7 +27,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->spa()
-            ->login() // Halaman Login Aktif
+            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
+            // Add global CSS for Login Page Background
+            ->renderHook(
+                'panels::body.end',
+                fn () => view('filament.custom-login-style')
+            )
             
             // === BAGIAN INI YANG MENGUBAH TAMPILAN JADI BAGUS ===
             ->brandName('IT Helpdesk PTPN IV') // Mengganti tulisan "Laravel"
@@ -40,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                \App\Filament\Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

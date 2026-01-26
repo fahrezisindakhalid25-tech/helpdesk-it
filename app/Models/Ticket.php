@@ -4,11 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Carbon\Carbon; // <--- WAJIB TAMBAH INI BUAT HITUNG WAKTU
 
 class Ticket extends Model
 {
     // Izinkan semua kolom diisi
     protected $guarded = [];
+
+    // Pastikan kolom ini dianggap sebagai tanggal oleh Laravel
+    protected $casts = [
+        'sla_due_at' => 'datetime',
+        'resolution_due_at' => 'datetime', // Asumsi nama kolom deadline resolusi kakak ini
+    ];
 
     protected static function boot()
     {
@@ -22,20 +29,40 @@ class Ticket extends Model
                 $model->no_tiket = 'TICKET-' . strtoupper(Str::random(5));
             }
 
-            // === AUTO-ASSIGN SLA DARI MASTER ===
-            // Jika sla_id belum diisi, ambil dari master SLA dengan nama "first response"
+            // === 1. LOGIKA FIRST RESPONSE ===
             if (empty($model->sla_id)) {
-                $firstResponseSla = Sla::where('name', 'first response')->first();
+                // Cari SLA dengan nama 'first response' (case-insensitive)
+                $firstResponseSla = Sla::where('name', 'LIKE', 'first response')->first();
                 if ($firstResponseSla) {
+                    // A. Tempel ID
                     $model->sla_id = $firstResponseSla->id;
+
+                    // B. HITUNG DEADLINE (Disini Rumusnya!)
+                    $time = Carbon::parse($firstResponseSla->response_time);
+                    
+                    $model->sla_due_at = now()
+                        ->addDays((int) $firstResponseSla->response_days) // Tambah Hari
+                        ->addHours($time->hour)      // Tambah Jam
+                        ->addMinutes($time->minute); // Tambah Menit
                 }
             }
 
-            // Jika resolution_sla_id belum diisi, ambil dari master SLA dengan nama "resolution"
+            // === 2. LOGIKA RESOLUTION (Yang Kakak Cari) ===
             if (empty($model->resolution_sla_id)) {
-                $resolutionSla = Sla::where('name', 'resolution')->first();
+                // Cari SLA dengan nama 'resolution' (case-insensitive)
+                $resolutionSla = Sla::where('name', 'LIKE', 'resolution')->first();
                 if ($resolutionSla) {
+                    // A. Tempel ID
                     $model->resolution_sla_id = $resolutionSla->id;
+
+                    // B. HITUNG DEADLINE (Rumus diperbaiki)
+                    // Ambil jam & menit dari SLA
+                    $timeRes = Carbon::parse($resolutionSla->response_time);
+                    
+                    $model->resolution_due_at = now()
+                        ->addDays((int) $resolutionSla->response_days)
+                        ->addHours($timeRes->hour)
+                        ->addMinutes($timeRes->minute);
                 }
             }
         });
@@ -49,7 +76,7 @@ class Ticket extends Model
         return $this->belongsTo(Sla::class, 'sla_id');
     }
 
-    // 2. Relasi SLA untuk RESOLUTION (Yang bikin error tadi)
+    // 2. Relasi SLA untuk RESOLUTION
     public function resolutionSla()
     {
         return $this->belongsTo(Sla::class, 'resolution_sla_id');

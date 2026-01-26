@@ -13,9 +13,13 @@ public function up(): void
 {
     Schema::create('slas', function (Blueprint $table) {
         $table->id();
-        $table->string('name'); // Contoh: "High", "Medium"
-        $table->time('response_time');   // Format jam:menit (contoh: 00:15:00)
-        $table->time('resolution_time'); // Format jam:menit (contoh: 02:00:00)
+        $table->string('name'); 
+        $table->string('number')->nullable();
+        
+        $table->string('response_days')->nullable();
+        $table->time('response_time')->nullable(); 
+        $table->integer('resolution_days')->default(0);
+
         $table->timestamps();
     });
 }

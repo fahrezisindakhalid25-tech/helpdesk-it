@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('theme_mode')->default('light')->after('remember_token');
+            $table->dropColumn('role'); // Drop old enum
+            $table->foreignId('role_id')->nullable()->after('id')->constrained('roles')->nullOnDelete();
         });
     }
 
@@ -22,7 +23,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('theme_mode');
+            $table->dropForeign(['role_id']);
+            $table->dropColumn('role_id');
+            $table->enum('role', ['admin', 'operator'])->default('operator')->after('email');
         });
     }
 };

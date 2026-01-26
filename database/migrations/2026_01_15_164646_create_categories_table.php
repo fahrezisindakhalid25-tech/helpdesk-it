@@ -14,7 +14,6 @@ public function up(): void
     Schema::create('categories', function (Blueprint $table) {
         $table->id();
         $table->string('name'); // Contoh: "Internet Mati"
-        $table->foreignId('sla_id')->constrained('slas')->onDelete('cascade');
         $table->timestamps();
     });
 }

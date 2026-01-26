@@ -168,7 +168,7 @@ class TicketResource extends Resource
                                 $sla = \App\Models\Sla::find($slaId);
                                 if (!$sla) return '-';
                                 
-                                $days = 0; 
+                                $days = (int) $sla->response_days; 
                                 $timeParts = explode(':', $sla->response_time ?? '00:00:00');
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
@@ -185,56 +185,47 @@ class TicketResource extends Resource
                         Forms\Components\Placeholder::make('separator_2')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
 
                         // ==========================================
-                        // 2. DROPDOWN KHUSUS RESOLUTION
+                        // 2. DROPDOWN SLA RESOLUSI (FINAL)
                         // ==========================================
                         Forms\Components\Select::make('resolution_sla_id')
-                            ->label('SLA: Resolution')
-                            ->relationship('resolutionSla', 'name') // Relasi Baru
+                            ->label('SLA: Resolution (Final)')
+                            ->relationship('sla', 'name') // Menggunakan relasi yang sama ke tabel SLAs
                             ->placeholder('Pilih SLA Resolusi')
-                            ->native(false)->live()
-                            ->afterStateUpdated(function ($record, $state, $set) {
-                                // Update resolution_sla_id dan ubah status jadi Open
-                                $upd = ['resolution_sla_id' => $state];
-                                if (!in_array($record->status, ['Replied', 'Solved', 'Closed'])) {
-                                    $upd['status'] = 'Open';
-                                    $set('status', 'Open');
-                                }
-                                $record->update($upd);
+                            ->native(false)
+                            ->live()
+                            ->afterStateUpdated(function ($record, $state) {
+                                $record->update(['resolution_sla_id' => $state]);
                             }),
 
-                        // TIMER RESOLUTION (Update Logika Membaca Waktu)
+                        // TIMER RESOLUTION
                         Forms\Components\Placeholder::make('resolution_timer')
                             ->hiddenLabel()
-                            ->content(function ($record, $get) {
-                                $end = $record->solved_at ?? $record->closed_at;
-                                if (($record->status === 'Solved' || $record->status === 'Closed') && $end) {
-                                    $text = $record->created_at->diff($end)->format('%ad %hh %im %ss');
-                                    $color = $record->status === 'Solved' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-100 border-gray-300';
-                                    return new \Illuminate\Support\HtmlString("<div class='$color p-2 rounded border text-center'><span class='font-bold'>✓ {$record->status}</span><div class='text-xs'>$text</div></div>");
+                            ->content(function ($record, $get) { 
+                                if ($record->status === 'Solved' || $record->status === 'Closed') {
+                                    $text = $record->created_at->diff($record->solved_at ?? $record->closed_at ?? now())->format('%ad %hh %im %ss');
+                                    return new \Illuminate\Support\HtmlString("<div class='bg-green-50 p-2 rounded border border-green-200 text-center'><span class='text-green-700 font-bold'>✓ Solved</span><div class='text-xs'>$text</div></div>");
                                 }
                                 
-                                // GUNAKAN $record->resolution_sla_id LANGSUNG DARI DATABASE
                                 $slaId = $record->resolution_sla_id ?? $get('resolution_sla_id');
                                 if (!$slaId) return new \Illuminate\Support\HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Resolusi -</div>');
 
-                                // Ambil Data SLA
                                 $sla = \App\Models\Sla::find($slaId);
                                 if (!$sla) return '-';
-
-                                // PERUBAHAN DISINI:
-                                // Kita baca 'response_days' & 'response_time' karena inputan di Master cuma itu.
-                                // response_days sekarang adalah Label/Teks, jadi anggap 0 hari untuk kalkulasi
-                                $days = 0;
+                                
+                                // Gunakan response_days (karena user menggunakan field Durasi Pengerjaan yang ada)
+                                $days = (int) $sla->response_days; 
+                                
+                                // Ambil jam dari response_time
                                 $timeParts = explode(':', $sla->response_time ?? '00:00:00');
                                 
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
                                 return new \Illuminate\Support\HtmlString("
-                                    <div class='flex justify-between items-center bg-gray-50 p-2 rounded border'>
-                                        <div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'Expired'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
+                                    <div class='flex justify-between items-center bg-gray-50 p-2 rounded border mb-4'>
+                                        <div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
                                             <span x-text=\"text\" class='text-sm font-bold text-red-600'></span>
                                         </div>
-                                        <div class='text-xs text-gray-500 text-right'>Target<br>{$timeParts[0]}h {$timeParts[1]}m</div>
+                                        <div class='text-xs text-gray-500 text-right'>Target<br>{$days} Hari</div>
                                     </div>
                                 ");
                             }),
@@ -261,10 +252,84 @@ class TicketResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('no_tiket')->searchable(),
+                Tables\Columns\TextColumn::make('no_tiket')
+                    ->searchable()
+                    ->badge()
+                    ->color(function ($record) {
+                        // Cek apakah ada chat baru dari user (user_id IS NULL) setelah reply terakhir admin
+                        $lastComment = $record->comments()->latest()->first();
+                        if ($lastComment && $lastComment->user_id === null) {
+                            return 'danger'; // Merah jika chat terakhir dari user
+                        }
+                        return null; // Tidak ada badge jika normal
+                    })
+                    ->formatStateUsing(function ($state, $record) {
+                        $lastComment = $record->comments()->latest()->first();
+                        if ($lastComment && $lastComment->user_id === null) {
+                             // Tambahkan indicator teks atau biarkan badge warna saja
+                             // Keterbatasan badge di TextColumn bawaan mungkin hanya styling.
+                             // Kita return state asli, tapi warnanya sudah dihandle 'color'
+                        }
+                        return $state;
+                    })
+                    ->label('No Tiket'),
+                    
                 Tables\Columns\TextColumn::make('nama_lengkap')->searchable(),
                 Tables\Columns\TextColumn::make('topik_bantuan')->limit(20)->label('Kategori'),
-                Tables\Columns\TextColumn::make('sla.name')->label('SLA')->badge()->color('danger'),
+                // Sla Name dihapus sesuai request
+                
+                // === SLA FIRST RESPONSE TIMER ===
+                Tables\Columns\TextColumn::make('sla_timer')
+                    ->label('SLA Respon')
+                    ->html()
+                    ->getStateUsing(function ($record) {
+                        if ($record->replied_at) {
+                            $durasi = $record->created_at->diff($record->replied_at)->format('%ad %hh %im');
+                            return "<div class='text-xs text-green-600 font-bold'>✓ Done<br><span class='font-normal text-gray-500'>$durasi</span></div>";
+                        }
+                        if (!$record->sla_id || !$record->sla) return '<span class="text-xs text-gray-400">-</span>';
+                        
+                        $timeParts = explode(':', $record->sla->response_time ?? '00:00:00');
+                        $deadline = $record->created_at->copy()->addDays((int)$record->sla->response_days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
+                        
+                        return "<div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
+                                <span x-text=\"text\" class='text-xs font-bold' :class=\"text === 'OVERDUE' ? 'text-red-600' : 'text-blue-600'\"></span>
+                            </div>";
+                    }),
+
+                // === SLA RESOLUTION TIMER (BARU) ===
+                Tables\Columns\TextColumn::make('sla_resolution_timer')
+                    ->label('SLA Resolution')
+                    ->html()
+                    ->getStateUsing(function ($record) {
+                         // Jika sudah selesai (Solved/Closed)
+                        if ($record->status === 'Solved' || $record->status === 'Closed') {
+                            $end = $record->solved_at ?? $record->closed_at ?? now();
+                            $durasi = $record->created_at->diff($end)->format('%ad %hh %im');
+                            return "<div class='text-xs text-green-600 font-bold'>✓ Solved<br><span class='font-normal text-gray-500'>$durasi</span></div>";
+                        }
+                        
+                        // Cek SLA Resolution ID
+                        $slaId = $record->resolution_sla_id; 
+                        if (!$slaId) return '<span class="text-xs text-gray-400">-</span>';
+
+                        // Ambil Data SLA (Gunakan Relasi resolutionSla di Model Ticket jika ada, atau manual)
+                        // Karena di TicketResource belum didefinisikan with('resolutionSla'), kita fetch manual atau pakai relasi kalau ada.
+                        // Di Model Ticket tadi ada 'resolutionSla'. Mari kita pakai itu.
+                        $sla = $record->resolutionSla; 
+                        if (!$sla) return '<span class="text-xs text-gray-400">-</span>';
+                        
+                        // Hitung Deadline (Sama seperti Sidebar)
+                        $days = (int) $sla->response_days; // Pakai response_days karena user pakai field itu
+                        $timeParts = explode(':', $sla->response_time ?? '00:00:00');
+                        
+                        $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
+                        
+                        return "<div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
+                                <span x-text=\"text\" class='text-xs font-bold' :class=\"text === 'OVERDUE' ? 'text-red-600' : 'text-blue-600'\"></span>
+                            </div>";
+                    }),
+
                 Tables\Columns\TextColumn::make('status')->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Solved' => 'success', 'Replied' => 'info', 'Open' => 'warning', 'Closed' => 'danger', default => 'gray'
@@ -421,5 +486,5 @@ class TicketResource extends Resource
     }
     
     public static function getRelations(): array { return []; }
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder { return parent::getEloquentQuery()->with(['sla', 'resolutionSla']); }
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder { return parent::getEloquentQuery()->with(['sla']); }
 }

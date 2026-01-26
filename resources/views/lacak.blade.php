@@ -4,32 +4,107 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tiket #{{ $ticket->no_tiket }} - Helpdesk</title>
+    
+    <!-- CDN Assets for Full Online Appearance -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+    <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        const theme = localStorage.getItem('user-theme') ?? 'system';
+        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    
     <style>
         body { font-family: 'Inter', sans-serif; }
+        trix-toolbar [data-trix-button-group="file-tools"] { display: none; } /* Hide file attachment */
+        .trix-content ul { list-style-type: disc; margin-left: 1em; }
+        .trix-content ol { list-style-type: decimal; margin-left: 1em; }
+        
+        /* Mobile Optimization for Trix */
+        @media (max-width: 640px) {
+            trix-toolbar .trix-button-group:not(:first-child) {
+                display: none; /* Hide advanced tools on mobile */
+            }
+            trix-toolbar .trix-button-group:first-child {
+                margin-bottom: 0;
+            }
+        }
+
+        /* Dark Mode for Trix */
+        .dark trix-editor {
+            background-color: #374151; /* gray-700 */
+            color: #f3f4f6; /* gray-100 */
+            border-color: #4b5563; /* gray-600 */
+        }
+        .dark trix-toolbar {
+            background-color: #1f2937; /* gray-800 */
+            border-color: #4b5563;
+        }
+        .dark trix-toolbar .trix-button {
+            background-color: #374151;
+            color: white;
+        }
+        .dark trix-toolbar .trix-button.trix-active {
+            background-color: #2563eb; /* blue-600 */
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
 
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 sticky top-0 z-10">
-        <div class="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-gray-800 dark:text-white">Tiket #{{ $ticket->no_tiket }}</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $ticket->deskripsi_umum_masalah }}</p>
+        <div class="max-w-3xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="w-full sm:w-auto">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white truncate">Tiket #{{ $ticket->no_tiket }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 break-words">{{ $ticket->deskripsi_umum_masalah }}</p>
             </div>
-            <div class="flex flex-col items-end">
-                <span class="px-3 py-1 rounded-full text-xs font-bold 
-                    {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-800' : 
-                      ($ticket->status == 'Closed' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800') }}">
-                    {{ $ticket->status }}
-                </span>
-                <a href="{{ route('home') }}" class="text-xs text-blue-600 mt-1 hover:underline">Kembali ke Home</a>
+            <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+                <button 
+                    type="button" 
+                    onclick="toggleTheme()" 
+                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-yellow-300 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm border border-gray-200 dark:border-gray-600 transition-colors focus:outline-none flex-shrink-0" 
+                    title="Ganti Tema">
+                    <!-- Sun Icon -->
+                    <svg class="hidden dark:block w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <!-- Moon Icon -->
+                    <svg class="block dark:hidden w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+
+                <div class="flex flex-col items-end">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold 
+                        {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-800' : 
+                          ($ticket->status == 'Closed' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800') }}">
+                        {{ $ticket->status }}
+                    </span>
+                    <a href="{{ route('home') }}" class="text-xs text-blue-600 mt-1 hover:underline">Kembali ke Home</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-4">
+    <div class="flex-1 overflow-y-auto p-4" id="chat-container-scroll">
         <div class="max-w-3xl mx-auto space-y-6">
             
             <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-lg p-4 text-sm text-yellow-800 dark:text-yellow-200">
@@ -50,42 +125,10 @@
                 <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Dibuat pada: {{ $ticket->created_at->format('d M Y H:i') }}</div>
             </div>
 
-            @forelse($ticket->comments as $comment)
-                <div class="flex {{ $comment->user_id ? 'justify-start' : 'justify-end' }}">
-                    
-                    @if($comment->user_id)
-                        <div class="flex gap-3 max-w-[80%]">
-                            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                A
-                            </div>
-                            <div>
-                                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
-                                    <p class="text-sm font-bold text-blue-600 mb-1">Admin Support</p>
-                                    <p class="text-gray-800 dark:text-gray-200 text-sm whitespace-pre-wrap">{{ $comment->content }}</p>
-                                </div>
-                                <span class="text-xs text-gray-400 ml-1">{{ $comment->created_at->format('H:i') }}</span>
-                            </div>
-                        </div>
-
-                    @else
-                        <div class="flex gap-3 max-w-[80%] flex-row-reverse">
-                            <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                U
-                            </div>
-                            <div>
-                                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 shadow-sm">
-                                    <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-1">Anda</p>
-                                    <p class="text-gray-800 dark:text-gray-200 text-sm whitespace-pre-wrap">{{ $comment->content }}</p>
-                                </div>
-                                <span class="text-xs text-gray-400 mr-1 text-right block">{{ $comment->created_at->format('H:i') }}</span>
-                            </div>
-                        </div>
-                    @endif
-
-                </div>
-            @empty
-                <p class="text-center text-gray-400 text-sm italic">Belum ada percakapan.</p>
-            @endforelse
+            <!-- CHAT CONTAINER (AJAX TARGET) -->
+            <div id="chat-history">
+                @include('partials.chat_history')
+            </div>
 
         </div>
     </div>
@@ -93,7 +136,6 @@
 <div class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 p-4 sticky bottom-0">
         <div class="max-w-3xl mx-auto">
 
-            {{-- 1. TAMPILKAN ERROR VALIDASI (Jika ada yang mencoba hack lewat inspect element) --}}
             @if($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                     <strong class="font-bold">Gagal!</strong>
@@ -101,9 +143,14 @@
                 </div>
             @endif
 
-            {{-- 2. LOGIKA TAMPILAN FORM --}}
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                    <strong class="font-bold">Berhasil!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+
             
-            {{-- KONDISI A: TIKET EXPIRED / CLOSED --}}
             @if($isExpired)
                 <div class="text-center p-4 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 rounded-lg flex flex-col items-center">
                     <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -111,7 +158,27 @@
                     <span class="text-xs">Masa berlaku tiket (5 Hari) telah habis atau masalah dinyatakan selesai permanen.</span>
                 </div>
 
-            {{-- KONDISI B: ADMIN BELUM JAWAB (User Harus Menunggu) --}}
+            @elseif($ticket->status === 'Solved')
+                <div class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-center">
+                    <p class="font-bold text-green-800 dark:text-green-300">Masalah Telah Diselesaikan</p>
+                    <p class="text-sm text-green-700 dark:text-green-400 mt-1">
+                        Jika Anda merasa masalah ini belum tuntas atau muncul kembali, silakan balas pesan di bawah ini untuk membuka kembali tiket.
+                    </p>
+                </div>
+
+                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST">
+                    @csrf
+                    <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
+                        <div class="flex-1">
+                            <input id="x" type="hidden" name="isi_pesan">
+                            <trix-editor input="x" placeholder="Tulis balasan untuk membuka kembali tiket..." class="bg-white dark:bg-gray-700 min-h-[80px] rounded-lg"></trix-editor>
+                        </div>
+                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2 h-[40px] w-full sm:w-auto">
+                            <span>Re-Open</span>
+                        </button>
+                    </div>
+                </form>
+
             @elseif(!$adminSudahJawab)
                 <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 rounded-lg flex flex-col items-center animate-pulse">
                     <svg class="w-8 h-8 mb-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -119,15 +186,18 @@
                     <span class="text-xs">Anda dapat membalas pesan setelah Admin merespon laporan ini.</span>
                 </div>
 
-            {{-- KONDISI C: NORMAL (Bisa Chat & Re-Open Solved Ticket) --}}
             @else
-                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" class="flex gap-2">
+                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST">
                     @csrf
-                    <textarea name="isi_pesan" rows="1" required placeholder="Tulis balasan Anda..." class="flex-1 appearance-none border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
-                        <span>Kirim</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
+                        <div class="flex-1">
+                            <input id="reply-input" type="hidden" name="isi_pesan">
+                            <trix-editor input="reply-input" placeholder="Tulis balasan Anda..." class="bg-white dark:bg-gray-700 min-h-[100px] rounded-lg"></trix-editor>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 h-[40px] w-full sm:w-auto">
+                            <span>Kirim</span>
+                        </button>
+                    </div>
                 </form>
             @endif
 
@@ -199,6 +269,59 @@
             img.style.transform = `scale(${currentZoom})`;
             img.style.transition = "transform 0.2s";
         }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('user-theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('user-theme', 'dark');
+            }
+        }
+        
+        // === AUTO REFRESH CHAT ===
+        const ticketUuid = "{{ $ticket->uuid }}";
+        const chatContainer = document.getElementById('chat-history');
+        const scrollContainer = document.getElementById('chat-container-scroll');
+        let isUserScrolling = false;
+
+        // Detect if user is scrolling up (don't auto scroll bottom if reading history)
+        scrollContainer.addEventListener('scroll', () => {
+            if (scrollContainer.scrollTop + scrollContainer.clientHeight < scrollContainer.scrollHeight - 50) {
+                isUserScrolling = true;
+            } else {
+                isUserScrolling = false;
+            }
+        });
+
+        // Auto Scroll Bottom on Load
+        function scrollToBottom() {
+            if (!isUserScrolling) {
+                scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+            }
+        }
+        setTimeout(scrollToBottom, 500); // Initial scroll
+
+        // Poll every 10 seconds to reduce server load
+        // DISABLED BY USER REQUEST (Localhost Performance)
+        /*
+        setInterval(() => {
+            // Only poll if tab is active/visible
+            if (document.hidden) return;
+
+            fetch(`{{ route('laporan.chat.history') }}?uuid=${ticketUuid}`)
+                .then(response => response.text())
+                .then(html => {
+                    chatContainer.innerHTML = html;
+                    // Only scroll if user hasn't scrolled up
+                    scrollToBottom();
+                })
+                .catch(err => console.error('Gagal refresh chat:', err));
+        }, 10000); // 10 Detik
+        */
+
     </script>
 </body>
 </html>

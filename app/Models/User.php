@@ -21,21 +21,12 @@ class User extends Authenticatable implements FilamentUser
     protected $fillable = [
         'name',
         'email',
+        'permissions',
         'password',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -44,7 +35,24 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'permissions' => 'array',
         ];
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        // Admin Full has wildcard access
+        if (in_array('*', $this->permissions ?? [])) {
+            return true;
+        }
+
+        return in_array($permission, $this->permissions ?? []);
+    }
+
+    public function isAdmin(): bool
+    {
+        // Check for wildcard permission
+        return in_array('*', $this->permissions ?? []);
     }
 
     /**

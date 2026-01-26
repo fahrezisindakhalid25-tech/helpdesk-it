@@ -51,7 +51,7 @@ class LaporanForm extends Component implements HasForms
                             ->options(Location::query()->pluck('name', 'name'))
                             ->searchable()
                             ->required(),
-                    ])->columns(2),
+                    ])->columns(['default' => 1, 'sm' => 2]),
 
                 Forms\Components\Section::make('Detail Masalah')
                     ->schema([

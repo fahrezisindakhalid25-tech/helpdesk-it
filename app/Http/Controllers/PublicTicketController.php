@@ -232,4 +232,15 @@ class PublicTicketController extends Controller
 
         return back()->with('success', 'Pesan terkirim!');
     }
+    // === 3. FUNGSI AJAX CHAT HISTORY ===
+    public function chatHistory(Request $request) 
+    {
+        $uuid = $request->query('uuid');
+        if (!$uuid) return response()->json(['error' => 'UUID required'], 400);
+
+        $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
+        
+        // Return Partial View
+        return view('partials.chat_history', compact('ticket'));
+    }
 }
