@@ -292,7 +292,8 @@ class TicketResource extends Resource
                     ->html()
                     ->getStateUsing(function ($record) {
                         if ($record->replied_at) {
-                            $durasi = $record->created_at->diff($record->replied_at)->format('%ad %hh %im');
+                            $repliedAt = $record->replied_at instanceof \Carbon\Carbon ? $record->replied_at : \Carbon\Carbon::parse($record->replied_at);
+                            $durasi = $record->created_at->diff($repliedAt)->format('%ad %hh %im');
                             return "<div class='text-xs text-green-600 font-bold'>✓ Done<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }
                         if (!$record->sla_id || !$record->sla) return '<span class="text-xs text-gray-400">-</span>';
@@ -313,6 +314,7 @@ class TicketResource extends Resource
                          // Jika sudah selesai (Solved/Closed)
                         if ($record->status === 'Solved' || $record->status === 'Closed') {
                             $end = $record->solved_at ?? $record->closed_at ?? now();
+                            $end = $end instanceof \Carbon\Carbon ? $end : \Carbon\Carbon::parse($end);
                             $durasi = $record->created_at->diff($end)->format('%ad %hh %im');
                             return "<div class='text-xs text-green-600 font-bold'>✓ Solved<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }

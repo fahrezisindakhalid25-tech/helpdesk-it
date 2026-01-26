@@ -51,7 +51,10 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 \App\Filament\Widgets\TicketStatsWidget::class,
-                \App\Filament\Widgets\ThemeSwitcher::class,
+                \App\Filament\Widgets\FirstResponseSlaChart::class,
+                \App\Filament\Widgets\TicketStatusChart::class,
+                \App\Filament\Widgets\TicketCategoryChart::class,
+                // \App\Filament\Widgets\ThemeSwitcher::class, // Removed
             ])
             ->middleware([
                 EncryptCookies::class,

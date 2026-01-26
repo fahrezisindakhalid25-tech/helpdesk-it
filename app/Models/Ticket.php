@@ -15,7 +15,11 @@ class Ticket extends Model
     // Pastikan kolom ini dianggap sebagai tanggal oleh Laravel
     protected $casts = [
         'sla_due_at' => 'datetime',
-        'resolution_due_at' => 'datetime', // Asumsi nama kolom deadline resolusi kakak ini
+        'resolution_due_at' => 'datetime',
+        'replied_at' => 'datetime',
+        'solved_at' => 'datetime',
+        'closed_at' => 'datetime',
+        'reopened_at' => 'datetime',
     ];
 
     protected static function boot()
