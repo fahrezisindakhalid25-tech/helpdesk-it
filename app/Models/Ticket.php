@@ -9,6 +9,7 @@ use Carbon\Carbon; // <--- WAJIB TAMBAH INI BUAT HITUNG WAKTU
 class Ticket extends Model
 {
     // Izinkan semua kolom diisi
+    // Izinkan semua kolom diisi
     protected $guarded = [];
 
     // Pastikan kolom ini dianggap sebagai tanggal oleh Laravel

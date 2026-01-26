@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Component;
+use App\Models\MasterLapor;
 
 class LaporanForm extends Component implements HasForms
 {
@@ -29,23 +30,45 @@ class LaporanForm extends Component implements HasForms
         return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Pelapor')
-                    ->description('Data diri Anda untuk keperluan konfirmasi.')
+                    ->description('Masukkan NIK Anda untuk melengkapi data otomatis.')
                     ->schema([
+                        Forms\Components\TextInput::make('nik')
+                            ->label('NIK')
+                            ->required()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                if (!$state) return;
+                                $karyawan = MasterLapor::where('nik', $state)->first();
+                                if ($karyawan) {
+                                    $set('nama_lengkap', $karyawan->nama);
+                                    $set('email', $karyawan->email);
+                                    $set('no_hp', $karyawan->no_hp);
+                                }
+                            })
+                            ->exists('master_lapors', 'nik')
+                            ->validationMessages([
+                                'exists' => 'NIK tidak terdaftar dalam database kami. Silakan hubungi Admin.',
+                            ]),
+
                         Forms\Components\TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
+                            ->readOnly()
                             ->required()
                             ->maxLength(255),
+                            
                         Forms\Components\TextInput::make('no_hp')
                             ->label('No WhatsApp')
                             ->tel()
                             ->numeric()
                             ->placeholder('08...')
-                            ->required(),
+                            ->nullable(), // Tidak wajib
+                            
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
-                            ->required()
+                            ->nullable() // Tidak wajib
                             ->maxLength(255),
+                            
                         Forms\Components\Select::make('lokasi')
                             ->label('Lokasi / Unit Kerja')
                             ->options(Location::query()->pluck('name', 'name'))

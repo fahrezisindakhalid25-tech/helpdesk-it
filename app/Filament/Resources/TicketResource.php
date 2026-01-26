@@ -122,7 +122,15 @@ class TicketResource extends Resource
                                     }),
                             ])->alignRight(),
                         ]),
-                        Forms\Components\Tabs\Tab::make('Emails')->icon('heroicon-m-envelope')->schema([Forms\Components\TextInput::make('email')->disabled()]),
+                        Forms\Components\Tabs\Tab::make('Data Pelapor')
+                                ->icon('heroicon-m-user')
+                                ->schema([
+                                    Forms\Components\TextInput::make('nik')->label('NIK')->disabled(),
+                                    Forms\Components\TextInput::make('nama_lengkap')->label('Nama Lengkap')->disabled(),
+                                    Forms\Components\TextInput::make('email')->label('Email')->disabled(),
+                                    Forms\Components\TextInput::make('no_hp')->label('No WhatsApp')->disabled(),
+                                    Forms\Components\TextInput::make('lokasi')->label('Lokasi')->disabled(),
+                                ])->columns(2),
                     ]),
                 ]),
 
