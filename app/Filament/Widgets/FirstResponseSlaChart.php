@@ -100,10 +100,6 @@ class FirstResponseSlaChart extends ChartWidget
                         'weight' => 'bold',
                         'size' => 12,
                     ],
-                    'formatter' => function($value, $context) {
-                         // Tampilkan value atau persentase jika cukup besar
-                         return $value > 0 ? $value : '';
-                    }
                 ],
             ],
         ];

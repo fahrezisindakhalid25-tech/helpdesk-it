@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tiket #{{ $ticket->no_tiket }} - Helpdesk</title>
     
-    <!-- CDN Assets for Full Online Appearance -->
+    <!-- CDN Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,6 +14,15 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
                     }
                 }
             }
@@ -21,7 +30,6 @@
     </script>
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
@@ -34,98 +42,183 @@
     </script>
     
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* trix-toolbar [data-trix-button-group="file-tools"] { display: none; } */ /* File attachment enabled */
-        .trix-content ul { list-style-type: disc; margin-left: 1em; }
-        .trix-content ol { list-style-type: decimal; margin-left: 1em; }
+        body { font-family: 'Inter', sans-serif; background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
         
-        /* Mobile Optimization for Trix */
-        @media (max-width: 640px) {
-            trix-toolbar .trix-button-group:not(:first-child) {
-                display: none; /* Hide advanced tools on mobile */
-            }
-            trix-toolbar .trix-button-group:first-child {
-                margin-bottom: 0;
-            }
-        }
-
-        /* Dark Mode for Trix */
-        .dark trix-editor {
-            background-color: #374151; /* gray-700 */
-            color: #f3f4f6; /* gray-100 */
-            border-color: #4b5563; /* gray-600 */
+        /* Custom Trix Styling to mimick Chat Input */
+        trix-toolbar {
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 0 !important;
+            padding: 8px 12px !important;
+            background: #f9fafb;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
         }
         .dark trix-toolbar {
-            background-color: #1f2937; /* gray-800 */
+            background: #374151;
             border-color: #4b5563;
         }
-        .dark trix-toolbar .trix-button {
-            background-color: #374151;
-            color: white;
+        
+        trix-toolbar .trix-button-group {
+            margin-bottom: 0 !important;
+            border: none !important;
+        }
+        trix-toolbar .trix-button {
+            border: none !important;
+            background: transparent !important;
+            width: 28px !important;
+            height: 28px !important;
+        }
+        trix-toolbar .trix-button.trix-active {
+            background: #e5e7eb !important;
+            color: #2563eb !important;
+            border-radius: 6px !important;
         }
         .dark trix-toolbar .trix-button.trix-active {
-            background-color: #2563eb; /* blue-600 */
+            background: #4b5563 !important;
+        }
+
+        trix-editor {
+            border: none !important;
+            padding: 12px !important;
+            min-height: 50px !important;
+            max-height: 150px;
+            overflow-y: auto;
+            border-radius: 0 0 12px 12px;
+            background: white;
+        }
+        .dark trix-editor {
+            background: #1f2937;
+            color: white;
+        }
+        trix-editor:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Hide unnecessary toolbar items for cleaner look */
+        trix-toolbar .trix-button--icon-heading-1,
+        trix-toolbar .trix-button--icon-quote,
+        trix-toolbar .trix-button--icon-code {
+            display: none !important;
+        }
+
+        .chat-background {
+            background-color: #f0f2f5;
+        }
+        .dark .chat-background {
+            background-color: #111827;
+        }
+        
+        /* Make embedded images clickable and small (thumbnail) */
+        .trix-content img, trix-editor img {
+            cursor: zoom-in;
+            border-radius: 8px;
+            max-width: 100%;
+            max-height: 200px; /* Limit height for thumbnail feel */
+            width: auto;
+            object-fit: contain;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            transition: transform 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+        .dark .trix-content img, .dark trix-editor img {
+            border-color: #4b5563;
+        }
+        .trix-content img:hover, trix-editor img:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
+<body class="chat-background min-h-screen flex flex-col transition-colors duration-200">
 
-    <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 sticky top-0 z-10">
-        <div class="max-w-3xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div class="w-full sm:w-auto">
-                <h1 class="text-xl font-bold text-gray-800 dark:text-white truncate">Tiket #{{ $ticket->no_tiket }}</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 break-words">{{ $ticket->deskripsi_umum_masalah }}</p>
-            </div>
-            <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-                <button 
-                    type="button" 
-                    onclick="toggleTheme()" 
-                    class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-yellow-300 hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm border border-gray-200 dark:border-gray-600 transition-colors focus:outline-none flex-shrink-0" 
-                    title="Ganti Tema">
-                    <!-- Sun Icon -->
-                    <svg class="hidden dark:block w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                    </svg>
-                    <!-- Moon Icon -->
-                    <svg class="block dark:hidden w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                    </svg>
-                </button>
-
-                <div class="flex flex-col items-end">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold 
-                        {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-800' : 
-                          ($ticket->status == 'Closed' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800') }}">
-                        {{ $ticket->status }}
-                    </span>
-                    <a href="{{ route('home') }}" class="text-xs text-blue-600 mt-1 hover:underline">Kembali ke Home</a>
+    <!-- Sticky Glassmorphism Header -->
+    <div class="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm transition-all duration-200">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <a href="{{ route('home') }}" class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                
+                <div class="flex flex-col">
+                    <h1 class="text-base font-bold text-gray-800 dark:text-white truncate flex items-center gap-2">
+                        Ticket #{{ $ticket->no_tiket }}
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide
+                            {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-700' : 
+                              ($ticket->status == 'Closed' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
+                            {{ $ticket->status }}
+                        </span>
+                    </h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px] sm:max-w-md">{{ $ticket->topik_bantuan }}</p>
                 </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition">
+                    <svg class="hidden dark:block w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg class="block dark:hidden w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-4" id="chat-container-scroll">
+    <!-- Main Chat Area -->
+    <div class="flex-1 overflow-y-auto px-4 py-6 pt-24 pb-48 sm:pb-52" id="chat-container-scroll">
         <div class="max-w-3xl mx-auto space-y-6">
             
-            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-lg p-4 text-sm text-yellow-800 dark:text-yellow-200">
-                <p><strong>Detail Laporan:</strong></p>
-                <div class="mt-1 text-gray-700 dark:text-gray-300">{!! $ticket->penjelasan_lengkap !!}</div>
-                
-                @if($ticket->gambar)
-                    <div class="mt-3">
-                        <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Lampiran Gambar:</p>
-                        <div class="grid grid-cols-2 gap-2">
-                            @foreach(json_decode($ticket->gambar, true) ?? [] as $gambar)
-                                <img src="{{ asset('storage/' . $gambar) }}" onclick="openModal(this.src)" alt="Laporan Gambar" class="rounded-lg max-w-xs border border-yellow-300 dark:border-yellow-700 shadow-sm cursor-pointer hover:opacity-90 transition">
-                            @endforeach
+            <!-- Ticket Detail Card (Collapsible style) -->
+            <div x-data="{ open: true }" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div @click="open = !open" class="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-gray-800 dark:text-gray-100">{{ $ticket->deskripsi_umum_masalah }}</h2>
+                            <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $ticket->created_at->format('d M Y, H:i') }}</p>
+                                <span class="text-gray-300 dark:text-gray-600">•</span>
+                                <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                     {{ $ticket->lokasi }}
+                                </div>
+                                <span class="text-gray-300 dark:text-gray-600">•</span>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Oleh: {{ $ticket->nama_lengkap }}</p>
+                            </div>
                         </div>
                     </div>
-                @endif
+                     <svg x-show="open" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                     <svg x-show="!open" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
                 
-                <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">Dibuat pada: {{ $ticket->created_at->format('d M Y H:i') }}</div>
+                <div x-show="open" class="px-5 pb-5 pt-0 text-sm text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-gray-700 mt-2">
+                    <div class="prose prose-sm dark:prose-invert max-w-none mt-3 trix-content">
+                        {!! $ticket->penjelasan_lengkap !!}
+                    </div>
+
+                    @if($ticket->gambar)
+                        <div class="mt-4 pt-4 border-t border-dashed border-gray-200 dark:border-gray-700">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Lampiran</p>
+                            <div class="flex gap-3 overflow-x-auto pb-2">
+                                @foreach(json_decode($ticket->gambar, true) ?? [] as $gambar)
+                                    <img src="{{ asset('storage/' . $gambar) }}" onclick="openModal(this.src)" class="h-20 w-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm cursor-zoom-in hover:scale-105 transition-transform">
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </div>
 
-            <!-- CHAT CONTAINER (AJAX TARGET) -->
+            <!-- Date Divider -->
+            <div class="flex justify-center">
+                <span class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm">
+                    Riwayat Percakapan
+                </span>
+            </div>
+
+            <!-- CHAT CONTAINER -->
             <div id="chat-history">
                 @include('partials.chat_history')
             </div>
@@ -133,71 +226,70 @@
         </div>
     </div>
 
-<div class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 p-4 sticky bottom-0">
+    <!-- Floating Bottom Input Area -->
+    <div class="fixed bottom-0 inset-x-0 z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 p-4 transition-all duration-300">
         <div class="max-w-3xl mx-auto">
-
+            
             @if($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <strong class="font-bold">Gagal!</strong>
-                    <span class="block sm:inline">{{ $errors->first() }}</span>
+                 <div class="mb-3 px-4 py-2 bg-red-50 text-red-600 text-xs rounded-lg border border-red-100 flex items-center gap-2 animate-bounce">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {{ $errors->first() }}
                 </div>
             @endif
 
             @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                    <strong class="font-bold">Berhasil!</strong>
-                    <span class="block sm:inline">{{ session('success') }}</span>
+                <div class="mb-3 px-4 py-2 bg-green-50 text-green-600 text-xs rounded-lg border border-green-100 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    {{ session('success') }}
                 </div>
             @endif
 
-            
             @if($isExpired)
-                <div class="text-center p-4 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 rounded-lg flex flex-col items-center">
-                    <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span class="font-bold">Tiket Ditutup</span>
-                    <span class="text-xs">Masa berlaku tiket (5 Hari) telah habis atau masalah dinyatakan selesai permanen.</span>
+                <div class="text-center py-2">
+                     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs font-semibold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Tiket telah ditutup permanen
+                     </span>
                 </div>
 
             @elseif($ticket->status === 'Solved')
-                <div class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-center">
-                    <p class="font-bold text-green-800 dark:text-green-300">Masalah Telah Diselesaikan</p>
-                    <p class="text-sm text-green-700 dark:text-green-400 mt-1">
-                        Jika Anda merasa masalah ini belum tuntas atau muncul kembali, silakan balas pesan di bawah ini untuk membuka kembali tiket.
-                    </p>
+                <div class="flex flex-col items-center gap-3">
+                    <div class="text-xs text-green-600 font-medium">Masalah ini ditandai selesai. Butuh bantuan lagi?</div>
+                    <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" class="w-full flex gap-2">
+                        @csrf
+                        <input type="hidden" name="isi_pesan" value="Mohon buka kembali tiket ini, masalah belum selesai.">
+                         <button type="submit" class="w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition shadow-sm flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.28l2.032 1.133C13.294 3 20 2.479 20 2.479m0 0v5h-9.28l-2.032-1.133C10.706 7 4 7.521 4 7.521m-3 9h1m0 0v5m0-5h9.28l2.032 1.133C13.294 21 20 21.521 20 21.521M24 16h-1m0 0v5m0-5h-9.28l-2.032-1.133C10.706 14 4 13.479 4 13.479"></path></svg>
+                            Buka Kembali Tiket
+                        </button>
+                    </form>
                 </div>
 
-                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST">
-                    @csrf
-                    <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
-                        <div class="flex-1">
-                            <input id="x" type="hidden" name="isi_pesan">
-                            <trix-editor input="x" placeholder="Tulis balasan untuk membuka kembali tiket..." class="bg-white dark:bg-gray-700 min-h-[80px] rounded-lg"></trix-editor>
-                        </div>
-                        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2 h-[40px] w-full sm:w-auto">
-                            <span>Re-Open</span>
-                        </button>
-                    </div>
-                </form>
-
             @elseif(!$adminSudahJawab)
-                <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 rounded-lg flex flex-col items-center animate-pulse">
-                    <svg class="w-8 h-8 mb-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="font-bold">Menunggu Respon Admin</span>
-                    <span class="text-xs">Anda dapat membalas pesan setelah Admin merespon laporan ini.</span>
+                <div class="text-center py-2 opacity-75">
+                     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-xs font-semibold animate-pulse">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Menunggu respon awal admin...
+                     </span>
                 </div>
 
             @else
-                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" enctype="multipart/form-data" class="relative">
                     @csrf
-                    <div class="flex flex-col gap-3">
-                        <div class="flex-1">
-                            <input id="reply-input" type="hidden" name="isi_pesan">
-                            <trix-editor input="reply-input" placeholder="Tulis balasan Anda..." class="bg-white dark:bg-gray-700 min-h-[100px] rounded-lg"></trix-editor>
-                        </div>
+                    
+                    <div class="bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-1 border border-transparent focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all shadow-inner">
+                        <input id="reply-input" type="hidden" name="isi_pesan">
+                        <trix-editor input="reply-input" placeholder="Tulis pesan balasan..." class="bg-transparent border-none min-h-[50px] focus:ring-0 px-3 py-2 text-sm md:text-base"></trix-editor>
                         
-                        <div class="flex justify-end mt-3">
-                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 h-[40px] w-full sm:w-auto">
-                                <span>Kirim Balasan</span>
+                        <div class="flex items-center justify-between px-2 pb-1 pt-1 border-t border-gray-200 dark:border-gray-600 mt-1">
+                            <div class="flex items-center gap-2">
+                                <!-- Trix Toolbar is moved here via CSS/JS or just let it float top, 
+                                     but since we customized CSS above, the toolbar appears attached to top of editor.
+                                     We can add a file upload button helper here if needed -->
+                            </div>
+                            <button type="submit" class="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-md flex items-center gap-2 px-4">
+                                <span class="text-xs font-bold">Kirim</span>
+                                <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -205,59 +297,23 @@
 
                 <script>
                     (function() {
-                        var HOST = "/laporan-upload-trix"; // Endpoint upload
-
+                        var HOST = "/laporan-upload-trix"; 
                         addEventListener("trix-attachment-add", function(event) {
-                            if (event.attachment.file) {
-                                uploadFileAttachment(event.attachment)
-                            }
+                            if (event.attachment.file) { uploadFileAttachment(event.attachment) }
                         })
-
-                        function uploadFileAttachment(attachment) {
-                            uploadFile(attachment.file, setProgress, setAttributes)
-
-                            function setProgress(progress) {
-                                attachment.setUploadProgress(progress)
-                            }
-
-                            function setAttributes(attributes) {
-                                attachment.setAttributes(attributes)
-                            }
+                        function uploadFileAttachment(attachment) { uploadFile(attachment.file, setProgress, setAttributes)
+                            function setProgress(progress) { attachment.setUploadProgress(progress) }
+                            function setAttributes(attributes) { attachment.setAttributes(attributes) }
                         }
-
                         function uploadFile(file, progressCallback, successCallback) {
-                            var key = createStorageKey(file)
-                            var formData = new FormData()
-                            var xhr = new XMLHttpRequest()
-
-                            formData.append("file", file)
-                            formData.append("_token", "{{ csrf_token() }}") // CSRF Token Laravel
-
-                            xhr.open("POST", HOST, true)
-
-                            xhr.upload.addEventListener("progress", function(event) {
-                                var progress = event.loaded / event.total * 100
-                                progressCallback(progress)
-                            })
-
+                            var formData = new FormData(); var xhr = new XMLHttpRequest();
+                            formData.append("file", file); formData.append("_token", "{{ csrf_token() }}");
+                            xhr.open("POST", HOST, true);
+                            xhr.upload.addEventListener("progress", function(event) { progressCallback(event.loaded / event.total * 100) });
                             xhr.addEventListener("load", function(event) {
-                                if (xhr.status == 200) {
-                                    var response = JSON.parse(xhr.responseText)
-                                    successCallback({
-                                        url: response.url,
-                                        href: response.url
-                                    })
-                                }
-                            })
-
-                            xhr.send(formData)
-                        }
-
-                        function createStorageKey(file) {
-                            var date = new Date()
-                            var day = date.toISOString().slice(0, 10)
-                            var name = date.getTime() + "-" + file.name
-                            return "tmp/" + day + "/" + name
+                                if (xhr.status == 200) { var response = JSON.parse(xhr.responseText); successCallback({ url: response.url, href: response.url }) }
+                            });
+                            xhr.send(formData);
                         }
                     })();
                 </script>
@@ -266,124 +322,40 @@
         </div>
     </div>
 
-    <!-- Modal Zoom Gambar -->
-    <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onclick="if(event.target === this) closeModal()">
-        <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-4xl max-h-[90vh] flex flex-col">
-            <!-- Header Modal -->
-            <div class="flex justify-between items-center p-4 border-b dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Pratinjau Gambar</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            
-            <!-- Gambar Container -->
-            <div class="flex-1 overflow-auto flex items-center justify-center p-4">
-                <img id="modalImage" src="" alt="Full Size" class="max-h-[75vh] max-w-full object-contain">
-            </div>
-            
-            <!-- Controls -->
-            <div class="flex justify-center gap-3 p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-                <button onclick="zoomIn()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
-                    🔍+ Perbesar
-                </button>
-                <button onclick="zoomOut()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
-                    🔍− Perkecil
-                </button>
-                <button onclick="resetZoom()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm">
-                    ⟲ Reset
-                </button>
-            </div>
-        </div>
+    <!-- Modal Zoom -->
+    <div id="imageModal" class="hidden fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4 backdrop-blur-sm" onclick="if(event.target === this) closeModal()">
+        <button onclick="closeModal()" class="absolute top-6 right-6 z-[70] p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition backdrop-blur-md shadow-lg border border-white/10 group">
+            <svg class="w-8 h-8 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <img id="modalImage" src="" class="max-h-[85vh] max-w-full rounded-lg shadow-2xl transition-transform duration-300">
     </div>
 
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
-        let currentZoom = 1;
-        
-        function openModal(imageSrc) {
-            document.getElementById('imageModal').classList.remove('hidden');
-            document.getElementById('modalImage').src = imageSrc;
-            currentZoom = 1;
-            updateImageZoom();
-        }
-        
-        function closeModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-        }
-
-        function zoomIn() {
-            currentZoom += 0.25;
-            updateImageZoom();
-        }
-
-        function zoomOut() {
-            if (currentZoom > 0.25) {
-                currentZoom -= 0.25;
-                updateImageZoom();
-            }
-        }
-
-        function resetZoom() {
-            currentZoom = 1;
-            updateImageZoom();
-        }
-
-        function updateImageZoom() {
-            const img = document.getElementById('modalImage');
-            img.style.transform = `scale(${currentZoom})`;
-            img.style.transition = "transform 0.2s";
-        }
-
+        function openModal(src) { document.getElementById('imageModal').classList.remove('hidden'); document.getElementById('modalImage').src = src; }
+        function closeModal() { document.getElementById('imageModal').classList.add('hidden'); }
         function toggleTheme() {
             const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('user-theme', 'light');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('user-theme', 'dark');
-            }
+            if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('user-theme', 'light'); } 
+            else { html.classList.add('dark'); localStorage.setItem('user-theme', 'dark'); }
         }
         
-        // === AUTO REFRESH CHAT ===
-        const ticketUuid = "{{ $ticket->uuid }}";
-        const chatContainer = document.getElementById('chat-history');
         const scrollContainer = document.getElementById('chat-container-scroll');
-        let isUserScrolling = false;
+        function scrollToBottom() { scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' }); }
+        setTimeout(scrollToBottom, 300);
 
-        // Detect if user is scrolling up (don't auto scroll bottom if reading history)
-        scrollContainer.addEventListener('scroll', () => {
-            if (scrollContainer.scrollTop + scrollContainer.clientHeight < scrollContainer.scrollHeight - 50) {
-                isUserScrolling = true;
-            } else {
-                isUserScrolling = false;
+        // === GLOBAL IMAGE CLICK HANDLER FOR TRIX CONTENT ===
+        document.addEventListener('click', function(e) {
+            // Check if clicked element is an image inside .trix-content OR trix-editor
+            if (e.target.tagName === 'IMG' && (e.target.closest('.trix-content') || e.target.closest('trix-editor'))) {
+                // Prevent default behavior (e.g. if wrapped in an anchor tag)
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Open modal
+                openModal(e.target.src);
             }
-        });
-
-        // Auto Scroll Bottom on Load
-        function scrollToBottom() {
-            if (!isUserScrolling) {
-                scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-            }
-        }
-        setTimeout(scrollToBottom, 500); // Initial scroll
-
-        // Poll every 10 seconds to reduce server load
-        // DISABLED BY USER REQUEST (Localhost Performance)
-        /*
-        setInterval(() => {
-            // Only poll if tab is active/visible
-            if (document.hidden) return;
-
-            fetch(`{{ route('laporan.chat.history') }}?uuid=${ticketUuid}`)
-                .then(response => response.text())
-                .then(html => {
-                    chatContainer.innerHTML = html;
-                    // Only scroll if user hasn't scrolled up
-                    scrollToBottom();
-                })
-                .catch(err => console.error('Gagal refresh chat:', err));
-        }, 10000); // 10 Detik
-        */
-
+        }, true); // Use capture phase to ensure we catch it before other listeners if needed
     </script>
 </body>
 </html>

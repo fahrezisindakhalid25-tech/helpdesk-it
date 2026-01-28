@@ -63,9 +63,6 @@ class TicketStatusChart extends ChartWidget
                         'weight' => 'bold',
                         'size' => 12,
                     ],
-                    'formatter' => function($value, $context) {
-                         return $value > 0 ? $value : '';
-                    }
                 ],
             ],
         ];

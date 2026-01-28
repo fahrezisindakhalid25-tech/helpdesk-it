@@ -12,6 +12,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Columns\Column;
 
 class TicketResource extends Resource
 {
@@ -69,10 +75,10 @@ class TicketResource extends Resource
                                     ->hiddenLabel()
                                     ->visible(fn ($record) => $record && $record->gambar)
                                     ->content(fn ($record) => $record && $record->gambar ? new \Illuminate\Support\HtmlString(
-                                        '<div class="mt-3"><p class="text-sm font-semibold text-gray-700 mb-2">Lampiran Gambar:</p><div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' . 
-                                        collect(is_string($record->gambar) ? json_decode($record->gambar, true) : $record->gambar)->flatten()->filter()->map(fn($img) => '<img src="' . asset('storage/' . $img) . '" alt="Gambar Laporan" onclick="openAdminModal(this.src)" style="max-width: 300px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: zoom-in;" class="zoom-img">')
+                                        '<div class="mt-3"><p class="text-sm font-semibold text-gray-700 mb-2">Lampiran Gambar:</p><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px;">' . 
+                                        collect(is_string($record->gambar) ? json_decode($record->gambar, true) : $record->gambar)->flatten()->filter()->map(fn($img) => '<img src="' . asset('storage/' . $img) . '" alt="Gambar Laporan" onclick="openAdminModal(this.src)" class="admin-thumbnail">')
                                         ->join('') . 
-                                        '</div><style>.zoom-img{transition: box-shadow 0.2s;}.zoom-img:hover{box-shadow: 0 4px 12px rgba(0,0,0,0.15);}</style></div><div id="admin-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);" onclick="closeAdminModal()"><div style="position:relative;margin:auto;top:50%;transform:translateY(-50%);"><img id="admin-modal-image" style="max-width:90vw;max-height:90vh;margin:auto;display:block;cursor:pointer;" onclick="event.stopPropagation()"><div style="position:absolute;top:10px;right:10px;color:white;font-size:28px;font-weight:bold;cursor:pointer;" onclick="closeAdminModal()">×</div><div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:10px;"><button onclick="adminZoomIn()" style="padding:8px 12px;background:white;border:none;border-radius:4px;cursor:pointer;">+ 20%</button><button onclick="adminResetZoom()" style="padding:8px 12px;background:white;border:none;border-radius:4px;cursor:pointer;">Reset</button><button onclick="adminZoomOut()" style="padding:8px 12px;background:white;border:none;border-radius:4px;cursor:pointer;">- 20%</button></div></div></div><script>let adminZoomLevel=100;function openAdminModal(src){document.getElementById("admin-modal").style.display="block";document.getElementById("admin-modal-image").src=src;adminZoomLevel=100;updateAdminImageZoom()}function closeAdminModal(){document.getElementById("admin-modal").style.display="none"}function adminZoomIn(){adminZoomLevel+=20;updateAdminImageZoom()}function adminZoomOut(){if(adminZoomLevel>50){adminZoomLevel-=20}updateAdminImageZoom()}function adminResetZoom(){adminZoomLevel=100;updateAdminImageZoom()}function updateAdminImageZoom(){document.getElementById("admin-modal-image").style.transform="scale("+adminZoomLevel/100+")"}document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeAdminModal()}})</script>'
+                                        '</div></div>'
                                     ) : '-'),
                             ])->compact(),
                             
@@ -80,19 +86,121 @@ class TicketResource extends Resource
 
                             // CHAT HISTORY
                             Forms\Components\Placeholder::make('chat_history')->label('Percakapan')->content(fn ($record) => $record ? new \Illuminate\Support\HtmlString(
-                                collect($record->comments)->map(fn($c) => '
-                                <div class="flex gap-3 mb-4">
-                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">'.substr($c->user->name ?? 'U', 0, 1).'</div>
-                                    <div class="flex-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="font-bold text-sm text-gray-800">'.($c->user->name ?? 'User').'</span>
-                                            <span class="text-xs text-gray-500">'.$c->created_at->diffForHumans().'</span>
+                                collect($record->comments)->map(function($c) use ($record) {
+                                    $senderName = $c->user ? $c->user->name : $record->nama_lengkap;
+                                    $initial = substr($senderName, 0, 1);
+                                    $isAdmin = (bool) $c->user_id;
+                                    $bgClass = $isAdmin ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-700'; // Green for Reporter to differentiate
+
+                                    return '
+                                    <div class="flex gap-3 mb-4">
+                                        <div class="w-8 h-8 rounded-full '.$bgClass.' flex items-center justify-center text-xs font-bold flex-shrink-0">'.$initial.'</div>
+                                        <div class="flex-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                            <div class="flex justify-between items-center mb-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-bold text-sm text-gray-800">'.$senderName.'</span>
+                                                    '.(!$isAdmin ? '<span class="text-[10px] bg-gray-200 text-gray-600 px-1 rounded">Pelapor</span>' : '<span class="text-[10px] bg-blue-50 text-blue-600 px-1 rounded">Admin</span>').'
+                                                </div>
+                                                <span class="text-xs text-gray-500">'.$c->created_at->diffForHumans().'</span>
+                                            </div>
+                                            <div class="text-sm text-gray-700 whitespace-pre-wrap admin-trix-content">'.$c->content.'</div>
+                                            '.($c->attachments ? collect(is_string($c->attachments) ? json_decode($c->attachments, true) : $c->attachments)->flatten()->filter()->map(fn($img) => '<div class="mt-2"><img src="'.asset('storage/'.$img).'" class="admin-thumbnail" onclick="openAdminModal(this.src)"></div>')->join('') : '').'
                                         </div>
-                                        <p class="text-sm text-gray-700 whitespace-pre-wrap">'.$c->content.'</p>
-                                        '.($c->attachments ? collect(is_string($c->attachments) ? json_decode($c->attachments, true) : $c->attachments)->flatten()->filter()->map(fn($img) => '<div class="mt-2"><img src="'.asset('storage/'.$img).'" class="max-w-[200px] rounded-lg border shadow-sm cursor-pointer" onclick="openAdminModal(this.src)"></div>')->join('') : '').'
-                                    </div>
-                                </div>')->join('')
+                                    </div>';
+                                })->join('')
                             ) : '-'),
+
+                            // GLOBAL SCRIPTS & STYLES FOR ADMIN PANEL (MODAL & THUMBNAILS)
+                            Forms\Components\Placeholder::make('admin_scripts')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('
+                                <style>
+                                    /* Thumbnail Styling */
+                                    .admin-thumbnail, .admin-trix-content img, .fi-fo-rich-editor img {
+                                        max-height: 200px !important;
+                                        width: auto !important;
+                                        border-radius: 8px;
+                                        border: 1px solid #ddd;
+                                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                        cursor: zoom-in;
+                                        transition: transform 0.2s;
+                                        display: inline-block;
+                                        margin: 5px 0;
+                                    }
+                                    .admin-thumbnail:hover, .admin-trix-content img:hover, .fi-fo-rich-editor img:hover {
+                                        opacity: 0.9;
+                                        transform: scale(1.02);
+                                    }
+                                </style>
+                                
+                                <!-- Admin Image Modal -->
+                                <div id="admin-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.85);backdrop-filter:blur(4px);" onclick="closeAdminModal()">
+                                    <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                                        <img id="admin-modal-image" style="max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,0.5);transform:scale(1);transition:transform 0.2s;" onclick="event.stopPropagation()">
+                                        
+                                        <!-- Close Button -->
+                                        <button onclick="closeAdminModal()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;width:40px;height:40px;border-radius:50%;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;">
+                                            &times;
+                                        </button>
+
+                                        <!-- Zoom Controls -->
+                                        <div style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:white;padding:5px;border-radius:8px;display:flex;gap:5px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+                                            <button onclick="event.stopPropagation(); adminZoomOut()" style="padding:8px 12px;border:none;background:#f3f4f6;border-radius:4px;cursor:pointer;font-weight:bold;">-</button>
+                                            <button onclick="event.stopPropagation(); adminResetZoom()" style="padding:8px 12px;border:none;background:#f3f4f6;border-radius:4px;cursor:pointer;font-size:12px;">Reset</button>
+                                            <button onclick="event.stopPropagation(); adminZoomIn()" style="padding:8px 12px;border:none;background:#f3f4f6;border-radius:4px;cursor:pointer;font-weight:bold;">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    let adminZoomLevel = 1;
+                                    
+                                    function openAdminModal(src) {
+                                        document.getElementById("admin-modal").style.display = "block";
+                                        document.getElementById("admin-modal-image").src = src;
+                                        adminZoomLevel = 1;
+                                        updateAdminImageZoom();
+                                    }
+                                    
+                                    function closeAdminModal() {
+                                        document.getElementById("admin-modal").style.display = "none";
+                                    }
+                                    
+                                    function adminZoomIn() {
+                                        adminZoomLevel += 0.2;
+                                        updateAdminImageZoom();
+                                    }
+                                    
+                                    function adminZoomOut() {
+                                        if (adminZoomLevel > 0.4) {
+                                            adminZoomLevel -= 0.2;
+                                            updateAdminImageZoom();
+                                        }
+                                    }
+                                    
+                                    function adminResetZoom() {
+                                        adminZoomLevel = 1;
+                                        updateAdminImageZoom();
+                                    }
+                                    
+                                    function updateAdminImageZoom() {
+                                        document.getElementById("admin-modal-image").style.transform = "scale(" + adminZoomLevel + ")";
+                                    }
+                                    
+                                    document.addEventListener("keydown", function(e) {
+                                        if (e.key === "Escape") {
+                                            closeAdminModal();
+                                        }
+                                    });
+
+                                    // Global Click Listener for Images in Trix Editor & Content
+                                    document.addEventListener("click", function(e) {
+                                        if (e.target.tagName === "IMG" && (e.target.closest(".admin-trix-content") || e.target.closest(".fi-fo-rich-editor"))) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            openAdminModal(e.target.src);
+                                        }
+                                    }, true);
+                                </script>
+                            ')),
 
                             Forms\Components\RichEditor::make('new_comment_content')
                                 ->label('Balas Pesan')
@@ -356,7 +464,143 @@ class TicketResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d M Y H:i')->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
-            ->actions([Tables\Actions\EditAction::make()->label('Detail')->icon('heroicon-m-eye'), Tables\Actions\DeleteAction::make()]);
+            ->filters([
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from')->label('Dari Tanggal'),
+                        DatePicker::make('created_until')->label('Sampai Tanggal'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exports([
+                        ExcelExport::make()
+                            ->fromTable()
+                            ->withFilename(fn ($resource) => $resource::getModelLabel() . '-' . date('Y-m-d'))
+                            ->withColumns([
+                                Column::make('no_tiket'),
+                                Column::make('nama_lengkap'),
+                                Column::make('topik_bantuan'),
+                                Column::make('status'),
+                                Column::make('created_at'),
+                            ])
+                    ])
+                    ->visible(fn () => auth()->user()->hasPermission('ticket.export'))
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make()->label('Detail')->icon('heroicon-m-eye'), 
+                Tables\Actions\Action::make('export_row')
+                    ->label('Export')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->visible(fn () => auth()->user()->hasPermission('ticket.export'))
+                    ->action(function ($record, \Filament\Tables\Actions\Action $action) {
+                        $record = $record ?? $action->getRecord();
+                        
+                        if (!$record) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Error')
+                                ->body('Surat tiket tidak ditemukan')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(new class($record) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings, \Maatwebsite\Excel\Concerns\WithMapping {
+                            public function __construct(private $record) {}
+                            
+                            public function collection()
+                            {
+                                return collect([$this->record]);
+                            }
+                            
+                            public function headings(): array
+                            {
+                                return [
+                                    'No Tiket',
+                                    'Lokasi',
+                                    'Nama Lengkap',
+                                    'Topik Bantuan',
+                                    'Email',
+                                    'No HP',
+                                    'Deskripsi Masalah',
+                                    'Status',
+                                    'Dibuat Pada',
+                                    'Direspon Pada',
+                                    'Diselesaikan Pada',
+                                    'Waktu First Response',
+                                    'Waktu Pengerjaan',
+                                    'Subjek',
+                                    'Pesan Awal',
+                                    'Riwayat Chat',
+                                ];
+                            }
+                            
+                            public function map($row): array
+                            {
+                                // Calculate SLA Durations (Format: 0d 0h 0m 0s)
+                                $firstResponseDuration = '-';
+                                if ($row->created_at && $row->replied_at) {
+                                    $firstResponseDuration = $row->created_at->diff($row->replied_at)->format('%ad %hh %im %ss');
+                                }
+
+                                $resolutionDuration = '-';
+                                $end = $row->solved_at ?? $row->closed_at;
+                                if ($row->created_at && $end) {
+                                    $resolutionDuration = $row->created_at->diff($end)->format('%ad %hh %im %ss');
+                                }
+
+                                // Format Chat History
+                                $chatHistory = '';
+                                if ($row->comments && $row->comments->count() > 0) {
+                                    foreach ($row->comments as $comment) {
+                                        $sender = $comment->user ? $comment->user->name : 'Unknown';
+                                        $time = $comment->created_at ? $comment->created_at->format('d/m/Y H:i') : '-';
+                                        $content = strip_tags($comment->content);
+                                        $chatHistory .= "[{$time}] {$sender}: {$content}\n";
+                                    }
+                                }
+
+                                return [
+                                    $row->no_tiket,
+                                    $row->lokasi,
+                                    $row->nama_lengkap,
+                                    $row->topik_bantuan,
+                                    $row->email,
+                                    $row->no_hp,
+                                    $row->deskripsi_umum_masalah,
+                                    $row->status,
+                                    $row->created_at,
+                                    $row->replied_at,
+                                    $row->solved_at ?? $row->closed_at,
+                                    $firstResponseDuration,
+                                    $resolutionDuration,
+                                    $row->deskripsi_umum_masalah, 
+                                    strip_tags($row->penjelasan_lengkap ?? ''),
+                                    $chatHistory,
+                                ];
+                            }
+                        }, 'Ticket-' . $record->no_tiket . '.xlsx');
+                    }),
+                Tables\Actions\DeleteAction::make()
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->visible(fn () => auth()->user()->hasPermission('ticket.export')),
+                ]),
+            ]);
     }
 
     public static function getPages(): array

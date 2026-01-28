@@ -43,6 +43,8 @@ class TicketCategoryChart extends ChartWidget
                 'legend' => [
                     'display' => false,
                 ],
+                // Tetap biarkan datalabels simple aktif karena user sudah install pluginnya di app.js, 
+                // tapi tidak usah pakai formatter aneh-aneh.
                 'datalabels' => [
                     'color' => '#ffffff',
                     'anchor' => 'end',
@@ -59,6 +61,9 @@ class TicketCategoryChart extends ChartWidget
                     'ticks' => [
                         'precision' => 0, // Integer only
                     ],
+                ],
+                'y' => [
+                    'display' => true, // Tampilkan kembali label defaultnya
                 ],
             ],
         ];

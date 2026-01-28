@@ -58,6 +58,7 @@ class UserResource extends Resource
                                 'ticket.update' => 'Update Tickets (Reply/Status)',
                                 'ticket.delete' => 'Delete Tickets',
                                 'ticket.change_sla' => 'Change Ticket SLA',
+                                'ticket.export' => 'Export Tickets',
                                 
                                 // Dashboard
                                 'dashboard.view' => 'View Dashboard Stats',
@@ -105,6 +106,7 @@ class UserResource extends Resource
                             'ticket.update' => 'Update Tiket',
                             'ticket.delete' => 'Hapus Tiket',
                             'ticket.change_sla' => 'Ubah SLA Tiket',
+                            'ticket.export' => 'Export Tiket',
                             'dashboard.view' => 'Lihat Dashboard',
                             'category.view' => 'Lihat Kategori',
                             'category.manage' => 'Kelola Kategori',
