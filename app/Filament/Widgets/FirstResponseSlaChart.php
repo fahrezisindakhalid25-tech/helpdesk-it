@@ -56,24 +56,56 @@ class FirstResponseSlaChart extends ChartWidget
             }
         }
 
+        $total = $onTime + $overdue + $running;
+        
+        // Helper function for percentage
+        $formatLabel = fn($label, $val) => $label . ' (' . ($total > 0 ? round(($val / $total) * 100, 1) : 0) . '% - ' . $val . ')';
+
         return [
             'datasets' => [
                 [
                     'label' => 'SLA Kinerja',
-                    'data' => [$onTime, $overdue, $running], // Tambah Running jika ingin ditampilkan
-                    'backgroundColor' => [
-                        '#22c55e', // On Time (Green)
-                        '#ef4444', // Overdue (Red)
-                        '#94a3b8', // Running (Gray) - Opsional
-                    ],
+                    'data' => [$onTime, $overdue, $running],
+                    'backgroundColor' => ['#22c55e', '#ef4444', '#94a3b8'],
+                    'hoverOffset' => 4,
                 ],
             ],
-            'labels' => ['On Time', 'Overdue', 'Dalam Proses'],
+            'labels' => [
+                $formatLabel('On Time', $onTime), 
+                $formatLabel('Overdue', $overdue), 
+                $formatLabel('Dalam Proses', $running)
+            ],
         ];
     }
 
     protected function getType(): string
     {
         return 'pie';
+    }
+    
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'x' => ['display' => false],
+                'y' => ['display' => false],
+            ],
+            'plugins' => [
+                'legend' => [
+                    'position' => 'bottom',
+                ],
+                'datalabels' => [
+                    'color' => '#ffffff',
+                    'font' => [
+                        'weight' => 'bold',
+                        'size' => 12,
+                    ],
+                    'formatter' => function($value, $context) {
+                         // Tampilkan value atau persentase jika cukup besar
+                         return $value > 0 ? $value : '';
+                    }
+                ],
+            ],
+        ];
     }
 }

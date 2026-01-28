@@ -33,6 +33,29 @@ class AdminPanelProvider extends PanelProvider
                 'panels::body.end',
                 fn () => view('filament.custom-login-style')
             )
+            ->renderHook(
+                'panels::head.end',
+                fn () => new \Illuminate\Support\HtmlString('
+                    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+                    <script>
+                        // Polling to ensure Chart is defined before registering
+                        const registerChartDataLabels = setInterval(() => {
+                            if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") {
+                                Chart.register(ChartDataLabels);
+                                clearInterval(registerChartDataLabels);
+                                console.log("ChartDataLabels registered successfully!");
+                            }
+                        }, 100);
+                        
+                        // Fallback: Re-register on Filament page load (SPA navigation)
+                        document.addEventListener("livewire:navigated", () => {
+                             if (typeof Chart !== "undefined" && typeof ChartDataLabels !== "undefined") {
+                                Chart.register(ChartDataLabels);
+                            }
+                        });
+                    </script>
+                ')
+            )
             
             // === BAGIAN INI YANG MENGUBAH TAMPILAN JADI BAGUS ===
             ->brandName('IT Helpdesk PTPN IV') // Mengganti tulisan "Laravel"

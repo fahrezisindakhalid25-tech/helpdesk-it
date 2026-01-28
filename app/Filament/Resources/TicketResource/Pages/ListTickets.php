@@ -16,4 +16,11 @@ class ListTickets extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\TicketResource\Widgets\TicketLegend::class,
+        ];
+    }
 }

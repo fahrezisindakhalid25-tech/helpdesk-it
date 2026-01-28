@@ -19,6 +19,7 @@ class TicketResource extends Resource
     protected static ?string $slug = 'laporan-ticket';
     protected static ?string $navigationLabel = 'Laporan Ticket';
     protected static ?string $modelLabel = 'Laporan';
+    protected static ?string $pluralModelLabel = 'Data Laporan';
 
     public static function form(Form $form): Form
     {
@@ -69,7 +70,7 @@ class TicketResource extends Resource
                                     ->visible(fn ($record) => $record && $record->gambar)
                                     ->content(fn ($record) => $record && $record->gambar ? new \Illuminate\Support\HtmlString(
                                         '<div class="mt-3"><p class="text-sm font-semibold text-gray-700 mb-2">Lampiran Gambar:</p><div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">' . 
-                                        collect(json_decode($record->gambar, true) ?? [])->map(fn($img) => '<img src="' . asset('storage/' . $img) . '" alt="Gambar Laporan" onclick="openAdminModal(this.src)" style="max-width: 300px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: zoom-in;" class="zoom-img">')
+                                        collect(is_string($record->gambar) ? json_decode($record->gambar, true) : $record->gambar)->flatten()->filter()->map(fn($img) => '<img src="' . asset('storage/' . $img) . '" alt="Gambar Laporan" onclick="openAdminModal(this.src)" style="max-width: 300px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: zoom-in;" class="zoom-img">')
                                         ->join('') . 
                                         '</div><style>.zoom-img{transition: box-shadow 0.2s;}.zoom-img:hover{box-shadow: 0 4px 12px rgba(0,0,0,0.15);}</style></div><div id="admin-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);" onclick="closeAdminModal()"><div style="position:relative;margin:auto;top:50%;transform:translateY(-50%);"><img id="admin-modal-image" style="max-width:90vw;max-height:90vh;margin:auto;display:block;cursor:pointer;" onclick="event.stopPropagation()"><div style="position:absolute;top:10px;right:10px;color:white;font-size:28px;font-weight:bold;cursor:pointer;" onclick="closeAdminModal()">×</div><div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:10px;"><button onclick="adminZoomIn()" style="padding:8px 12px;background:white;border:none;border-radius:4px;cursor:pointer;">+ 20%</button><button onclick="adminResetZoom()" style="padding:8px 12px;background:white;border:none;border-radius:4px;cursor:pointer;">Reset</button><button onclick="adminZoomOut()" style="padding:8px 12px;background:white;border:none;border-radius:4px;cursor:pointer;">- 20%</button></div></div></div><script>let adminZoomLevel=100;function openAdminModal(src){document.getElementById("admin-modal").style.display="block";document.getElementById("admin-modal-image").src=src;adminZoomLevel=100;updateAdminImageZoom()}function closeAdminModal(){document.getElementById("admin-modal").style.display="none"}function adminZoomIn(){adminZoomLevel+=20;updateAdminImageZoom()}function adminZoomOut(){if(adminZoomLevel>50){adminZoomLevel-=20}updateAdminImageZoom()}function adminResetZoom(){adminZoomLevel=100;updateAdminImageZoom()}function updateAdminImageZoom(){document.getElementById("admin-modal-image").style.transform="scale("+adminZoomLevel/100+")"}document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeAdminModal()}})</script>'
                                     ) : '-'),
@@ -88,11 +89,19 @@ class TicketResource extends Resource
                                             <span class="text-xs text-gray-500">'.$c->created_at->diffForHumans().'</span>
                                         </div>
                                         <p class="text-sm text-gray-700 whitespace-pre-wrap">'.$c->content.'</p>
+                                        '.($c->attachments ? collect(is_string($c->attachments) ? json_decode($c->attachments, true) : $c->attachments)->flatten()->filter()->map(fn($img) => '<div class="mt-2"><img src="'.asset('storage/'.$img).'" class="max-w-[200px] rounded-lg border shadow-sm cursor-pointer" onclick="openAdminModal(this.src)"></div>')->join('') : '').'
                                     </div>
                                 </div>')->join('')
                             ) : '-'),
 
-                            Forms\Components\Textarea::make('new_comment_content')->label('Balas Pesan')->rows(3)->dehydrated(false),
+                            Forms\Components\RichEditor::make('new_comment_content')
+                                ->label('Balas Pesan')
+                                ->fileAttachmentsDisk('public')
+                                ->fileAttachmentsDirectory('comment-attachments')
+                                ->fileAttachmentsVisibility('public')
+                                ->dehydrated(false),
+                            // FileUpload dihapus karena sudah di-handle RichEditor
+                            // Forms\Components\FileUpload::make('new_comment_attachments')... (Removed)
 
                             // TOMBOL KIRIM
                             Forms\Components\Actions::make([
@@ -102,7 +111,13 @@ class TicketResource extends Resource
                                     ->action(function ($record, $get, $set) {
                                         if (!$get('new_comment_content')) return;
                                         $content = $get('new_comment_content');
-                                        $record->comments()->create(['user_id' => auth()->id(), 'content' => $content]);
+                                        // $attachments = $get('new_comment_attachments'); // Tidak perlu lagi
+
+                                        $record->comments()->create([
+                                            'user_id' => auth()->id(),
+                                            'content' => $content,
+                                            'attachments' => null, // Attachments sudah embed di content HTML
+                                        ]);
                                         
                                         $dataUpdate = ['last_reply_at' => now()];
                                         if (empty($record->replied_at)) $dataUpdate['replied_at'] = now();
@@ -113,7 +128,9 @@ class TicketResource extends Resource
                                             $set('status', 'Replied'); 
                                         }
                                         $record->update($dataUpdate);
+                                        $record->update($dataUpdate);
                                         $set('new_comment_content', '');
+                                        // $set('new_comment_attachments', []); // Removed
                                         
                                         // === KIRIM NOTIFIKASI KE USER ===
                                         self::sendAdminReplyNotification($record, $content);
@@ -155,6 +172,7 @@ class TicketResource extends Resource
                             ->placeholder('Pilih SLA Respon')
                             ->native(false)
                             ->live()
+                            ->disabled(fn () => !auth()->user()->hasPermission('ticket.change_sla'))
                             ->afterStateUpdated(function ($record, $state) {
                                 // Hanya update SLA ID, tanpa mengubah status
                                 $record->update(['sla_id' => $state]);
@@ -201,6 +219,7 @@ class TicketResource extends Resource
                             ->placeholder('Pilih SLA Resolusi')
                             ->native(false)
                             ->live()
+                            ->disabled(fn () => !auth()->user()->hasPermission('ticket.change_sla'))
                             ->afterStateUpdated(function ($record, $state) {
                                 $record->update(['resolution_sla_id' => $state]);
                             }),
@@ -263,22 +282,12 @@ class TicketResource extends Resource
                 Tables\Columns\TextColumn::make('no_tiket')
                     ->searchable()
                     ->badge()
-                    ->color(function ($record) {
-                        // Cek apakah ada chat baru dari user (user_id IS NULL) setelah reply terakhir admin
-                        $lastComment = $record->comments()->latest()->first();
-                        if ($lastComment && $lastComment->user_id === null) {
-                            return 'danger'; // Merah jika chat terakhir dari user
-                        }
-                        return null; // Tidak ada badge jika normal
-                    })
-                    ->formatStateUsing(function ($state, $record) {
-                        $lastComment = $record->comments()->latest()->first();
-                        if ($lastComment && $lastComment->user_id === null) {
-                             // Tambahkan indicator teks atau biarkan badge warna saja
-                             // Keterbatasan badge di TextColumn bawaan mungkin hanya styling.
-                             // Kita return state asli, tapi warnanya sudah dihandle 'color'
-                        }
-                        return $state;
+                    ->color(fn ($record) => match ($record->status) {
+                        'Open' => 'info',
+                        'Replied' => 'warning',
+                        'Solved' => 'success',
+                        'Closed' => 'danger',
+                        default => 'gray',
                     })
                     ->label('No Tiket'),
                     
@@ -342,7 +351,7 @@ class TicketResource extends Resource
 
                 Tables\Columns\TextColumn::make('status')->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Solved' => 'success', 'Replied' => 'info', 'Open' => 'warning', 'Closed' => 'danger', default => 'gray'
+                        'Solved' => 'success', 'Replied' => 'warning', 'Open' => 'info', 'Closed' => 'danger', default => 'gray'
                     }),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d M Y H:i')->sortable(),
             ])
@@ -464,12 +473,18 @@ class TicketResource extends Resource
 
         try {
             // Kirim via Fonnte API dengan Authorization header
-            \Http::withHeaders([
+            $response = \Http::withHeaders([
                 'Authorization' => $token,
             ])->asForm()->post('https://api.fonnte.com/send', [
                 'target' => $phone,
                 'message' => $message,
             ]);
+
+            \Log::info('WhatsApp Response for Ticket #' . $ticket->no_tiket . ': ' . $response->body());
+
+            if (!$response->successful()) {
+                 \Log::error('WhatsApp Failed: ' . $response->body());
+            }
         } catch (\Exception $e) {
             \Log::error('WhatsApp balasan admin gagal dikirim untuk Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
         }
@@ -496,5 +511,5 @@ class TicketResource extends Resource
     }
     
     public static function getRelations(): array { return []; }
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder { return parent::getEloquentQuery()->with(['sla']); }
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder { return parent::getEloquentQuery()->with(['sla', 'resolutionSla', 'comments.user']); }
 }

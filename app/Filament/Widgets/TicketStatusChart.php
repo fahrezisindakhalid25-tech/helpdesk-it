@@ -17,6 +17,12 @@ class TicketStatusChart extends ChartWidget
             ->pluck('total', 'status')
             ->toArray();
 
+        $total = array_sum($data);
+        $labels = array_map(function($status, $count) use ($total) {
+            $percentage = $total > 0 ? round(($count / $total) * 100, 1) : 0;
+            return "$status ($percentage% - $count)";
+        }, array_keys($data), array_values($data));
+
         return [
             'datasets' => [
                 [
@@ -28,14 +34,40 @@ class TicketStatusChart extends ChartWidget
                         '#22c55e', // Solved (Success)
                         '#ef4444', // Closed (Danger)
                     ],
+                    'hoverOffset' => 4,
                 ],
             ],
-            'labels' => array_keys($data),
+            'labels' => $labels,
         ];
     }
 
     protected function getType(): string
     {
         return 'doughnut';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'x' => ['display' => false],
+                'y' => ['display' => false],
+            ],
+            'plugins' => [
+                'legend' => [
+                    'position' => 'bottom',
+                ],
+                'datalabels' => [
+                    'color' => '#ffffff',
+                    'font' => [
+                        'weight' => 'bold',
+                        'size' => 12,
+                    ],
+                    'formatter' => function($value, $context) {
+                         return $value > 0 ? $value : '';
+                    }
+                ],
+            ],
+        ];
     }
 }

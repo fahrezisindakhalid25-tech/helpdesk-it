@@ -35,7 +35,7 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; }
-        trix-toolbar [data-trix-button-group="file-tools"] { display: none; } /* Hide file attachment */
+        /* trix-toolbar [data-trix-button-group="file-tools"] { display: none; } */ /* File attachment enabled */
         .trix-content ul { list-style-type: disc; margin-left: 1em; }
         .trix-content ol { list-style-type: decimal; margin-left: 1em; }
         
@@ -187,18 +187,80 @@
                 </div>
 
             @else
-                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST">
+                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
+                    <div class="flex flex-col gap-3">
                         <div class="flex-1">
                             <input id="reply-input" type="hidden" name="isi_pesan">
                             <trix-editor input="reply-input" placeholder="Tulis balasan Anda..." class="bg-white dark:bg-gray-700 min-h-[100px] rounded-lg"></trix-editor>
                         </div>
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 h-[40px] w-full sm:w-auto">
-                            <span>Kirim</span>
-                        </button>
+                        
+                        <div class="flex justify-end mt-3">
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 h-[40px] w-full sm:w-auto">
+                                <span>Kirim Balasan</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
+
+                <script>
+                    (function() {
+                        var HOST = "/laporan-upload-trix"; // Endpoint upload
+
+                        addEventListener("trix-attachment-add", function(event) {
+                            if (event.attachment.file) {
+                                uploadFileAttachment(event.attachment)
+                            }
+                        })
+
+                        function uploadFileAttachment(attachment) {
+                            uploadFile(attachment.file, setProgress, setAttributes)
+
+                            function setProgress(progress) {
+                                attachment.setUploadProgress(progress)
+                            }
+
+                            function setAttributes(attributes) {
+                                attachment.setAttributes(attributes)
+                            }
+                        }
+
+                        function uploadFile(file, progressCallback, successCallback) {
+                            var key = createStorageKey(file)
+                            var formData = new FormData()
+                            var xhr = new XMLHttpRequest()
+
+                            formData.append("file", file)
+                            formData.append("_token", "{{ csrf_token() }}") // CSRF Token Laravel
+
+                            xhr.open("POST", HOST, true)
+
+                            xhr.upload.addEventListener("progress", function(event) {
+                                var progress = event.loaded / event.total * 100
+                                progressCallback(progress)
+                            })
+
+                            xhr.addEventListener("load", function(event) {
+                                if (xhr.status == 200) {
+                                    var response = JSON.parse(xhr.responseText)
+                                    successCallback({
+                                        url: response.url,
+                                        href: response.url
+                                    })
+                                }
+                            })
+
+                            xhr.send(formData)
+                        }
+
+                        function createStorageKey(file) {
+                            var date = new Date()
+                            var day = date.toISOString().slice(0, 10)
+                            var name = date.getTime() + "-" + file.name
+                            return "tmp/" + day + "/" + name
+                        }
+                    })();
+                </script>
             @endif
 
         </div>

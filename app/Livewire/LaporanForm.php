@@ -52,7 +52,7 @@ class LaporanForm extends Component implements HasForms
 
                         Forms\Components\TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
-                            ->readOnly()
+                            //->readOnly()
                             ->required()
                             ->maxLength(255),
                             

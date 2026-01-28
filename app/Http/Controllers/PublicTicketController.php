@@ -207,21 +207,39 @@ class PublicTicketController extends Controller
     // === 2. UPDATE FUNGSI REPLY ===
     public function reply(Request $request, $uuid)
     {
-        $request->validate(['isi_pesan' => 'required|string']);
+        // Validasi Attachment
+        $request->validate([
+            'isi_pesan' => 'required|string',
+            'attachments.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
+        ]);
+
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
 
+        // Cek Expired
         if ($ticket->created_at->addDays(5)->isPast() || $ticket->status === 'Closed') {
              return back()->withErrors(['status' => 'Tiket ini sudah ditutup permanen dan tidak bisa dibalas lagi.']);
         }
 
+        // Cek Admin Reply
         $adminSudahJawab = $ticket->comments()->whereNotNull('user_id')->exists();
         if (!$adminSudahJawab) {
             return back()->withErrors(['status' => 'Mohon tunggu balasan dari Admin terlebih dahulu sebelum mengirim pesan.']);
         }
 
+        // Handle File Uploads
+        $attachmentPaths = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    $attachmentPaths[] = $file->store('comment-attachments', 'public');
+                }
+            }
+        }
+
         $ticket->comments()->create([
             'user_id' => null,
-            'content' => $request->isi_pesan
+            'content' => $request->isi_pesan,
+            'attachments' => !empty($attachmentPaths) ? $attachmentPaths : null,
         ]);
 
         if ($ticket->status !== 'Open') {
@@ -242,5 +260,15 @@ class PublicTicketController extends Controller
         
         // Return Partial View
         return view('partials.chat_history', compact('ticket'));
+    }
+    // === 4. HANDLE TRIX ATTACHMENT UPLOAD ===
+    public function uploadTrixImage(Request $request) 
+    {
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('trix-attachments', 'public');
+            return response()->json(['url' => asset('storage/' . $path)]);
+        }
+        
+        return response()->json(['error' => 'No file uploaded'], 400);
     }
 }

@@ -34,4 +34,33 @@ class TicketCategoryChart extends ChartWidget
     {
         return 'bar';
     }
+
+    protected function getOptions(): array
+    {
+        return [
+            'indexAxis' => 'y', // Horizontal Bar
+            'plugins' => [
+                'legend' => [
+                    'display' => false,
+                ],
+                'datalabels' => [
+                    'color' => '#ffffff',
+                    'anchor' => 'end',
+                    'align' => 'start',
+                    'offset' => -4,
+                    'font' => [
+                        'weight' => 'bold',
+                        'size' => 12,
+                    ],
+                ],
+            ],
+            'scales' => [
+                'x' => [
+                    'ticks' => [
+                        'precision' => 0, // Integer only
+                    ],
+                ],
+            ],
+        ];
+    }
 }

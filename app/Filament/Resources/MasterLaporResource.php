@@ -23,6 +23,27 @@ class MasterLaporResource extends Resource
     
     protected static ?string $navigationLabel = 'Data Karyawan';
 
+    // === AUTHORIZATION ===
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->hasPermission('master_lapor.view') || auth()->user()->hasPermission('master_lapor.manage');
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()->hasPermission('master_lapor.manage');
+    }
+
+    public static function canEdit($record): bool
+    {
+        return auth()->user()->hasPermission('master_lapor.manage');
+    }
+
+    public static function canDelete($record): bool
+    {
+        return auth()->user()->hasPermission('master_lapor.manage');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
