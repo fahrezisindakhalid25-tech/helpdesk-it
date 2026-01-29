@@ -248,6 +248,12 @@ class PublicTicketController extends Controller
             $ticket->update(['reopened_at' => now()]);
         }
 
+        if ($request->wantsJson() || $request->ajax()) {
+            // Render partial view for the single new comment
+            $html = view('partials.chat_single', ['comment' => $ticket->comments()->latest()->first(), 'ticket' => $ticket])->render();
+            return response()->json(['success' => true, 'message' => 'Pesan terkirim!', 'html' => $html]);
+        }
+
         return back()->with('success', 'Pesan terkirim!');
     }
     // === 3. FUNGSI AJAX CHAT HISTORY ===

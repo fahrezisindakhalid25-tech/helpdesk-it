@@ -164,6 +164,23 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div x-data="{ show: false, message: '' }"
+         x-init="@if(session('success')) message = '{{ session('success') }}'; show = true; setTimeout(() => show = false, 3000); @endif"
+         @show-toast.window="message = $event.detail; show = true; setTimeout(() => show = false, 3000)"
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform -translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform -translate-y-2"
+         class="fixed top-24 left-1/2 transform -translate-x-1/2 z-[60] px-6 py-3 bg-green-500 text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2"
+         style="display: none;">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span x-text="message"></span>
+    </div>
+
     <!-- Main Chat Area -->
     <div class="flex-1 overflow-y-auto px-4 py-6 pt-24 pb-48 sm:pb-52" id="chat-container-scroll">
         <div class="max-w-3xl mx-auto space-y-6">
@@ -222,6 +239,9 @@
             <div id="chat-history">
                 @include('partials.chat_history')
             </div>
+            
+            <!-- Spacer to prevent content from being hidden behind footer -->
+            <div class="h-10"></div>
 
         </div>
     </div>
@@ -237,12 +257,7 @@
                 </div>
             @endif
 
-            @if(session('success'))
-                <div class="mb-3 px-4 py-2 bg-green-50 text-green-600 text-xs rounded-lg border border-green-100 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    {{ session('success') }}
-                </div>
-            @endif
+
 
             @if($isExpired)
                 <div class="text-center py-2">
@@ -274,7 +289,7 @@
                 </div>
 
             @else
-                <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" enctype="multipart/form-data" class="relative">
+                <form id="reply-form" action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" enctype="multipart/form-data" class="relative">
                     @csrf
                     
                     <div class="bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-1 border border-transparent focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all shadow-inner">
@@ -283,11 +298,8 @@
                         
                         <div class="flex items-center justify-between px-2 pb-1 pt-1 border-t border-gray-200 dark:border-gray-600 mt-1">
                             <div class="flex items-center gap-2">
-                                <!-- Trix Toolbar is moved here via CSS/JS or just let it float top, 
-                                     but since we customized CSS above, the toolbar appears attached to top of editor.
-                                     We can add a file upload button helper here if needed -->
                             </div>
-                            <button type="submit" class="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-md flex items-center gap-2 px-4">
+                            <button type="submit" id="submit-btn" class="p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition shadow-md flex items-center gap-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span class="text-xs font-bold">Kirim</span>
                                 <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                             </button>
@@ -315,6 +327,64 @@
                             });
                             xhr.send(formData);
                         }
+
+                        // === AJAX FORM SUBMISSION ===
+                        const form = document.getElementById('reply-form');
+                        const submitBtn = document.getElementById('submit-btn');
+                        
+                        form.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            
+                            const content = document.getElementById('reply-input').value;
+                            if(!content.trim()) return;
+
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
+                            const formData = new FormData(form);
+
+                            fetch(form.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.success) {
+                                    // 1. Append new message
+                                    const chatHistory = document.getElementById('chat-history');
+                                    // Remove "empty state" if exists
+                                    const emptyState = chatHistory.querySelector('.opacity-60');
+                                    if(emptyState) emptyState.remove();
+
+                                    chatHistory.insertAdjacentHTML('beforeend', data.html);
+
+                                    // 2. Clear input
+                                    document.querySelector("trix-editor").editor.loadHTML("");
+                                    document.getElementById('reply-input').value = "";
+
+                                    // 3. Scroll to bottom
+                                    scrollToBottom();
+
+                                    // 4. Show Toast (Using the Alpine component we added)
+                                    // Dispatch event to show toast
+                                    window.dispatchEvent(new CustomEvent('show-toast', { detail: data.message }));
+                                } else {
+                                    alert('Gagal mengirim pesan');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Terjadi kesalahan. Silakan coba lagi.');
+                            })
+                            .finally(() => {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = '<span class="text-xs font-bold">Kirim</span><svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>';
+                            });
+                        });
                     })();
                 </script>
             @endif
@@ -341,7 +411,23 @@
         }
         
         const scrollContainer = document.getElementById('chat-container-scroll');
-        function scrollToBottom() { scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' }); }
+
+        function scrollToBottom() { 
+            if(scrollContainer) {
+                // Gunakan scrollTop max untuk memastikan scroll sampai paling bawah (termasuk padding)
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            }
+        }
+        
+        // Execute immediately and after small delays to account for rendering/images
+        window.addEventListener('load', function() {
+            scrollToBottom();
+            setTimeout(scrollToBottom, 100);
+            setTimeout(scrollToBottom, 500);
+        });
+        
+        // Also run now in case load already happened
+        scrollToBottom();
         setTimeout(scrollToBottom, 300);
 
         // === GLOBAL IMAGE CLICK HANDLER FOR TRIX CONTENT ===
