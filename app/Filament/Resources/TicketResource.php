@@ -64,7 +64,10 @@ class TicketResource extends Resource
                 // === KOLOM KIRI (CHAT & DETAIL) ===
                 Forms\Components\Group::make()->columnSpan(2)->schema([
                     Forms\Components\Tabs::make('Aktivitas Tiket')->tabs([
-                        Forms\Components\Tabs\Tab::make('Activity')->icon('heroicon-m-chat-bubble-left-right')->schema([
+                        Forms\Components\Tabs\Tab::make('Activity')
+                            ->icon('heroicon-m-chat-bubble-left-right')
+                            ->extraAttributes(['wire:poll.5s' => '']) // Real-time Update (5 detik)
+                            ->schema([
                             Forms\Components\Section::make()->schema([
                                 Forms\Components\TextInput::make('topik_bantuan')->disabled()->extraAttributes(['class' => 'bg-gray-100']),
                                 Forms\Components\Textarea::make('deskripsi_umum_masalah')->rows(2)->disabled()->extraAttributes(['class' => 'font-bold text-lg mb-2']),
@@ -413,14 +416,7 @@ class TicketResource extends Resource
                             $durasi = $record->created_at->diff($repliedAt)->format('%ad %hh %im');
                             return "<div class='text-xs text-green-600 font-bold'>✓ Done<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }
-                        if (!$record->sla_id || !$record->sla) return '<span class="text-xs text-gray-400">-</span>';
-                        
-                        $timeParts = explode(':', $record->sla->response_time ?? '00:00:00');
-                        $deadline = $record->created_at->copy()->addDays((int)$record->sla->response_days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
-                        
-                        return "<div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
-                                <span x-text=\"text\" class='text-xs font-bold' :class=\"text === 'OVERDUE' ? 'text-red-600' : 'text-blue-600'\"></span>
-                            </div>";
+                        return '<span class="text-xs text-gray-400">-</span>';
                     }),
 
                 // === SLA RESOLUTION TIMER (BARU) ===
@@ -436,25 +432,7 @@ class TicketResource extends Resource
                             return "<div class='text-xs text-green-600 font-bold'>✓ Solved<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }
                         
-                        // Cek SLA Resolution ID
-                        $slaId = $record->resolution_sla_id; 
-                        if (!$slaId) return '<span class="text-xs text-gray-400">-</span>';
-
-                        // Ambil Data SLA (Gunakan Relasi resolutionSla di Model Ticket jika ada, atau manual)
-                        // Karena di TicketResource belum didefinisikan with('resolutionSla'), kita fetch manual atau pakai relasi kalau ada.
-                        // Di Model Ticket tadi ada 'resolutionSla'. Mari kita pakai itu.
-                        $sla = $record->resolutionSla; 
-                        if (!$sla) return '<span class="text-xs text-gray-400">-</span>';
-                        
-                        // Hitung Deadline (Sama seperti Sidebar)
-                        $days = (int) $sla->response_days; // Pakai response_days karena user pakai field itu
-                        $timeParts = explode(':', $sla->response_time ?? '00:00:00');
-                        
-                        $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
-                        
-                        return "<div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
-                                <span x-text=\"text\" class='text-xs font-bold' :class=\"text === 'OVERDUE' ? 'text-red-600' : 'text-blue-600'\"></span>
-                            </div>";
+                        return '<span class="text-xs text-gray-400">-</span>';
                     }),
 
                 Tables\Columns\TextColumn::make('status')->badge()

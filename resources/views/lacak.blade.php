@@ -145,7 +145,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-base font-bold text-gray-800 dark:text-white truncate flex items-center gap-2">
                         Ticket #{{ $ticket->no_tiket }}
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide
+                        <span id="ticket-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide
                             {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-700' : 
                               ($ticket->status == 'Closed' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
                             {{ $ticket->status }}
@@ -442,6 +442,61 @@
                 openModal(e.target.src);
             }
         }, true); // Use capture phase to ensure we catch it before other listeners if needed
+
+        // === REAL-TIME UDPATES (POLLING) ===
+        // Poll every 10 seconds to check for new messages
+        // NOW: PURELY SILENT - No visual shaking guaranteed
+        
+        setInterval(function() {
+            fetch('{{ route("laporan.chat-history") }}?uuid={{ $ticket->uuid }}', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 1. Check Status Change
+                // If ID exists (it should), update text and class without reload
+                const statusBadge = document.getElementById('ticket-status-badge');
+                if (statusBadge && data.status !== statusBadge.innerText.trim()) {
+                    // Only reload if status becomes Solved/Closed to show new UI options
+                    if (data.status === 'Solved' || data.status === 'Closed') {
+                        window.location.reload();
+                        return;
+                    }
+                    // Otherwise just update text
+                    statusBadge.innerText = data.status;
+                }
+
+                // 2. Check Admin Reply (Only reload if we need to show the reply form)
+                @if(!$adminSudahJawab)
+                    if (data.adminSudahJawab) {
+                        window.location.reload();
+                        return;
+                    }
+                @endif
+
+                // 3. Update Chat History SURGICALLY
+                if (data.html) {
+                     const chatHistory = document.getElementById('chat-history');
+                     const currentHTML = chatHistory.innerHTML.trim();
+                     const newHTML = data.html.trim();
+
+                     // STRICT CHECK: Only touch DOM if string length differs significantly
+                     // This prevents replacing the container if nothing changed
+                     if (currentHTML !== newHTML) {
+                         // Check if we are just appending or if it's a full change
+                         // For simplicity and stability: replace innerHTML but preserve scroll first
+                         
+                         const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 150;
+
+                         chatHistory.innerHTML = data.html;
+
+                         if (isAtBottom) scrollToBottom();
+                     }
+                }
+            })
+            .catch(err => console.error('Silent poll error:', err));
+        }, 10000); // 10 seconds 
+
     </script>
 </body>
 </html>

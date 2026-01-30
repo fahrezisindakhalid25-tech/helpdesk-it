@@ -264,8 +264,15 @@ class PublicTicketController extends Controller
 
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
         
-        // Return Partial View
-        return view('partials.chat_history', compact('ticket'));
+        $html = view('partials.chat_history', compact('ticket'))->render();
+        $adminSudahJawab = $ticket->comments()->whereNotNull('user_id')->exists();
+        
+        return response()->json([
+            'html' => $html,
+            'status' => $ticket->status,
+            'adminSudahJawab' => $adminSudahJawab,
+            'isExpired' => $ticket->created_at->addDays(5)->isPast() || $ticket->status === 'Closed'
+        ]);
     }
     // === 4. HANDLE TRIX ATTACHMENT UPLOAD ===
     public function uploadTrixImage(Request $request) 

@@ -97,7 +97,7 @@ class LaporanForm extends Component implements HasForms
                             ])
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('gambar')
-                            ->label('Upload Bukti Gambar (Opsional)')
+                            ->label('Foto Langsung / Upload Bukti (Opsional)')
                             ->multiple()
                             ->image()
                             ->directory('laporan-gambar')
