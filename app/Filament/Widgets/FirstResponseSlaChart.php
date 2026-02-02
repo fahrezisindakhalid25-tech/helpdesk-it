@@ -5,11 +5,13 @@ namespace App\Filament\Widgets;
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
 use Carbon\Carbon;
+use Filament\Support\RawJs;
 
 class FirstResponseSlaChart extends ChartWidget
 {
     protected static ?string $heading = 'SLA First Response';
     protected static ?int $sort = 1;
+    protected static string $view = 'filament.widgets.chart-widget-custom';
 
     protected function getData(): array
     {
@@ -91,16 +93,8 @@ class FirstResponseSlaChart extends ChartWidget
                 'y' => ['display' => false],
             ],
             'plugins' => [
-                'legend' => [
-                    'position' => 'bottom',
-                ],
-                'datalabels' => [
-                    'color' => '#ffffff',
-                    'font' => [
-                        'weight' => 'bold',
-                        'size' => 12,
-                    ],
-                ],
+                'legend' => ['display' => false],
+                'tooltip' => ['enabled' => true],
             ],
         ];
     }

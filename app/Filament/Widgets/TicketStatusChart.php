@@ -4,11 +4,13 @@ namespace App\Filament\Widgets;
 
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
+use Filament\Support\RawJs;
 
 class TicketStatusChart extends ChartWidget
 {
     protected static ?string $heading = 'Status Tiket';
     protected static ?int $sort = 2;
+    protected static string $view = 'filament.widgets.chart-widget-custom';
 
     protected function getData(): array
     {
@@ -17,27 +19,26 @@ class TicketStatusChart extends ChartWidget
             ->pluck('total', 'status')
             ->toArray();
 
-        $total = array_sum($data);
-        $labels = array_map(function($status, $count) use ($total) {
-            $percentage = $total > 0 ? round(($count / $total) * 100, 1) : 0;
-            return "$status ($percentage% - $count)";
-        }, array_keys($data), array_values($data));
-
         return [
             'datasets' => [
                 [
                     'label' => 'Tiket',
-                    'data' => array_values($data),
+                    'data' => [
+                        $data['Open'] ?? 0,
+                        $data['Replied'] ?? 0,
+                        $data['Solved'] ?? 0,
+                        $data['Closed'] ?? 0,
+                    ],
                     'backgroundColor' => [
-                        '#fbbf24', // Open (Warning)
-                        '#3b82f6', // Replied (Info)
-                        '#22c55e', // Solved (Success)
-                        '#ef4444', // Closed (Danger)
+                        '#fbbf24', // Yellow - Open
+                        '#3b82f6', // Blue - Replied
+                        '#22c55e', // Green - Solved
+                        '#ef4444', // Red - Closed
                     ],
                     'hoverOffset' => 4,
                 ],
             ],
-            'labels' => $labels,
+            'labels' => ['Open', 'Replied', 'Solved', 'Closed'],
         ];
     }
 
@@ -54,16 +55,8 @@ class TicketStatusChart extends ChartWidget
                 'y' => ['display' => false],
             ],
             'plugins' => [
-                'legend' => [
-                    'position' => 'bottom',
-                ],
-                'datalabels' => [
-                    'color' => '#ffffff',
-                    'font' => [
-                        'weight' => 'bold',
-                        'size' => 12,
-                    ],
-                ],
+                'legend' => ['display' => false],
+                'tooltip' => ['enabled' => true],
             ],
         ];
     }

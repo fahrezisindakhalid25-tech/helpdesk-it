@@ -454,19 +454,21 @@
             .then(response => response.json())
             .then(data => {
                 // 1. Check Status Change
-                // If ID exists (it should), update text and class without reload
                 const statusBadge = document.getElementById('ticket-status-badge');
                 if (statusBadge && data.status !== statusBadge.innerText.trim()) {
-                    // Only reload if status becomes Solved/Closed to show new UI options
                     if (data.status === 'Solved' || data.status === 'Closed') {
                         window.location.reload();
                         return;
                     }
-                    // Otherwise just update text
                     statusBadge.innerText = data.status;
+                    
+                    // Update class color
+                    statusBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide " + 
+                        (data.status == 'Solved' ? 'bg-green-100 text-green-700' : 
+                        (data.status == 'Closed' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'));
                 }
 
-                // 2. Check Admin Reply (Only reload if we need to show the reply form)
+                // 2. Check Admin Reply
                 @if(!$adminSudahJawab)
                     if (data.adminSudahJawab) {
                         window.location.reload();
@@ -474,28 +476,54 @@
                     }
                 @endif
 
-                // 3. Update Chat History SURGICALLY
+                // 3. Update Chat History (SMOOTH NO-FLICKER)
                 if (data.html) {
                      const chatHistory = document.getElementById('chat-history');
-                     const currentHTML = chatHistory.innerHTML.trim();
-                     const newHTML = data.html.trim();
+                     
+                     // Helper to strip whitespace text nodes for cleaner comparison
+                     const cleanHTML = (html) => html.replace(/>\s+</g, '><').trim();
 
-                     // STRICT CHECK: Only touch DOM if string length differs significantly
-                     // This prevents replacing the container if nothing changed
-                     if (currentHTML !== newHTML) {
-                         // Check if we are just appending or if it's a full change
-                         // For simplicity and stability: replace innerHTML but preserve scroll first
-                         
+                     // Create a virtual DOM to compare
+                     const tempDiv = document.createElement('div');
+                     tempDiv.innerHTML = data.html;
+                     
+                     const oldChildren = Array.from(chatHistory.children);
+                     const newChildren = Array.from(tempDiv.children);
+
+                     // Check for "Empty State" removal
+                     // If we currently have the "Empty State" (opacity-60) and new data has real messages
+                     const hasEmptyState = chatHistory.querySelector('.opacity-60');
+                     if (hasEmptyState && newChildren.length > 0 && !tempDiv.querySelector('.opacity-60')) {
+                         chatHistory.innerHTML = data.html;
+                         scrollToBottom();
+                         return;
+                     }
+
+                     // If new data has MORE children than current, append the difference
+                     if (newChildren.length > oldChildren.length) {
                          const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 150;
 
-                         chatHistory.innerHTML = data.html;
+                         // Append only the new nodes
+                         for (let i = oldChildren.length; i < newChildren.length; i++) {
+                             const newNode = newChildren[i].cloneNode(true);
+                             // Add slide-up animation if using tailwind
+                             newNode.classList.add('animate-fade-in-up'); 
+                             chatHistory.appendChild(newNode);
+                         }
 
                          if (isAtBottom) scrollToBottom();
+                     } 
+                     // Fallback: If somehow length is same but content changed (edited?), or length is smaller (deleted?)
+                     // Just replace content ONLY if strict mismatch (rare case in this system)
+                     else if (cleanHTML(chatHistory.innerHTML) !== cleanHTML(data.html)) {
+                         // Only replace if it's NOT just a new message appended (e.g. edit)
+                         // But for now, let's stick to append-only for smoothness unless lengths mismatch weirdly.
+                         // If we are strictly just waiting for new messages, the length check covers 99% cases.
                      }
                 }
             })
             .catch(err => console.error('Silent poll error:', err));
-        }, 10000); // 10 seconds 
+        }, 3000); // Check every 3 seconds for faster response 
 
     </script>
 </body>

@@ -129,59 +129,11 @@ class PublicTicketController extends Controller
         }
     }
 
-    // === FUNGSI KIRIM WHATSAPP ===
+    // === FUNGSI KIRIM WHATSAPP (VIA QUEUE) ===
     private function sendWhatsAppNotification($ticket)
     {
-        $token = env('WA_API_TOKEN');
-        if (!$token) {
-            \Log::warning('WA_API_TOKEN tidak ditemukan di ENV');
-            return;
-        }
-
-        // Format nomor ke 62 (Indonesia)
-        $phone = $this->formatPhoneNumber($ticket->no_hp);
-        $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
-
-        $message = "IT Helpdesk PTPN IV\n\n"
-            . "Halo {$ticket->nama_lengkap},\n\n"
-            . "Laporan Anda telah diterima!\n\n"
-            . "Nomor Tiket: {$ticket->no_tiket}\n"
-            . "Kategori: {$ticket->topik_bantuan}\n"
-            . "Status: Dalam Antrian\n\n"
-            . "Lacak laporan Anda di:\n"
-            . "{$linkTracking}\n\n"
-            . "Tim kami akan segera menghubungi Anda.";
-
-        try {
-            // Kirim via Fonnte API dengan Authorization header
-            Http::withHeaders([
-                'Authorization' => $token,
-            ])->asForm()->post('https://api.fonnte.com/send', [
-                'target' => $phone,
-                'message' => $message,
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('WhatsApp gagal dikirim untuk Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
-        }
-    }
-
-    // === HELPER: FORMAT NOMOR TELEPON ===
-    private function formatPhoneNumber($phone)
-    {
-        // Hapus karakter non-digit
-        $phone = preg_replace('/\D/', '', $phone);
-        
-        // Jika dimulai dengan 0, ganti dengan 62
-        if (substr($phone, 0, 1) === '0') {
-            $phone = '62' . substr($phone, 1);
-        }
-        
-        // Jika belum dimulai dengan 62, tambahkan
-        if (substr($phone, 0, 2) !== '62') {
-            $phone = '62' . $phone;
-        }
-        
-        return $phone;
+        // Dispatch Job ke Queue
+        \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
     }
 
     public function success($uuid)
@@ -198,7 +150,7 @@ class PublicTicketController extends Controller
 
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
 
-        $isExpired = $ticket->created_at->addDays(5)->isPast() || $ticket->status === 'Closed';
+        $isExpired = $this->isTicketExpired($ticket);
         $adminSudahJawab = $ticket->comments()->whereNotNull('user_id')->exists();
 
         return view('lacak', compact('ticket', 'isExpired', 'adminSudahJawab'));
@@ -216,7 +168,7 @@ class PublicTicketController extends Controller
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
 
         // Cek Expired
-        if ($ticket->created_at->addDays(5)->isPast() || $ticket->status === 'Closed') {
+        if ($this->isTicketExpired($ticket)) {
              return back()->withErrors(['status' => 'Tiket ini sudah ditutup permanen dan tidak bisa dibalas lagi.']);
         }
 
@@ -271,9 +223,25 @@ class PublicTicketController extends Controller
             'html' => $html,
             'status' => $ticket->status,
             'adminSudahJawab' => $adminSudahJawab,
-            'isExpired' => $ticket->created_at->addDays(5)->isPast() || $ticket->status === 'Closed'
+            'isExpired' => $this->isTicketExpired($ticket)
         ]);
     }
+
+    // === HELPER: CEK KADALUARSA ===
+    private function isTicketExpired($ticket)
+    {
+        // Ambil SLA Resolution dari relasi (jika ada), atau default 5 hari
+        $days = 5;
+        if ($ticket->resolutionSla) {
+            $days = (int) $ticket->resolutionSla->response_days;
+        } elseif ($ticket->sla) {
+             // Fallback ke SLA First Response jika Resolution belum set (opsional, tapi aman)
+             $days = (int) $ticket->sla->response_days;
+        }
+
+        return $ticket->created_at->copy()->addDays($days)->isPast() || $ticket->status === 'Closed';
+    }
+
     // === 4. HANDLE TRIX ATTACHMENT UPLOAD ===
     public function uploadTrixImage(Request $request) 
     {

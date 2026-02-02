@@ -23,7 +23,7 @@ class TicketStatsWidget extends BaseWidget
                 ->color('primary'),
 
             Stat::make('Open', $openTicket)
-                ->description('Tiket aktif')
+                ->description('Tiket aktif/pesan dari user')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
 

@@ -31,4 +31,8 @@ return [
         ],
     ],
 
+    'fonnte' => [
+        'token' => env('WA_API_TOKEN'),
+    ],
+
 ];

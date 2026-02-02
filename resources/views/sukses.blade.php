@@ -103,7 +103,7 @@
             <div class="space-y-3">
                 <a href="{{ route('laporan.cek', ['uuid' => $ticket->uuid]) }}" 
                    class="block w-full py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/30 text-white font-bold text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    🚀 Lacak Tiket Sekarang
+                    🚀 Buka Halaman Tiket Sekarang
                 </a>
                 
                 <a href="{{ route('home') }}" 

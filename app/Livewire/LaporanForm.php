@@ -129,14 +129,9 @@ class LaporanForm extends Component implements HasForms
         $ticket = Ticket::create($data);
 
         // Send Notifications
-        $this->sendWhatsAppNotification($ticket);
+        \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
 
         return redirect()->route('laporan.sukses', ['uuid' => $ticket->uuid]);
-    }
-
-    private function sendWhatsAppNotification($ticket) {
-        // Logika notifikasi WA (sama seperti sebelumnya)
-        // ...
     }
 
     public function render()

@@ -5,16 +5,16 @@
             
             <div class="flex items-center gap-2">
                 <span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-0.5 rounded-full text-xs font-bold" 
-                      style="background-color: #eff6ff; color: #1d4ed8; border: 1px solid rgba(29, 78, 216, 0.1);">
-                    Biru
+                      style="background-color: #fefce8; color: #a16207; border: 1px solid rgba(29, 78, 216, 0.1);">
+                    Kuning 
                 </span>
                 <span class="text-gray-600 dark:text-gray-400">Tiket Baru/Pesan baru (Open)</span>
             </div>
 
             <div class="flex items-center gap-2">
                 <span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-0.5 rounded-full text-xs font-bold" 
-                      style="background-color: #fefce8; color: #a16207; border: 1px solid rgba(161, 98, 7, 0.2);">
-                    Kuning
+                      style="background-color: #eff6ff; color: #1d4ed8; border: 1px solid rgba(161, 98, 7, 0.2);">
+                    Biru 
                 </span>
                 <span class="text-gray-600 dark:text-gray-400">Sudah dibalas (Replied)</span>
             </div>

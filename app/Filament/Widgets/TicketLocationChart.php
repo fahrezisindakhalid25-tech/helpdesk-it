@@ -4,35 +4,36 @@ namespace App\Filament\Widgets;
 
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
+use App\Models\Location;
 
-class TicketCategoryChart extends ChartWidget
+class TicketLocationChart extends ChartWidget
 {
-    protected static ?string $heading = 'Tiket per Kategori';
-    protected static ?int $sort = 3;
+    protected static ?string $heading = 'Tiket per Lokasi';
+    protected static ?int $sort = 5;
     protected int | string | array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.chart-widget-custom';
     
-    // Perbesar area canvas agar batang tidak gepeng
+    // Gunakan custom view agar ada label manualnya
+    // Gunakan custom view agar ada label manualnya
+    protected static string $view = 'filament.widgets.chart-widget-custom';
     protected static ?string $maxHeight = '1200px';
 
     protected function getData(): array
     {
-        // 1. Ambil semua kategori yang mungkin
-        $allCategories = \App\Models\Category::pluck('name')->toArray();
-
-        // 2. Ambil hitungan tiket per kategori dari Database
-        $ticketCounts = Ticket::selectRaw('topik_bantuan, count(*) as total')
-            ->groupBy('topik_bantuan')
-            ->pluck('total', 'topik_bantuan')
+        // ... (data fetching logic remains same) ...
+        $allLocations = Location::pluck('name')->toArray();
+        
+        $ticketCounts = Ticket::selectRaw('lokasi, count(*) as total')
+            ->groupBy('lokasi')
+            ->pluck('total', 'lokasi')
             ->toArray();
 
-        // 3. Merge data: Pastikan semua kategori ada, jika tidak ada set 0
         $data = [];
-        foreach ($allCategories as $category) {
-            $data[$category] = $ticketCounts[$category] ?? 0;
+        foreach ($allLocations as $loc) {
+            $data[$loc] = $ticketCounts[$loc] ?? 0;
         }
-        
-        // Urutkan dari yang terbanyak (High to Low)
+        arsort($data); // Urutkan dari yang terbanyak
+
+        // Ambil Top 15 agar tidak terlalu padat jika banyak
         arsort($data);
 
         return [
@@ -40,7 +41,8 @@ class TicketCategoryChart extends ChartWidget
                 [
                     'label' => 'Jumlah Tiket',
                     'data' => array_values($data),
-                    'backgroundColor' => '#3b82f6',
+                    'backgroundColor' => '#ec4899', // Pink
+                    'borderRadius' => 4,
                     'barPercentage' => 0.9,
                     'categoryPercentage' => 0.9,
                 ],
@@ -68,18 +70,18 @@ class TicketCategoryChart extends ChartWidget
                 ],
             ],
             'scales' => [
+                'y' => [
+                    'display' => true,
+                ],
                 'x' => [
                     'ticks' => [
-                        'precision' => 0, // Integer only
+                        'precision' => 0,
                     ],
-                ],
-                'y' => [
-                    'display' => true, // Tampilkan kembali label defaultnya
                 ],
             ],
             'layout' => [
                 'padding' => [
-                    'right' => 50, // Ruang untuk label yang 'Outside'
+                    'right' => 50,
                 ],
             ],
         ];

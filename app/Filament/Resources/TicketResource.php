@@ -394,8 +394,8 @@ class TicketResource extends Resource
                     ->searchable()
                     ->badge()
                     ->color(fn ($record) => match ($record->status) {
-                        'Open' => 'info',
-                        'Replied' => 'warning',
+                        'Open' => 'warning',
+                        'Replied' => 'info',
                         'Solved' => 'success',
                         'Closed' => 'danger',
                         default => 'gray',
@@ -437,7 +437,7 @@ class TicketResource extends Resource
 
                 Tables\Columns\TextColumn::make('status')->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Solved' => 'success', 'Replied' => 'warning', 'Open' => 'info', 'Closed' => 'danger', default => 'gray'
+                        'Solved' => 'success', 'Replied' => 'info', 'Open' => 'warning', 'Closed' => 'danger', default => 'gray'
                     }),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d M Y H:i')->sortable(),
             ])
@@ -533,81 +533,17 @@ class TicketResource extends Resource
         self::sendAdminReplyWhatsApp($ticket, $replyContent);
     }
 
-    // === KIRIM EMAIL BALASAN ADMIN ===
+    // === KIRIM EMAIL BALASAN ADMIN (VIA QUEUE) ===
     private static function sendAdminReplyEmail($ticket, $replyContent)
     {
-        $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
-        $subject = "[IT Helpdesk] Balasan Atas Laporan Anda - #{$ticket->no_tiket}";
-        
-        $htmlBody = "
-        <html>
-            <head>
-                <meta charset='utf-8'>
-                <style>
-                    body { font-family: Arial, sans-serif; color: #333; }
-                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-                    .content { background-color: #ecf0f1; padding: 20px; border: 1px solid #bdc3c7; }
-                    .reply-box { background-color: white; padding: 15px; margin: 15px 0; border-left: 4px solid #3498db; }
-                    .footer { background-color: #34495e; color: white; padding: 15px; text-align: center; border-radius: 0 0 5px 5px; font-size: 12px; }
-                    .button { background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px; }
-                </style>
-            </head>
-            <body>
-                <div class='container'>
-                    <div class='header'>
-                        <h2>Balasan dari Admin IT Helpdesk</h2>
-                    </div>
-                    <div class='content'>
-                        <p>Halo <strong>{$ticket->nama_lengkap}</strong>,</p>
-                        
-                        <p>Admin kami telah memberikan balasan untuk laporan Anda:</p>
-                        
-                        <div class='reply-box'>
-                            <p><strong>Tiket #:</strong> {$ticket->no_tiket}</p>
-                            <p><strong>Kategori:</strong> {$ticket->topik_bantuan}</p>
-                            <hr>
-                            <p>" . nl2br(e($replyContent)) . "</p>
-                        </div>
-                        
-                        <p>Silakan cek status laporan dan berikan balasan Anda di link berikut:</p>
-                        <p><a href='{$linkTracking}' class='button'>Lihat Detail Laporan</a></p>
-                        
-                        <p style='margin-top: 20px; color: #7f8c8d; font-size: 12px;'>
-                            Atau copy-paste link ini di browser: <br>
-                            {$linkTracking}
-                        </p>
-                    </div>
-                    <div class='footer'>
-                        <p><strong>IT Helpdesk PTPN IV</strong></p>
-                        <p>Jangan balas email ini, gunakan link di atas untuk merespons.</p>
-                    </div>
-                </div>
-            </body>
-        </html>
-        ";
-        
-        try {
-            \Mail::html($htmlBody, function ($message) use ($ticket, $subject) {
-                $message->to($ticket->email)
-                    ->subject($subject)
-                    ->from(config('mail.from.address'), config('mail.from.name'));
-            });
-        } catch (\Exception $e) {
-            \Log::error('Email balasan admin gagal dikirim untuk Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
-        }
+        // Dispatch Job Email (Type: admin_reply)
+        \App\Jobs\SendEmailNotification::dispatch($ticket, 'admin_reply', $replyContent);
     }
 
     // === KIRIM WHATSAPP BALASAN ADMIN ===
+    // === KIRIM WHATSAPP BALASAN ADMIN (VIA QUEUE) ===
     private static function sendAdminReplyWhatsApp($ticket, $replyContent)
     {
-        $token = env('WA_API_TOKEN');
-        if (!$token) {
-            \Log::warning('WA_API_TOKEN tidak ditemukan di ENV');
-            return;
-        }
-
-        $phone = self::formatPhoneNumber($ticket->no_hp);
         $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
 
         // Potong reply content agar tidak terlalu panjang di WA (max 1024 char)
@@ -626,23 +562,8 @@ class TicketResource extends Resource
             . "{$linkTracking}\n\n"
             . "Terima kasih atas kesabaran Anda.";
 
-        try {
-            // Kirim via Fonnte API dengan Authorization header
-            $response = \Http::withHeaders([
-                'Authorization' => $token,
-            ])->asForm()->post('https://api.fonnte.com/send', [
-                'target' => $phone,
-                'message' => $message,
-            ]);
-
-            \Log::info('WhatsApp Response for Ticket #' . $ticket->no_tiket . ': ' . $response->body());
-
-            if (!$response->successful()) {
-                 \Log::error('WhatsApp Failed: ' . $response->body());
-            }
-        } catch (\Exception $e) {
-            \Log::error('WhatsApp balasan admin gagal dikirim untuk Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
-        }
+        // Dispatch ke Queue dengan pesan kustom
+        \App\Jobs\SendWhatsAppNotification::dispatch($ticket, $message);
     }
 
     // === HELPER: FORMAT NOMOR TELEPON ===

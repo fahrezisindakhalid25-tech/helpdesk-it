@@ -99,7 +99,7 @@
             </div>
             
             <p class="mt-4 text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
-                Ada kendala teknis? Isi form di bawah ini dan kami akan segera membantu Anda.
+                Ada kendala teknis? silahkan isi form di bawah ini dan kami akan segera membantu Anda.
             </p>
         </div>
 
@@ -137,5 +137,19 @@
 
     <!-- Filament Scripts -->
     @filamentScripts
+    
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.hook('request', ({ uri, options, payload, respond, succeed, fail }) => {
+                fail(({ status, content, preventDefault }) => {
+                    if (status === 419 || status === 404) {
+                        alert('Maaf, sesi Anda telah berakhir atau terjadi kesalahan koneksi. Halaman akan dimuat ulang untuk memperbarui data.');
+                        window.location.reload();
+                        preventDefault();
+                    }
+                })
+            })
+        });
+    </script>
 </body>
 </html>
