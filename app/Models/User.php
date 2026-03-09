@@ -23,6 +23,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'permissions',
         'password',
+        'theme_mode',
     ];
 
     /**
@@ -41,26 +42,23 @@ class User extends Authenticatable implements FilamentUser
 
     public function hasPermission(string $permission): bool
     {
-        // Admin Full has wildcard access
-        if (in_array('*', $this->permissions ?? [])) {
+        if (in_array('*', $this->permissions ?? [], true)) {
             return true;
         }
 
-        return in_array($permission, $this->permissions ?? []);
+        return in_array($permission, $this->permissions ?? [], true);
     }
 
     public function isAdmin(): bool
     {
-        // Check for wildcard permission
-        return in_array('*', $this->permissions ?? []);
+        return in_array('*', $this->permissions ?? [], true);
     }
 
     /**
-     * Menentukan siapa yang bisa mengakses panel admin.
-     * Return true agar semua user yang terdaftar bisa login ke dashboard.
+     * Hanya user dengan minimal satu permission admin yang dapat mengakses panel.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return is_array($this->permissions) && count($this->permissions) > 0;
     }
 }

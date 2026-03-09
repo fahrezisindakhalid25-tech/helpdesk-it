@@ -1,13 +1,14 @@
 <style>
-    /* Target only the login page specifically if possible, or apply broadly but scoped */
-    body.fi-body.fi-panel-admin.fi-page-filament-auth-custom-login {
+    /* Target only the login and register pages specifically if possible, or apply broadly but scoped */
+    body.fi-body.fi-panel-admin.fi-page-filament-auth-custom-login,
+    body.fi-body.fi-panel-admin.fi-page-filament-auth-custom-register {
         background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1920&auto=format&fit=crop');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
     }
     
-    /* Make the login card glassmorphism */
+    /* Make the auth card glassmorphism */
     .fi-simple-main {
         background-color: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(10px);

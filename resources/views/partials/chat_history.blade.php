@@ -1,8 +1,12 @@
 @forelse($ticket->comments as $comment)
+    @php
+        $safeContent = \App\Support\TicketSecurity::sanitizeRichText($comment->content);
+        $rawAttachments = is_string($comment->attachments) ? json_decode($comment->attachments, true) : $comment->attachments;
+        $attachments = collect($rawAttachments)->flatten()->filter();
+    @endphp
     <div class="flex {{ $comment->user_id ? 'justify-start' : 'justify-end' }} mb-4 animate-fade-in-up">
         
         @if($comment->user_id)
-            <!-- ADMIN MESSAGE (LEFT) -->
             <div class="flex items-end max-w-[85%] sm:max-w-[75%] gap-2">
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-md flex-shrink-0 order-1">
                     A
@@ -13,13 +17,9 @@
                     </div>
                     <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-4 rounded-2xl rounded-bl-sm shadow-sm border border-gray-100 dark:border-gray-700 relative group transition-all hover:shadow-md">
                         <div class="prose prose-sm dark:prose-invert max-w-none break-words leading-relaxed trix-content">
-                            {!! $comment->content !!}
+                            {!! $safeContent !!}
                         </div>
                         
-                        @php
-                            $rawAttachments = is_string($comment->attachments) ? json_decode($comment->attachments, true) : $comment->attachments;
-                            $attachments = collect($rawAttachments)->flatten()->filter();
-                        @endphp
                         @if($attachments->count() > 0)
                             <div class="mt-3 grid grid-cols-2 gap-2">
                                 @foreach($attachments as $img)
@@ -36,7 +36,6 @@
             </div>
 
         @else
-            <!-- USER MESSAGE (RIGHT) -->
             <div class="flex items-end max-w-[85%] sm:max-w-[75%] flex-row-reverse gap-2">
                 <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xs font-bold flex-shrink-0 order-1">
                     {{ substr($ticket->nama_lengkap, 0, 1) }}
@@ -47,13 +46,9 @@
                     </div>
                      <div class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-4 rounded-2xl rounded-br-none shadow-sm relative group transition-all hover:shadow-md">
                         <div class="prose prose-sm dark:prose-invert max-w-none break-words leading-relaxed trix-content">
-                             {!! $comment->content !!}
+                             {!! $safeContent !!}
                         </div>
                         
-                        @php
-                            $rawAttachments = is_string($comment->attachments) ? json_decode($comment->attachments, true) : $comment->attachments;
-                            $attachments = collect($rawAttachments)->flatten()->filter();
-                        @endphp
                         @if($attachments->count() > 0)
                             <div class="mt-3 grid grid-cols-2 gap-2 dir-rtl">
                                 @foreach($attachments as $img)

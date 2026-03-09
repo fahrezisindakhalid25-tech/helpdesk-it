@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Ticket;
+use App\Support\TicketSecurity;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,42 +19,28 @@ class SendWhatsAppNotification implements ShouldQueue
     protected $ticket;
     protected $customMessage;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param Ticket $ticket
-     * @param string|null $customMessage Optional custom message override
-     */
     public function __construct(Ticket $ticket, $customMessage = null)
     {
         $this->ticket = $ticket;
         $this->customMessage = $customMessage;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $ticket = $this->ticket;
         $token = config('services.fonnte.token');
 
-        if (!$token) {
+        if (! $token) {
             Log::warning('WA_API_TOKEN tidak ditemukan di ENV saat memproses Job Ticket #' . $ticket->no_tiket);
             return;
         }
 
-        // Format nomor ke 62 (Indonesia)
         $phone = $this->formatPhoneNumber($ticket->no_hp);
-        // Note: Route inside job might need explicit domain if running from CLI, but usually fine.
-        // Better to pass full link if needed, but route() usually works if APP_URL is set.
-        
+
         if ($this->customMessage) {
-            // === MODE 1: CUSTOM MESSAGE (E.g. Admin Reply) ===
             $message = $this->customMessage;
         } else {
-            // === MODE 2: DEFAULT NEW TICKET MESSAGE ===
-            $linkTracking = route('laporan.cek', ['uuid' => $ticket->uuid]); 
+            $linkTracking = TicketSecurity::trackingUrl($ticket);
             $message = "IT Helpdesk PTPN IV\n\n"
                 . "Halo {$ticket->nama_lengkap},\n\n"
                 . "Laporan Anda telah diterima!\n\n"
@@ -75,15 +62,11 @@ class SendWhatsAppNotification implements ShouldQueue
 
             Log::info('WhatsApp Job Result #' . $ticket->no_tiket . ': ' . $response->body());
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('WhatsApp Job Failed: ' . $response->body());
-                // Optional: throw exception to retry job?
-                // throw new \Exception('Fonnte API Error'); 
             }
-
         } catch (\Exception $e) {
             Log::error('WhatsApp Job Error for Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
-            // $this->release(60); // Retry after 60s if needed
         }
     }
 

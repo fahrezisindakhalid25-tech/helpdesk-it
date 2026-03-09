@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use App\Filament\Resources\TicketResource\Pages;
+use App\Support\TicketSecurity;
 use App\Models\Ticket;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -97,16 +98,16 @@ class TicketResource extends Resource
 
                                     return '
                                     <div class="flex gap-3 mb-4">
-                                        <div class="w-8 h-8 rounded-full '.$bgClass.' flex items-center justify-center text-xs font-bold flex-shrink-0">'.$initial.'</div>
+                                        <div class="w-8 h-8 rounded-full '.$bgClass.' flex items-center justify-center text-xs font-bold flex-shrink-0">'.e($initial).'</div>
                                         <div class="flex-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
                                             <div class="flex justify-between items-center mb-1">
                                                 <div class="flex items-center gap-2">
-                                                    <span class="font-bold text-sm text-gray-800">'.$senderName.'</span>
+                                                    <span class="font-bold text-sm text-gray-800">'.e($senderName).'</span>
                                                     '.(!$isAdmin ? '<span class="text-[10px] bg-gray-200 text-gray-600 px-1 rounded">Pelapor</span>' : '<span class="text-[10px] bg-blue-50 text-blue-600 px-1 rounded">Admin</span>').'
                                                 </div>
-                                                <span class="text-xs text-gray-500">'.$c->created_at->diffForHumans().'</span>
+                                                <span class="text-xs text-gray-500">'.e($c->created_at->diffForHumans()).'</span>
                                             </div>
-                                            <div class="text-sm text-gray-700 whitespace-pre-wrap admin-trix-content">'.$c->content.'</div>
+                                            <div class="text-sm text-gray-700 whitespace-pre-wrap admin-trix-content">'.TicketSecurity::sanitizeRichText($c->content).'</div>
                                             '.($c->attachments ? collect(is_string($c->attachments) ? json_decode($c->attachments, true) : $c->attachments)->flatten()->filter()->map(fn($img) => '<div class="mt-2"><img src="'.asset('storage/'.$img).'" class="admin-thumbnail" onclick="openAdminModal(this.src)"></div>')->join('') : '').'
                                         </div>
                                     </div>';
@@ -221,7 +222,7 @@ class TicketResource extends Resource
                                     ->visible(fn ($record) => !$record->isClosed())
                                     ->action(function ($record, $get, $set) {
                                         if (!$get('new_comment_content')) return;
-                                        $content = $get('new_comment_content');
+                                        $content = TicketSecurity::sanitizeRichText($get('new_comment_content'));
                                         // $attachments = $get('new_comment_attachments'); // Tidak perlu lagi
 
                                         $record->comments()->create([
@@ -544,11 +545,12 @@ class TicketResource extends Resource
     // === KIRIM WHATSAPP BALASAN ADMIN (VIA QUEUE) ===
     private static function sendAdminReplyWhatsApp($ticket, $replyContent)
     {
-        $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
+        $linkTracking = TicketSecurity::trackingUrl($ticket);
 
         // Potong reply content agar tidak terlalu panjang di WA (max 1024 char)
-        $shortReply = substr($replyContent, 0, 200);
-        if (strlen($replyContent) > 200) {
+        $replyText = TicketSecurity::plainTextFromRichText($replyContent);
+        $shortReply = substr($replyText, 0, 200);
+        if (strlen($replyText) > 200) {
             $shortReply .= '...';
         }
 
@@ -589,3 +591,5 @@ class TicketResource extends Resource
     public static function getRelations(): array { return []; }
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder { return parent::getEloquentQuery()->with(['sla', 'resolutionSla', 'comments.user']); }
 }
+
+

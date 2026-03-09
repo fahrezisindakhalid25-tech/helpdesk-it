@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiket #{{ $ticket->no_tiket }} - Helpdesk</title>
+    <title>{{ ($requiresVerification ?? false) ? 'Verifikasi Akses Tiket - Helpdesk' : 'Tiket #' . $ticket->no_tiket . ' - Helpdesk' }}</title>
     
     <!-- CDN Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -133,6 +133,7 @@
     </style>
 </head>
 <body class="chat-background min-h-screen flex flex-col transition-colors duration-200">
+    @php($hasAccess = !($requiresVerification ?? false))
 
     <!-- Sticky Glassmorphism Header -->
     <div class="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm transition-all duration-200">
@@ -144,14 +145,18 @@
                 
                 <div class="flex flex-col">
                     <h1 class="text-base font-bold text-gray-800 dark:text-white truncate flex items-center gap-2">
-                        Ticket #{{ $ticket->no_tiket }}
-                        <span id="ticket-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide
-                            {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-700' : 
-                              ($ticket->status == 'Closed' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
-                            {{ $ticket->status }}
-                        </span>
+                        @if($hasAccess)
+                            Ticket #{{ $ticket->no_tiket }}
+                            <span id="ticket-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide
+                                {{ $ticket->status == 'Solved' ? 'bg-green-100 text-green-700' : 
+                                  ($ticket->status == 'Closed' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
+                                {{ $ticket->status }}
+                            </span>
+                        @else
+                            Verifikasi Akses Tiket
+                        @endif
                     </h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px] sm:max-w-md">{{ $ticket->topik_bantuan }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px] sm:max-w-md">{{ $hasAccess ? $ticket->topik_bantuan : 'Masukkan email yang dipakai saat membuat tiket.' }}</p>
                 </div>
             </div>
 
@@ -181,8 +186,41 @@
         <span x-text="message"></span>
     </div>
 
+    @if(!$hasAccess)
+        <div class="flex-1 flex items-center justify-center px-4 pt-24 pb-8">
+            <div class="w-full max-w-md rounded-3xl border border-gray-200 bg-white/90 p-6 shadow-xl backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
+                <div class="mb-5 text-center">
+                    <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300">
+                        <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 .552-.448 1-1 1s-1-.448-1-1 .448-1 1-1 1 .448 1 1zm0 0V8m0 12h.01M5.071 19H19a2 2 0 002-2V7a2 2 0 00-2-2h-3.586a1 1 0 01-.707-.293l-1.414-1.414A1 1 0 0012.586 3H11.414a1 1 0 00-.707.293L9.293 4.707A1 1 0 018.586 5H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Verifikasi Akses Tiket</h2>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        Untuk membuka tiket ini, masukkan email yang digunakan saat membuat laporan.
+                    </p>
+                </div>
+
+                @if($errors->any())
+                    <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
+                <form action="{{ route('laporan.authorize', $ticket->uuid) }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label for="email" class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">Email Pelapor</label>
+                        <input id="email" name="email" type="email" required class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100">
+                    </div>
+                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        Buka Halaman Tiket
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endif
+
     <!-- Main Chat Area -->
-    <div class="flex-1 overflow-y-auto px-4 py-6 pt-24 pb-48 sm:pb-52" id="chat-container-scroll">
+    <div class="{{ $hasAccess ? '' : 'hidden' }} flex-1 overflow-y-auto px-4 py-6 pt-24 pb-48 sm:pb-52" id="chat-container-scroll">
         <div class="max-w-3xl mx-auto space-y-6">
             
             <!-- Ticket Detail Card (Collapsible style) -->
@@ -212,7 +250,7 @@
                 
                 <div x-show="open" class="px-5 pb-5 pt-0 text-sm text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-gray-700 mt-2">
                     <div class="prose prose-sm dark:prose-invert max-w-none mt-3 trix-content">
-                        {!! $ticket->penjelasan_lengkap !!}
+                        {!! \\App\\Support\\TicketSecurity::sanitizeRichText($ticket->penjelasan_lengkap) !!}
                     </div>
 
                     @if($ticket->gambar)
@@ -247,7 +285,7 @@
     </div>
 
     <!-- Floating Bottom Input Area -->
-    <div class="fixed bottom-0 inset-x-0 z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 p-4 transition-all duration-300">
+    <div class="{{ $hasAccess ? '' : 'hidden' }} fixed bottom-0 inset-x-0 z-40 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 p-4 transition-all duration-300">
         <div class="max-w-3xl mx-auto">
             
             @if($errors->any())
@@ -272,6 +310,7 @@
                     <div class="text-xs text-green-600 font-medium">Masalah ini ditandai selesai. Butuh bantuan lagi?</div>
                     <form action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" class="w-full flex gap-2">
                         @csrf
+                        <input type="hidden" name="token" value="{{ $accessToken }}">
                         <input type="hidden" name="isi_pesan" value="Mohon buka kembali tiket ini, masalah belum selesai.">
                          <button type="submit" class="w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition shadow-sm flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.28l2.032 1.133C13.294 3 20 2.479 20 2.479m0 0v5h-9.28l-2.032-1.133C10.706 7 4 7.521 4 7.521m-3 9h1m0 0v5m0-5h9.28l2.032 1.133C13.294 21 20 21.521 20 21.521M24 16h-1m0 0v5m0-5h-9.28l-2.032-1.133C10.706 14 4 13.479 4 13.479"></path></svg>
@@ -291,6 +330,7 @@
             @else
                 <form id="reply-form" action="{{ route('laporan.reply', $ticket->uuid) }}" method="POST" enctype="multipart/form-data" class="relative">
                     @csrf
+                    <input type="hidden" name="token" value="{{ $accessToken }}">
                     
                     <div class="bg-gray-100 dark:bg-gray-700/50 rounded-2xl p-1 border border-transparent focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all shadow-inner">
                         <input id="reply-input" type="hidden" name="isi_pesan">
@@ -309,7 +349,9 @@
 
                 <script>
                     (function() {
-                        var HOST = "/laporan-upload-trix"; 
+                        const ticketUuid = @json($ticket->uuid);
+                        const ticketAccessToken = @json($accessToken);
+                        const uploadUrl = @json(route('laporan.upload_trix'));
                         addEventListener("trix-attachment-add", function(event) {
                             if (event.attachment.file) { uploadFileAttachment(event.attachment) }
                         })
@@ -319,11 +361,12 @@
                         }
                         function uploadFile(file, progressCallback, successCallback) {
                             var formData = new FormData(); var xhr = new XMLHttpRequest();
-                            formData.append("file", file); formData.append("_token", "{{ csrf_token() }}");
-                            xhr.open("POST", HOST, true);
+                            formData.append("file", file); formData.append("uuid", ticketUuid); formData.append("token", ticketAccessToken); formData.append("_token", "{{ csrf_token() }}");
+                            xhr.open("POST", uploadUrl, true);
                             xhr.upload.addEventListener("progress", function(event) { progressCallback(event.loaded / event.total * 100) });
                             xhr.addEventListener("load", function(event) {
                                 if (xhr.status == 200) { var response = JSON.parse(xhr.responseText); successCallback({ url: response.url, href: response.url }) }
+                                else { alert('Upload gambar ditolak. Pastikan file berupa gambar maksimal 5MB.'); }
                             });
                             xhr.send(formData);
                         }
@@ -411,6 +454,7 @@
         }
         
         const scrollContainer = document.getElementById('chat-container-scroll');
+        const accessToken = @json($accessToken ?? null);
 
         function scrollToBottom() { 
             if(scrollContainer) {
@@ -447,8 +491,8 @@
         // Poll every 10 seconds to check for new messages
         // NOW: PURELY SILENT - No visual shaking guaranteed
         
-        setInterval(function() {
-            fetch('{{ route("laporan.chat-history") }}?uuid={{ $ticket->uuid }}', {
+        if (accessToken) setInterval(function() {
+            fetch('{{ route("laporan.chat-history") }}?uuid={{ $ticket->uuid }}&token={{ $accessToken ?? '' }}', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
             .then(response => response.json())
@@ -478,48 +522,48 @@
 
                 // 3. Update Chat History (SMOOTH NO-FLICKER)
                 if (data.html) {
-                     const chatHistory = document.getElementById('chat-history');
-                     
+                    const chatHistory = document.getElementById('chat-history');
+                    
                      // Helper to strip whitespace text nodes for cleaner comparison
-                     const cleanHTML = (html) => html.replace(/>\s+</g, '><').trim();
+                    const cleanHTML = (html) => html.replace(/>\s+</g, '><').trim();
 
                      // Create a virtual DOM to compare
-                     const tempDiv = document.createElement('div');
-                     tempDiv.innerHTML = data.html;
-                     
-                     const oldChildren = Array.from(chatHistory.children);
-                     const newChildren = Array.from(tempDiv.children);
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data.html;
+                    
+                    const oldChildren = Array.from(chatHistory.children);
+                    const newChildren = Array.from(tempDiv.children);
 
                      // Check for "Empty State" removal
                      // If we currently have the "Empty State" (opacity-60) and new data has real messages
-                     const hasEmptyState = chatHistory.querySelector('.opacity-60');
-                     if (hasEmptyState && newChildren.length > 0 && !tempDiv.querySelector('.opacity-60')) {
-                         chatHistory.innerHTML = data.html;
-                         scrollToBottom();
-                         return;
-                     }
+                    const hasEmptyState = chatHistory.querySelector('.opacity-60');
+                    if (hasEmptyState && newChildren.length > 0 && !tempDiv.querySelector('.opacity-60')) {
+                        chatHistory.innerHTML = data.html;
+                        scrollToBottom();
+                        return;
+                    }
 
                      // If new data has MORE children than current, append the difference
-                     if (newChildren.length > oldChildren.length) {
-                         const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 150;
+                    if (newChildren.length > oldChildren.length) {
+                        const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 150;
 
                          // Append only the new nodes
-                         for (let i = oldChildren.length; i < newChildren.length; i++) {
-                             const newNode = newChildren[i].cloneNode(true);
+                        for (let i = oldChildren.length; i < newChildren.length; i++) {
+                            const newNode = newChildren[i].cloneNode(true);
                              // Add slide-up animation if using tailwind
-                             newNode.classList.add('animate-fade-in-up'); 
-                             chatHistory.appendChild(newNode);
-                         }
+                            newNode.classList.add('animate-fade-in-up'); 
+                            chatHistory.appendChild(newNode);
+                        }
 
-                         if (isAtBottom) scrollToBottom();
-                     } 
+                        if (isAtBottom) scrollToBottom();
+                    } 
                      // Fallback: If somehow length is same but content changed (edited?), or length is smaller (deleted?)
                      // Just replace content ONLY if strict mismatch (rare case in this system)
-                     else if (cleanHTML(chatHistory.innerHTML) !== cleanHTML(data.html)) {
+                    else if (cleanHTML(chatHistory.innerHTML) !== cleanHTML(data.html)) {
                          // Only replace if it's NOT just a new message appended (e.g. edit)
                          // But for now, let's stick to append-only for smoothness unless lengths mismatch weirdly.
                          // If we are strictly just waiting for new messages, the length check covers 99% cases.
-                     }
+                    }
                 }
             })
             .catch(err => console.error('Silent poll error:', err));
@@ -528,3 +572,12 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+

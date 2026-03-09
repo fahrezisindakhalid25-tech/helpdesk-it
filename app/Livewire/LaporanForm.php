@@ -5,14 +5,13 @@ namespace App\Livewire;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Ticket;
+use App\Support\TicketSecurity;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Component;
-use App\Models\MasterLapor;
 
 class LaporanForm extends Component implements HasForms
 {
@@ -30,45 +29,34 @@ class LaporanForm extends Component implements HasForms
         return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Pelapor')
-                    ->description('Masukkan NIK Anda untuk melengkapi data otomatis.')
+                    ->description('NIK digunakan untuk verifikasi. Data kontak diisi manual untuk mencegah kebocoran data internal.')
                     ->schema([
                         Forms\Components\TextInput::make('nik')
                             ->label('NIK')
                             ->required()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                if (!$state) return;
-                                $karyawan = MasterLapor::where('nik', $state)->first();
-                                if ($karyawan) {
-                                    $set('nama_lengkap', $karyawan->nama);
-                                    $set('email', $karyawan->email);
-                                    $set('no_hp', $karyawan->no_hp);
-                                }
-                            })
                             ->exists('master_lapors', 'nik')
                             ->validationMessages([
-                                'exists' => 'NIK tidak terdaftar dalam database kami. Silakan hubungi Admin.',
+                                'exists' => 'Data tidak dapat diverifikasi. Silakan periksa kembali NIK Anda.',
                             ]),
 
                         Forms\Components\TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
-                            //->readOnly()
                             ->required()
                             ->maxLength(255),
-                            
+
                         Forms\Components\TextInput::make('no_hp')
                             ->label('No WhatsApp')
                             ->tel()
-                            ->numeric()
-                            ->placeholder('08...')
-                            ->nullable(), // Tidak wajib
-                            
+                            ->required()
+                            ->maxLength(20)
+                            ->placeholder('08...'),
+
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
-                            ->nullable() // Tidak wajib
+                            ->required()
                             ->maxLength(255),
-                            
+
                         Forms\Components\Select::make('lokasi')
                             ->label('Lokasi / Unit Kerja')
                             ->options(Location::query()->pluck('name', 'name'))
@@ -93,7 +81,7 @@ class LaporanForm extends Component implements HasForms
                             ->label('Detail Kronologi')
                             ->required()
                             ->toolbarButtons([
-                                'bold', 'italic', 'underline', 'bulletList', 'orderedList', 'undo', 'redo'
+                                'bold', 'italic', 'underline', 'bulletList', 'orderedList', 'undo', 'redo',
                             ])
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('gambar')
@@ -101,7 +89,7 @@ class LaporanForm extends Component implements HasForms
                             ->multiple()
                             ->image()
                             ->directory('laporan-gambar')
-                            ->maxSize(5120) // 5MB
+                            ->maxSize(5120)
                             ->columnSpanFull(),
                     ]),
             ])
@@ -110,25 +98,31 @@ class LaporanForm extends Component implements HasForms
 
     public function create()
     {
-        // Rate Limiter
         $key = 'kirim-tiket:' . request()->ip();
+
         if (RateLimiter::tooManyAttempts($key, 1)) {
             $seconds = RateLimiter::availableIn($key);
-            $this->addError('rate_limit', "Mohon tunggu $seconds detik lagi sebelum mengirim laporan baru.");
-            return;
+            $this->addError('rate_limit', "Mohon tunggu {$seconds} detik lagi sebelum mengirim laporan baru.");
+            return null;
         }
+
         RateLimiter::hit($key, 60);
 
         $data = $this->form->getState();
+        $data['nama_lengkap'] = TicketSecurity::sanitizePlainText($data['nama_lengkap'] ?? '');
+        $data['email'] = strtolower(trim((string) ($data['email'] ?? '')));
+        $data['no_hp'] = preg_replace('/\D+/', '', (string) ($data['no_hp'] ?? '')) ?: '';
+        $data['lokasi'] = TicketSecurity::sanitizePlainText($data['lokasi'] ?? '');
+        $data['topik_bantuan'] = TicketSecurity::sanitizePlainText($data['topik_bantuan'] ?? '');
+        $data['deskripsi_umum_masalah'] = TicketSecurity::sanitizePlainText($data['deskripsi_umum_masalah'] ?? '');
+        $data['penjelasan_lengkap'] = TicketSecurity::sanitizeRichText($data['penjelasan_lengkap'] ?? '');
 
-        // Handle file upload array to JSON
         if (isset($data['gambar']) && is_array($data['gambar'])) {
             $data['gambar'] = json_encode(array_values($data['gambar']));
         }
 
         $ticket = Ticket::create($data);
 
-        // Send Notifications
         \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
 
         return redirect()->route('laporan.sukses', ['uuid' => $ticket->uuid]);
