@@ -1,5 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-@import 'trix/dist/trix.css';
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
