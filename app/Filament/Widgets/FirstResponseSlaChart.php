@@ -9,9 +9,9 @@ use Filament\Support\RawJs;
 
 class FirstResponseSlaChart extends ChartWidget
 {
-    protected static ?string $heading = 'SLA First Response';
+    protected ?string $heading = 'SLA First Response';
     protected static ?int $sort = 1;
-    protected static string $view = 'filament.widgets.chart-widget-custom';
+    protected string $view = 'filament.widgets.chart-widget-custom';
 
     protected function getData(): array
     {

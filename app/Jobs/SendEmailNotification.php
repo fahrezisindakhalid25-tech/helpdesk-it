@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use App\Models\Ticket;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -110,7 +111,7 @@ class SendEmailNotification implements ShouldQueue
                     ->from($fromAddress, $fromName);
             });
             Log::info("Email notification ($this->type) sent to {$ticket->email} for Ticket #{$ticket->no_tiket}");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Email Job Error for Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
         }
     }

@@ -8,14 +8,14 @@ use App\Models\Location;
 
 class TicketLocationChart extends ChartWidget
 {
-    protected static ?string $heading = 'Tiket per Lokasi';
+    protected ?string $heading = 'Tiket per Lokasi';
     protected static ?int $sort = 5;
     protected int | string | array $columnSpan = 'full';
     
     // Gunakan custom view agar ada label manualnya
     // Gunakan custom view agar ada label manualnya
-    protected static string $view = 'filament.widgets.chart-widget-custom';
-    protected static ?string $maxHeight = '1200px';
+    protected string $view = 'filament.widgets.chart-widget-custom';
+    protected ?string $maxHeight = '1200px';
 
     protected function getData(): array
     {

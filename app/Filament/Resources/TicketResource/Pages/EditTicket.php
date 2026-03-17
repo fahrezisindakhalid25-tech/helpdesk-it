@@ -2,6 +2,12 @@
 
 namespace App\Filament\Resources\TicketResource\Pages;
 
+use Filament\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Filament\Actions\DeleteAction;
 use App\Filament\Resources\TicketResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -13,11 +19,11 @@ class EditTicket extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\Action::make('export')
+            Action::make('export')
                 ->label('Export Ticket')
                 ->icon('heroicon-m-arrow-down-tray')
                 ->action(function ($record) {
-                    return \Maatwebsite\Excel\Facades\Excel::download(new class($record) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings, \Maatwebsite\Excel\Concerns\WithMapping {
+                    return Excel::download(new class($record) implements FromCollection, WithHeadings, WithMapping {
                         public function __construct(private $record) {}
                         
                         public function collection()
@@ -91,7 +97,7 @@ class EditTicket extends EditRecord
                                 ];
                             }                  }, 'Ticket-' . $record->no_tiket . '.xlsx');
                 }),
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

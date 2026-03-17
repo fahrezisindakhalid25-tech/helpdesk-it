@@ -2,11 +2,19 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\MasterLaporResource\Pages\ListMasterLapors;
+use App\Filament\Resources\MasterLaporResource\Pages\CreateMasterLapor;
+use App\Filament\Resources\MasterLaporResource\Pages\EditMasterLapor;
 use App\Filament\Resources\MasterLaporResource\Pages;
 use App\Filament\Resources\MasterLaporResource\RelationManagers;
 use App\Models\MasterLapor;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,9 +25,9 @@ class MasterLaporResource extends Resource
 {
     protected static ?string $model = MasterLapor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
     
-    protected static ?string $navigationGroup = 'Master Data';
+    protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
     
     protected static ?string $navigationLabel = 'Data Karyawan';
 
@@ -44,24 +52,24 @@ class MasterLaporResource extends Resource
         return auth()->user()->hasPermission('master_lapor.manage');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('nik')
+        return $schema
+            ->components([
+                TextInput::make('nik')
                     ->label('NIK')
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\TextInput::make('nama')
+                TextInput::make('nama')
                     ->label('Nama Lengkap')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
+                TextInput::make('email')
                     ->label('Email')
                     ->email()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('no_hp')
+                TextInput::make('no_hp')
                     ->label('No HP / WhatsApp')
                     ->tel()
                     ->maxLength(255),
@@ -72,23 +80,23 @@ class MasterLaporResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nik')
+                TextColumn::make('nik')
                     ->label('NIK')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('nama')
+                TextColumn::make('nama')
                     ->label('Nama Lengkap')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('no_hp')
+                TextColumn::make('no_hp')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -96,12 +104,12 @@ class MasterLaporResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -116,9 +124,9 @@ class MasterLaporResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMasterLapors::route('/'),
-            'create' => Pages\CreateMasterLapor::route('/create'),
-            'edit' => Pages\EditMasterLapor::route('/{record}/edit'),
+            'index' => ListMasterLapors::route('/'),
+            'create' => CreateMasterLapor::route('/create'),
+            'edit' => EditMasterLapor::route('/{record}/edit'),
         ];
     }
 }

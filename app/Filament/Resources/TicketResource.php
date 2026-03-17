@@ -2,16 +2,47 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use App\Models\Location;
+use App\Models\Category;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\Placeholder;
+use Illuminate\Support\HtmlString;
+use Filament\Schemas\Components\Actions;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use App\Models\Sla;
+use Filament\Tables\Columns\TextColumn;
+use Carbon\Carbon;
+use Filament\Schemas\Components\Grid;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TicketExport;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use App\Filament\Resources\TicketResource\Pages\ListTickets;
+use App\Filament\Resources\TicketResource\Pages\CreateTicket;
+use App\Filament\Resources\TicketResource\Pages\EditTicket;
+use App\Jobs\SendEmailNotification;
+use App\Jobs\SendWhatsAppNotification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use App\Filament\Resources\TicketResource\Pages;
 use App\Models\Ticket;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -27,57 +58,57 @@ class TicketResource extends Resource
     protected static ?string $modelLabel = 'Laporan';
     protected static ?string $pluralModelLabel = 'Data Laporan';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        $halamanSaatIni = $form->getOperation(); 
+        $halamanSaatIni = $schema->getOperation(); 
 
         // === MODE 1: CREATE (Saat Admin Input Manual) ===
         if ($halamanSaatIni === 'create') {
-            return $form->schema([
-                Forms\Components\Group::make()->columnSpanFull()->schema([
-                    Forms\Components\Section::make('Buat Tiket Laporan Baru')
+            return $schema->components([
+                Group::make()->columnSpanFull()->schema([
+                    Section::make('Buat Tiket Laporan Baru')
                         ->schema([
-                            Forms\Components\TextInput::make('nama_lengkap')->required()->label('Nama Pelapor'),
-                            Forms\Components\TextInput::make('email')->email()->required(),
-                            Forms\Components\TextInput::make('no_hp')->numeric()->required()->label('No WhatsApp'),
+                            TextInput::make('nama_lengkap')->required()->label('Nama Pelapor'),
+                            TextInput::make('email')->email()->required(),
+                            TextInput::make('no_hp')->numeric()->required()->label('No WhatsApp'),
                             
-                            Forms\Components\Select::make('lokasi')
-                                ->options(\App\Models\Location::pluck('name', 'name'))
+                            Select::make('lokasi')
+                                ->options(Location::pluck('name', 'name'))
                                 ->required()->searchable(),
                             
-                            Forms\Components\Select::make('topik_bantuan')
+                            Select::make('topik_bantuan')
                                 ->label('Kategori Masalah')
-                                ->options(\App\Models\Category::pluck('name', 'name'))
+                                ->options(Category::pluck('name', 'name'))
                                 ->required()->searchable(),
 
-                            Forms\Components\Textarea::make('deskripsi_umum_masalah')->required()->columnSpanFull()->label('Subjek'),
-                            Forms\Components\RichEditor::make('penjelasan_lengkap')->columnSpanFull(),
+                            Textarea::make('deskripsi_umum_masalah')->required()->columnSpanFull()->label('Subjek'),
+                            RichEditor::make('penjelasan_lengkap')->columnSpanFull(),
                         ])->columns(2),
                 ]),
             ]);
         }
 
         // === MODE 2: DETAIL (DASHBOARD ADMIN) ===
-        return $form
+        return $schema
             ->columns(3)
-            ->schema([
+            ->components([
                 // === KOLOM KIRI (CHAT & DETAIL) ===
-                Forms\Components\Group::make()->columnSpan(2)->schema([
-                    Forms\Components\Tabs::make('Aktivitas Tiket')->tabs([
-                        Forms\Components\Tabs\Tab::make('Activity')
+                Group::make()->columnSpan(2)->schema([
+                    Tabs::make('Aktivitas Tiket')->tabs([
+                        Tab::make('Activity')
                             ->icon('heroicon-m-chat-bubble-left-right')
                             ->extraAttributes(['wire:poll.5s' => '']) // Real-time Update (5 detik)
                             ->schema([
-                            Forms\Components\Section::make()->schema([
-                                Forms\Components\TextInput::make('topik_bantuan')->disabled()->extraAttributes(['class' => 'bg-gray-100']),
-                                Forms\Components\Textarea::make('deskripsi_umum_masalah')->rows(2)->disabled()->extraAttributes(['class' => 'font-bold text-lg mb-2']),
-                                Forms\Components\RichEditor::make('penjelasan_lengkap')->disabled()->toolbarButtons([]),
+                            Section::make()->schema([
+                                TextInput::make('topik_bantuan')->disabled()->extraAttributes(['class' => 'bg-gray-100']),
+                                Textarea::make('deskripsi_umum_masalah')->rows(2)->disabled()->extraAttributes(['class' => 'font-bold text-lg mb-2']),
+                                RichEditor::make('penjelasan_lengkap')->disabled()->toolbarButtons([]),
                                 
                                 // TAMPILKAN GAMBAR JIKA ADA
-                                Forms\Components\Placeholder::make('gambar_display')
+                                Placeholder::make('gambar_display')
                                     ->hiddenLabel()
                                     ->visible(fn ($record) => $record && $record->gambar)
-                                    ->content(fn ($record) => $record && $record->gambar ? new \Illuminate\Support\HtmlString(
+                                    ->content(fn ($record) => $record && $record->gambar ? new HtmlString(
                                         '<div class="mt-3"><p class="text-sm font-semibold text-gray-700 mb-2">Lampiran Gambar:</p><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px;">' . 
                                         collect(is_string($record->gambar) ? json_decode($record->gambar, true) : $record->gambar)->flatten()->filter()->map(fn($img) => '<img src="' . asset('storage/' . $img) . '" alt="Gambar Laporan" onclick="openAdminModal(this.src)" class="admin-thumbnail">')
                                         ->join('') . 
@@ -85,10 +116,10 @@ class TicketResource extends Resource
                                     ) : '-'),
                             ])->compact(),
                             
-                            Forms\Components\Placeholder::make('separator')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
+                            Placeholder::make('separator')->content(new HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
 
                             // CHAT HISTORY
-                            Forms\Components\Placeholder::make('chat_history')->label('Percakapan')->content(fn ($record) => $record ? new \Illuminate\Support\HtmlString(
+                            Placeholder::make('chat_history')->label('Percakapan')->content(fn ($record) => $record ? new HtmlString(
                                 collect($record->comments)->map(function($c) use ($record) {
                                     $senderName = $c->user ? $c->user->name : $record->nama_lengkap;
                                     $initial = substr($senderName, 0, 1);
@@ -114,7 +145,7 @@ class TicketResource extends Resource
                             ) : '-'),
 
                             // GLOBAL SCRIPTS & STYLES FOR ADMIN PANEL (MODAL & THUMBNAILS)
-                            Forms\Components\Placeholder::make('admin_scripts')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('
+                            Placeholder::make('admin_scripts')->hiddenLabel()->content(new HtmlString('
                                 <style>
                                     /* Thumbnail Styling */
                                     .admin-thumbnail, .admin-trix-content img, .fi-fo-rich-editor img {
@@ -205,7 +236,7 @@ class TicketResource extends Resource
                                 </script>
                             ')),
 
-                            Forms\Components\RichEditor::make('new_comment_content')
+                            RichEditor::make('new_comment_content')
                                 ->label('Balas Pesan')
                                 ->fileAttachmentsDisk('public')
                                 ->fileAttachmentsDirectory('comment-attachments')
@@ -215,8 +246,8 @@ class TicketResource extends Resource
                             // Forms\Components\FileUpload::make('new_comment_attachments')... (Removed)
 
                             // TOMBOL KIRIM
-                            Forms\Components\Actions::make([
-                                Forms\Components\Actions\Action::make('kirim_balasan')
+                            Actions::make([
+                                Action::make('kirim_balasan')
                                     ->label('Post Reply')->color('primary')->icon('heroicon-m-paper-airplane')
                                     ->visible(fn ($record) => !$record->isClosed())
                                     ->action(function ($record, $get, $set) {
@@ -246,38 +277,38 @@ class TicketResource extends Resource
                                         // === KIRIM NOTIFIKASI KE USER ===
                                         self::sendAdminReplyNotification($record, $content);
                                         
-                                        \Filament\Notifications\Notification::make()->title('Terkirim')->success()->send();
+                                        Notification::make()->title('Terkirim')->success()->send();
                                     }),
                             ])->alignRight(),
                         ]),
-                        Forms\Components\Tabs\Tab::make('Data Pelapor')
+                        Tab::make('Data Pelapor')
                                 ->icon('heroicon-m-user')
                                 ->schema([
-                                    Forms\Components\TextInput::make('nik')->label('NIK')->disabled(),
-                                    Forms\Components\TextInput::make('nama_lengkap')->label('Nama Lengkap')->disabled(),
-                                    Forms\Components\TextInput::make('email')->label('Email')->disabled(),
-                                    Forms\Components\TextInput::make('no_hp')->label('No WhatsApp')->disabled(),
-                                    Forms\Components\TextInput::make('lokasi')->label('Lokasi')->disabled(),
+                                    TextInput::make('nik')->label('NIK')->disabled(),
+                                    TextInput::make('nama_lengkap')->label('Nama Lengkap')->disabled(),
+                                    TextInput::make('email')->label('Email')->disabled(),
+                                    TextInput::make('no_hp')->label('No WhatsApp')->disabled(),
+                                    TextInput::make('lokasi')->label('Lokasi')->disabled(),
                                 ])->columns(2),
                     ]),
                 ]),
 
                 // === KOLOM KANAN (SIDEBAR: SEKARANG ADA 2 DROPDOWN SLA) ===
-                Forms\Components\Group::make()->columnSpan(1)->schema([
-                    Forms\Components\Section::make('Kontrol SLA')->schema([
+                Group::make()->columnSpan(1)->schema([
+                    Section::make('Kontrol SLA')->schema([
                         
-                        Forms\Components\Placeholder::make('header_custom')->content(fn ($record) => new \Illuminate\Support\HtmlString('
+                        Placeholder::make('header_custom')->content(fn ($record) => new HtmlString('
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-lg">'.substr($record->nama_lengkap ?? 'A', 0, 1).'</div>
                                 <div><div class="font-bold text-gray-900">'.($record->nama_lengkap ?? '-').'</div><div class="text-xs text-gray-500">Pelapor</div></div>
                             </div>')),
 
-                        Forms\Components\Placeholder::make('separator_sla')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
+                        Placeholder::make('separator_sla')->content(new HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
 
                         // ==========================================
                         // 1. DROPDOWN KHUSUS FIRST RESPONSE
                         // ==========================================
-                        Forms\Components\Select::make('sla_id')
+                        Select::make('sla_id')
                             ->label('SLA: First Response')
                             ->relationship('sla', 'name')
                             ->placeholder('Pilih SLA Respon')
@@ -290,26 +321,26 @@ class TicketResource extends Resource
                             }),
 
                         // TIMER FIRST RESPONSE
-                        Forms\Components\Placeholder::make('first_response_timer')
+                        Placeholder::make('first_response_timer')
                             ->hiddenLabel()
                             ->content(function ($record, $get) { 
                                 if ($record->replied_at) {
                                     $text = $record->created_at->diff($record->replied_at)->format('%ad %hh %im %ss');
-                                    return new \Illuminate\Support\HtmlString("<div class='bg-blue-50 p-2 rounded border border-blue-200 text-center'><span class='text-blue-700 font-bold'>✓ Responded</span><div class='text-xs'>$text</div></div>");
+                                    return new HtmlString("<div class='bg-blue-50 p-2 rounded border border-blue-200 text-center'><span class='text-blue-700 font-bold'>✓ Responded</span><div class='text-xs'>$text</div></div>");
                                 }
                                 // GUNAKAN $record->sla_id LANGSUNG DARI DATABASE
                                 $slaId = $record->sla_id ?? $get('sla_id');
-                                if (!$slaId) return new \Illuminate\Support\HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Respon -</div>');
+                                if (!$slaId) return new HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Respon -</div>');
 
                                 // Ambil Data SLA (Hari + Jam)
-                                $sla = \App\Models\Sla::find($slaId);
+                                $sla = Sla::find($slaId);
                                 if (!$sla) return '-';
                                 
                                 $days = (int) $sla->response_days; 
                                 $timeParts = explode(':', $sla->response_time ?? '00:00:00');
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
-                                return new \Illuminate\Support\HtmlString("
+                                return new HtmlString("
                                     <div class='flex justify-between items-center bg-gray-50 p-2 rounded border mb-4'>
                                         <div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
                                             <span x-text=\"text\" class='text-sm font-bold text-red-600'></span>
@@ -319,12 +350,12 @@ class TicketResource extends Resource
                                 ");
                             }),
 
-                        Forms\Components\Placeholder::make('separator_2')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
+                        Placeholder::make('separator_2')->content(new HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
 
                         // ==========================================
                         // 2. DROPDOWN SLA RESOLUSI (FINAL)
                         // ==========================================
-                        Forms\Components\Select::make('resolution_sla_id')
+                        Select::make('resolution_sla_id')
                             ->label('SLA: Resolution (Final)')
                             ->relationship('sla', 'name') // Menggunakan relasi yang sama ke tabel SLAs
                             ->placeholder('Pilih SLA Resolusi')
@@ -336,18 +367,18 @@ class TicketResource extends Resource
                             }),
 
                         // TIMER RESOLUTION
-                        Forms\Components\Placeholder::make('resolution_timer')
+                        Placeholder::make('resolution_timer')
                             ->hiddenLabel()
                             ->content(function ($record, $get) { 
                                 if ($record->status === 'Solved' || $record->status === 'Closed') {
                                     $text = $record->created_at->diff($record->solved_at ?? $record->closed_at ?? now())->format('%ad %hh %im %ss');
-                                    return new \Illuminate\Support\HtmlString("<div class='bg-green-50 p-2 rounded border border-green-200 text-center'><span class='text-green-700 font-bold'>✓ Solved</span><div class='text-xs'>$text</div></div>");
+                                    return new HtmlString("<div class='bg-green-50 p-2 rounded border border-green-200 text-center'><span class='text-green-700 font-bold'>✓ Solved</span><div class='text-xs'>$text</div></div>");
                                 }
                                 
                                 $slaId = $record->resolution_sla_id ?? $get('resolution_sla_id');
-                                if (!$slaId) return new \Illuminate\Support\HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Resolusi -</div>');
+                                if (!$slaId) return new HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Resolusi -</div>');
 
-                                $sla = \App\Models\Sla::find($slaId);
+                                $sla = Sla::find($slaId);
                                 if (!$sla) return '-';
                                 
                                 // Gunakan response_days (karena user menggunakan field Durasi Pengerjaan yang ada)
@@ -358,7 +389,7 @@ class TicketResource extends Resource
                                 
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
-                                return new \Illuminate\Support\HtmlString("
+                                return new HtmlString("
                                     <div class='flex justify-between items-center bg-gray-50 p-2 rounded border mb-4'>
                                         <div x-data=\"{ target: $deadline, now: new Date().getTime(), text: '...', update() { this.now = new Date().getTime(); let d = this.target - this.now; if (d < 0) { this.text = 'OVERDUE'; } else { let days = Math.floor(d / 86400000); let hours = Math.floor((d % 86400000) / 3600000); let mins = Math.floor((d % 3600000) / 60000); let secs = Math.floor((d % 60000) / 1000); this.text = days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's'; } }, init() { this.update(); setInterval(() => this.update(), 1000); } }\" x-init=\"init()\">
                                             <span x-text=\"text\" class='text-sm font-bold text-red-600'></span>
@@ -368,10 +399,10 @@ class TicketResource extends Resource
                                 ");
                             }),
 
-                        Forms\Components\Placeholder::make('separator_3')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
+                        Placeholder::make('separator_3')->content(new HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
 
                         // STATUS SELECT
-                        Forms\Components\Select::make('status')
+                        Select::make('status')
                             ->options(['Open' => 'Open', 'Replied' => 'Replied', 'Solved' => 'Solved', 'Closed' => 'Closed'])
                             ->required()->native(false)->live()
                             ->afterStateUpdated(function ($record, $state) {
@@ -390,7 +421,7 @@ class TicketResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('no_tiket')
+                TextColumn::make('no_tiket')
                     ->searchable()
                     ->badge()
                     ->color(fn ($record) => match ($record->status) {
@@ -402,17 +433,17 @@ class TicketResource extends Resource
                     })
                     ->label('No Tiket'),
                     
-                Tables\Columns\TextColumn::make('nama_lengkap')->searchable(),
-                Tables\Columns\TextColumn::make('topik_bantuan')->limit(20)->label('Kategori'),
+                TextColumn::make('nama_lengkap')->searchable(),
+                TextColumn::make('topik_bantuan')->limit(20)->label('Kategori'),
                 // Sla Name dihapus sesuai request
                 
                 // === SLA FIRST RESPONSE TIMER ===
-                Tables\Columns\TextColumn::make('sla_timer')
+                TextColumn::make('sla_timer')
                     ->label('SLA Respon')
                     ->html()
                     ->getStateUsing(function ($record) {
                         if ($record->replied_at) {
-                            $repliedAt = $record->replied_at instanceof \Carbon\Carbon ? $record->replied_at : \Carbon\Carbon::parse($record->replied_at);
+                            $repliedAt = $record->replied_at instanceof Carbon ? $record->replied_at : Carbon::parse($record->replied_at);
                             $durasi = $record->created_at->diff($repliedAt)->format('%ad %hh %im');
                             return "<div class='text-xs text-green-600 font-bold'>✓ Done<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }
@@ -420,14 +451,14 @@ class TicketResource extends Resource
                     }),
 
                 // === SLA RESOLUTION TIMER (BARU) ===
-                Tables\Columns\TextColumn::make('sla_resolution_timer')
+                TextColumn::make('sla_resolution_timer')
                     ->label('SLA Resolution')
                     ->html()
                     ->getStateUsing(function ($record) {
                          // Jika sudah selesai (Solved/Closed)
                         if ($record->status === 'Solved' || $record->status === 'Closed') {
                             $end = $record->solved_at ?? $record->closed_at ?? now();
-                            $end = $end instanceof \Carbon\Carbon ? $end : \Carbon\Carbon::parse($end);
+                            $end = $end instanceof Carbon ? $end : Carbon::parse($end);
                             $durasi = $record->created_at->diff($end)->format('%ad %hh %im');
                             return "<div class='text-xs text-green-600 font-bold'>✓ Solved<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }
@@ -435,29 +466,29 @@ class TicketResource extends Resource
                         return '<span class="text-xs text-gray-400">-</span>';
                     }),
 
-                Tables\Columns\TextColumn::make('status')->badge()
+                TextColumn::make('status')->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Solved' => 'success', 'Replied' => 'info', 'Open' => 'warning', 'Closed' => 'danger', default => 'gray'
                     }),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d M Y H:i')->sortable(),
+                TextColumn::make('created_at')->dateTime('d M Y H:i')->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Filter::make('created_at')
                     ->label('Tanggal')
-                    ->form([
-                        Forms\Components\Grid::make(3)->schema([
+                    ->schema([
+                        Grid::make(3)->schema([
                             DatePicker::make('created_from')->label('Dari Tanggal'),
                             DatePicker::make('created_until')->label('Sampai Tanggal'),
-                            Forms\Components\Actions::make([
-                                Forms\Components\Actions\Action::make('export')
+                            Actions::make([
+                                Action::make('export')
                                     ->label('Export')
                                     ->icon('heroicon-m-arrow-down-tray')
                                     ->color('success')
                                     ->visible(fn () => auth()->user()->hasPermission('ticket.export'))
                                     ->action(function ($livewire) {
-                                         return \Maatwebsite\Excel\Facades\Excel::download(
-                                            new \App\Exports\TicketExport($livewire->getFilteredTableQuery()),
+                                         return Excel::download(
+                                            new TicketExport($livewire->getFilteredTableQuery()),
                                             'Tickets-' . date('Y-m-d') . '.xlsx'
                                         );
                                     }),
@@ -477,20 +508,20 @@ class TicketResource extends Resource
                             );
                     })
             ])
-            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
+            ->filtersLayout(FiltersLayout::AboveContent)
             ->filtersFormColumns(2)
             ->headerActions([])
-            ->actions([
-                Tables\Actions\EditAction::make()->label('Detail')->icon('heroicon-m-eye'), 
-                Tables\Actions\Action::make('export_row')
+            ->recordActions([
+                EditAction::make()->label('Detail')->icon('heroicon-m-eye'), 
+                Action::make('export_row')
                     ->label('Export')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->visible(fn () => auth()->user()->hasPermission('ticket.export'))
-                    ->action(function ($record, \Filament\Tables\Actions\Action $action) {
+                    ->action(function ($record, Action $action) {
                         $record = $record ?? $action->getRecord();
                         
                         if (!$record) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Error')
                                 ->body('Surat tiket tidak ditemukan')
                                 ->danger()
@@ -498,16 +529,16 @@ class TicketResource extends Resource
                             return;
                         }
 
-                        return \Maatwebsite\Excel\Facades\Excel::download(
-                            new \App\Exports\TicketExport(\App\Models\Ticket::where('id', $record->id)),
+                        return Excel::download(
+                            new TicketExport(Ticket::where('id', $record->id)),
                             'Ticket-' . $record->no_tiket . '.xlsx'
                         );
                     }),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                     ExportBulkAction::make()
                         ->visible(fn () => auth()->user()->hasPermission('ticket.export')),
                 ]),
@@ -517,9 +548,9 @@ class TicketResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTickets::route('/'),
-            'create' => Pages\CreateTicket::route('/create'),
-            'edit' => Pages\EditTicket::route('/{record}/edit'),
+            'index' => ListTickets::route('/'),
+            'create' => CreateTicket::route('/create'),
+            'edit' => EditTicket::route('/{record}/edit'),
         ];
     }
 
@@ -537,7 +568,7 @@ class TicketResource extends Resource
     private static function sendAdminReplyEmail($ticket, $replyContent)
     {
         // Dispatch Job Email (Type: admin_reply)
-        \App\Jobs\SendEmailNotification::dispatch($ticket, 'admin_reply', $replyContent);
+        SendEmailNotification::dispatch($ticket, 'admin_reply', $replyContent);
     }
 
     // === KIRIM WHATSAPP BALASAN ADMIN ===
@@ -563,7 +594,7 @@ class TicketResource extends Resource
             . "Terima kasih atas kesabaran Anda.";
 
         // Dispatch ke Queue dengan pesan kustom
-        \App\Jobs\SendWhatsAppNotification::dispatch($ticket, $message);
+        SendWhatsAppNotification::dispatch($ticket, $message);
     }
 
     // === HELPER: FORMAT NOMOR TELEPON ===
@@ -587,5 +618,5 @@ class TicketResource extends Resource
     }
     
     public static function getRelations(): array { return []; }
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder { return parent::getEloquentQuery()->with(['sla', 'resolutionSla', 'comments.user']); }
+    public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['sla', 'resolutionSla', 'comments.user']); }
 }

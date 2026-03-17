@@ -8,9 +8,9 @@ use Filament\Support\RawJs;
 
 class TicketStatusChart extends ChartWidget
 {
-    protected static ?string $heading = 'Status Tiket';
+    protected ?string $heading = 'Status Tiket';
     protected static ?int $sort = 2;
-    protected static string $view = 'filament.widgets.chart-widget-custom';
+    protected string $view = 'filament.widgets.chart-widget-custom';
 
     protected function getData(): array
     {

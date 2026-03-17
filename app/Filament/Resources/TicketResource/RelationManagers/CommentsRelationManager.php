@@ -1,9 +1,13 @@
 <?php
 
 namespace App\Filament\Resources\TicketResource\RelationManagers; // <--- INI WAJIB BENAR
-
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\CreateAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -13,11 +17,11 @@ class CommentsRelationManager extends RelationManager
     protected static string $relationship = 'comments';
     protected static ?string $title = 'Aktivitas & Diskusi';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Textarea::make('content')
+        return $schema
+            ->components([
+                Textarea::make('content')
                     ->label('Tulis Balasan...')
                     ->required()
                     ->columnSpanFull(),
@@ -30,23 +34,23 @@ class CommentsRelationManager extends RelationManager
             ->recordTitleAttribute('content')
             // KITA UBAH JADI STACK (TIMELINE VIEW)
             ->columns([
-                Tables\Columns\Layout\Stack::make([
-                    Tables\Columns\Layout\Split::make([
+                Stack::make([
+                    Split::make([
                         // Nama Pengirim di Kiri
-                        Tables\Columns\TextColumn::make('user.name')
+                        TextColumn::make('user.name')
                             ->weight('bold')
                             ->icon('heroicon-m-user-circle')
                             ->color('primary'),
 
                         // Waktu di Kanan
-                        Tables\Columns\TextColumn::make('created_at')
+                        TextColumn::make('created_at')
                             ->dateTime('d M Y - H:i')
                             ->color('gray')
                             ->alignEnd(),
                     ]),
 
                     // Isi Pesan di Bawahnya
-                    Tables\Columns\TextColumn::make('content')
+                    TextColumn::make('content')
                         ->wrap() // Agar teks panjang turun ke bawah
                         ->extraAttributes(['class' => 'py-2']), // Kasih jarak dikit
                 ])->space(3), // Jarak antar chat
@@ -56,16 +60,16 @@ class CommentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 // Tombol Balas Pesan
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Reply / Balas Pesan')
                     ->icon('heroicon-m-chat-bubble-left-right')
                     ->modalHeading('Tulis Balasan Anda')
-                    ->mutateFormDataUsing(function (array $data): array {
+                    ->mutateDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();
                         return $data;
                     }),
             ])
-            ->actions([]) // Hapus tombol edit/delete biar bersih
+            ->recordActions([]) // Hapus tombol edit/delete biar bersih
             ->defaultSort('created_at', 'asc'); // Chat lama di atas, baru di bawah (seperti WA)
     }
 }

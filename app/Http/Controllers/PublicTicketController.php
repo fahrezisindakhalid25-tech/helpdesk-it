@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use Log;
+use App\Jobs\SendWhatsAppNotification;
 use App\Models\Ticket;
 use App\Models\Location;
 use App\Models\Category;
@@ -124,8 +127,8 @@ class PublicTicketController extends Controller
                     ->subject($subject)
                     ->from(config('mail.from.address'), config('mail.from.name'));
             });
-        } catch (\Exception $e) {
-            \Log::error('Email gagal dikirim untuk Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::error('Email gagal dikirim untuk Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
         }
     }
 
@@ -133,7 +136,7 @@ class PublicTicketController extends Controller
     private function sendWhatsAppNotification($ticket)
     {
         // Dispatch Job ke Queue
-        \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
+        SendWhatsAppNotification::dispatch($ticket);
     }
 
     public function success($uuid)

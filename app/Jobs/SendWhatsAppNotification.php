@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use App\Models\Ticket;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -81,7 +82,7 @@ class SendWhatsAppNotification implements ShouldQueue
                 // throw new \Exception('Fonnte API Error'); 
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('WhatsApp Job Error for Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
             // $this->release(60); // Retry after 60s if needed
         }
