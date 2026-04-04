@@ -28,7 +28,7 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
-    
+
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     public static function form(Schema $schema): Schema
@@ -62,29 +62,29 @@ class UserResource extends Resource
                             ->label('Daftar Izin')
                             ->options([
                                 '*' => 'SUPER ADMIN (Akses Penuh)', // Wildcard
-                                
+
                                 'ticket.view' => 'View Tickets',
                                 'ticket.create' => 'Create Tickets',
                                 'ticket.update' => 'Update Tickets (Reply/Status)',
                                 'ticket.delete' => 'Delete Tickets',
                                 'ticket.change_sla' => 'Change Ticket SLA',
                                 'ticket.export' => 'Export Tickets',
-                                
+
                                 // Dashboard
                                 'dashboard.view' => 'View Dashboard Stats',
-                                
+
                                 'category.view' => 'View Categories',
                                 'category.manage' => 'Manage Categories',
-                                
+
                                 'location.view' => 'View Locations',
                                 'location.manage' => 'Manage Locations',
-                                
+
                                 'sla.view' => 'View SLAs',
                                 'sla.manage' => 'Manage SLAs',
-                                
+
                                 'master_lapor.view' => 'View Data Karyawan',
                                 'master_lapor.manage' => 'Manage Data Karyawan',
-                                
+
                                 'user.view' => 'View Users',
                                 'user.manage' => 'Manage Users',
                             ])

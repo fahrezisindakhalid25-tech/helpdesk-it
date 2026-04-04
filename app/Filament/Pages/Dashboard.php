@@ -12,7 +12,7 @@ class Dashboard extends BaseDashboard
     {
         /** @var User */
         $user = Auth::user();
-        
+
         return $user->hasPermission('dashboard.view');
     }
 }
