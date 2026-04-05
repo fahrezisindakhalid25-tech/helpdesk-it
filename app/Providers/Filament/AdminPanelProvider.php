@@ -2,6 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\CustomLogin;
+use Illuminate\Support\Facades\Blade;
+use App\Filament\Pages\Dashboard;
+use Filament\Widgets\AccountWidget;
+use App\Filament\Widgets\TicketStatsWidget;
+use App\Filament\Widgets\FirstResponseSlaChart;
+use App\Filament\Widgets\TicketStatusChart;
+use App\Filament\Widgets\TicketCategoryChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -27,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->spa()
-            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
+            ->login(CustomLogin::class)
             // Add global CSS for Login Page Background
             ->renderHook(
                 'panels::body.end',
@@ -36,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             // Custom Logic: Inject Chart.js Plugin Registration
             ->renderHook(
                 'panels::head.end',
-                fn () => \Illuminate\Support\Facades\Blade::render('@vite(["resources/css/app.css", "resources/js/app.js"])')
+                fn () => Blade::render('@vite(["resources/css/app.css", "resources/js/app.js"])')
             )
             
             // === BAGIAN INI YANG MENGUBAH TAMPILAN JADI BAGUS ===
@@ -50,15 +58,15 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                \App\Filament\Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                \App\Filament\Widgets\TicketStatsWidget::class,
-                \App\Filament\Widgets\FirstResponseSlaChart::class,
-                \App\Filament\Widgets\TicketStatusChart::class,
-                \App\Filament\Widgets\TicketCategoryChart::class,
+                AccountWidget::class,
+                TicketStatsWidget::class,
+                FirstResponseSlaChart::class,
+                TicketStatusChart::class,
+                TicketCategoryChart::class,
                 // \App\Filament\Widgets\ThemeSwitcher::class, // Removed
             ])
             ->middleware([

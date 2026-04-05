@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicTicketController;
+use App\Livewire\ReportForms;
 
+Route::get('/report-forms', ReportForms::class);
 Route::get('/', [PublicTicketController::class, 'index'])->name('home');
 Route::post('/laporan-store', [PublicTicketController::class, 'store'])->name('laporan.store');
 Route::get('/laporan-sukses/{uuid}', [PublicTicketController::class, 'success'])->name('laporan.sukses');

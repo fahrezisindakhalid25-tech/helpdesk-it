@@ -44,7 +44,7 @@ class Ticket extends Model
 
                     // B. HITUNG DEADLINE (Disini Rumusnya!)
                     $time = Carbon::parse($firstResponseSla->response_time);
-                    
+
                     $model->sla_due_at = now()
                         ->addDays((int) $firstResponseSla->response_days) // Tambah Hari
                         ->addHours($time->hour)      // Tambah Jam

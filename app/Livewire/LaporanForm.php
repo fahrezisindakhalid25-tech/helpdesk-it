@@ -2,20 +2,30 @@
 
 namespace App\Livewire;
 
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\FileUpload;
+use App\Jobs\SendWhatsAppNotification;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Ticket;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Component;
 use App\Models\MasterLapor;
 
-class LaporanForm extends Component implements HasForms
+class LaporanForm extends Component implements HasForms, HasActions
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public ?array $data = [];
@@ -25,18 +35,18 @@ class LaporanForm extends Component implements HasForms
         $this->form->fill();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Informasi Pelapor')
+        return $schema
+            ->components([
+                Section::make('Informasi Pelapor')
                     ->description('Masukkan NIK Anda untuk melengkapi data otomatis.')
                     ->schema([
-                        Forms\Components\TextInput::make('nik')
+                        TextInput::make('nik')
                             ->label('NIK')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            ->afterStateUpdated(function ($state, Set $set) {
                                 if (!$state) return;
                                 $karyawan = MasterLapor::where('nik', $state)->first();
                                 if ($karyawan) {
@@ -50,53 +60,53 @@ class LaporanForm extends Component implements HasForms
                                 'exists' => 'NIK tidak terdaftar dalam database kami. Silakan hubungi Admin.',
                             ]),
 
-                        Forms\Components\TextInput::make('nama_lengkap')
+                        TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
                             //->readOnly()
                             ->required()
                             ->maxLength(255),
                             
-                        Forms\Components\TextInput::make('no_hp')
+                        TextInput::make('no_hp')
                             ->label('No WhatsApp')
                             ->tel()
                             ->numeric()
                             ->placeholder('08...')
                             ->nullable(), // Tidak wajib
                             
-                        Forms\Components\TextInput::make('email')
+                        TextInput::make('email')
                             ->label('Email')
                             ->email()
                             ->nullable() // Tidak wajib
                             ->maxLength(255),
                             
-                        Forms\Components\Select::make('lokasi')
+                        Select::make('lokasi')
                             ->label('Lokasi / Unit Kerja')
                             ->options(Location::query()->pluck('name', 'name'))
                             ->searchable()
                             ->required(),
                     ])->columns(['default' => 1, 'sm' => 2]),
 
-                Forms\Components\Section::make('Detail Masalah')
+                Section::make('Detail Masalah')
                     ->schema([
-                        Forms\Components\Select::make('topik_bantuan')
+                        Select::make('topik_bantuan')
                             ->label('Kategori Masalah')
                             ->options(Category::query()->pluck('name', 'name'))
                             ->searchable()
                             ->required(),
-                        Forms\Components\TextInput::make('deskripsi_umum_masalah')
+                        TextInput::make('deskripsi_umum_masalah')
                             ->label('Judul Laporan')
                             ->placeholder('Contoh: Printer Macet di Ruang Keuangan')
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),
-                        Forms\Components\RichEditor::make('penjelasan_lengkap')
+                        RichEditor::make('penjelasan_lengkap')
                             ->label('Detail Kronologi')
                             ->required()
                             ->toolbarButtons([
                                 'bold', 'italic', 'underline', 'bulletList', 'orderedList', 'undo', 'redo'
                             ])
                             ->columnSpanFull(),
-                        Forms\Components\FileUpload::make('gambar')
+                        FileUpload::make('gambar')
                             ->label('Foto Langsung / Upload Bukti (Opsional)')
                             ->multiple()
                             ->image()
@@ -129,7 +139,7 @@ class LaporanForm extends Component implements HasForms
         $ticket = Ticket::create($data);
 
         // Send Notifications
-        \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
+        SendWhatsAppNotification::dispatch($ticket);
 
         return redirect()->route('laporan.sukses', ['uuid' => $ticket->uuid]);
     }

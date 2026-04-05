@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Illuminate\Support\Facades\Route;
@@ -24,13 +26,13 @@ class AppServiceProvider extends ServiceProvider
         // Force HTTPS jika sedang menggunakan Tunneling (LocalTunnel/Ngrok)
         // Atau jika aplikasi mendeteksi protocol https di header
         if (request()->header('X-Forwarded-Proto') === 'https' || !app()->isLocal()) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
         
         // HACK: Untuk LocalTunnel, kadang APP_ENV tetap 'local' tapi kita akses via HTTPS.
         // Kita paksa saja jika URL saat ini mengandung 'https'
-        if (\Illuminate\Support\Str::contains(request()->url(), 'https://')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+        if (Str::contains(request()->url(), 'https://')) {
+            URL::forceScheme('https');
         }
           Livewire::setScriptRoute(function ($handle) {
             $prefix = env("LIVEWIRE_URL_PREFIX");

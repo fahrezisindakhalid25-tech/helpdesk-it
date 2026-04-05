@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Filament\Resources\Tickets\Pages;
+
+use Filament\Actions\CreateAction;
+use App\Filament\Resources\Tickets\Widgets\TicketLegend;
+use App\Filament\Resources\Tickets\TicketResource;
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
+
+class ListTickets extends ListRecords
+{
+    protected static string $resource = TicketResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            TicketLegend::class,
+        ];
+    }
+}

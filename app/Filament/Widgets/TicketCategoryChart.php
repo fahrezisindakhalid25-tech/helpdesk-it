@@ -2,23 +2,24 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Category;
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
 
 class TicketCategoryChart extends ChartWidget
 {
-    protected static ?string $heading = 'Tiket per Kategori';
+    protected ?string $heading = 'Tiket per Kategori';
     protected static ?int $sort = 3;
     protected int | string | array $columnSpan = 'full';
-    protected static string $view = 'filament.widgets.chart-widget-custom';
+    protected string $view = 'filament.widgets.chart-widget-custom';
     
     // Perbesar area canvas agar batang tidak gepeng
-    protected static ?string $maxHeight = '1200px';
+    protected ?string $maxHeight = '1200px';
 
     protected function getData(): array
     {
         // 1. Ambil semua kategori yang mungkin
-        $allCategories = \App\Models\Category::pluck('name')->toArray();
+        $allCategories = Category::pluck('name')->toArray();
 
         // 2. Ambil hitungan tiket per kategori dari Database
         $ticketCounts = Ticket::selectRaw('topik_bantuan, count(*) as total')
