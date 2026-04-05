@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Category;
+use App\Models\Master\Category;
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
 
@@ -12,7 +12,7 @@ class TicketCategoryChart extends ChartWidget
     protected static ?int $sort = 3;
     protected int | string | array $columnSpan = 'full';
     protected string $view = 'filament.widgets.chart-widget-custom';
-    
+
     // Perbesar area canvas agar batang tidak gepeng
     protected ?string $maxHeight = '1200px';
 
@@ -32,7 +32,7 @@ class TicketCategoryChart extends ChartWidget
         foreach ($allCategories as $category) {
             $data[$category] = $ticketCounts[$category] ?? 0;
         }
-        
+
         // Urutkan dari yang terbanyak (High to Low)
         arsort($data);
 

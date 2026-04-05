@@ -8,7 +8,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use App\Models\Master\Location;
-use App\Models\Category;
+use App\Models\Master\Category;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Tabs;

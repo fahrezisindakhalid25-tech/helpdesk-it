@@ -7,7 +7,7 @@ use Log;
 use App\Jobs\SendWhatsAppNotification;
 use App\Models\Ticket;
 use App\Models\Master\Location;
-use App\Models\Category;
+use App\Models\Master\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Mail;

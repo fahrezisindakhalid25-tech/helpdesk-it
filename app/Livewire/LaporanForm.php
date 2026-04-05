@@ -12,7 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\FileUpload;
 use App\Jobs\SendWhatsAppNotification;
-use App\Models\Category;
+use App\Models\Master\Category;
 use App\Models\Master\Location;
 use App\Models\Ticket;
 use Filament\Forms;

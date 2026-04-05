@@ -12,7 +12,7 @@ use App\Filament\Resources\Categories\Pages\ListCategories;
 use App\Filament\Resources\Categories\Pages\CreateCategory;
 use App\Filament\Resources\Categories\Pages\EditCategory;
 use App\Filament\Resources\CategoryResource\Pages;
-use App\Models\Category;
+use App\Models\Master\Category;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
