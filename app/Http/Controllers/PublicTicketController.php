@@ -6,7 +6,7 @@ use Exception;
 use Log;
 use App\Jobs\SendWhatsAppNotification;
 use App\Models\Ticket;
-use App\Models\Location;
+use App\Models\Master\Location;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -81,7 +81,7 @@ class PublicTicketController extends Controller
     {
         $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
         $subject = "[IT Helpdesk] Laporan Anda Telah Diterima - #{$ticket->no_tiket}";
-        
+
         $htmlBody = "
         <html>
             <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
@@ -89,38 +89,38 @@ class PublicTicketController extends Controller
                     <h2 style='color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px;'>
                         Laporan IT Helpdesk PTPN IV
                     </h2>
-                    
+
                     <p>Halo <strong>{$ticket->nama_lengkap}</strong>,</p>
-                    
+
                     <p>Terima kasih telah melaporkan kendala IT kepada kami. Laporan Anda telah berhasil diterima dan sedang kami proses.</p>
-                    
+
                     <div style='background-color: #ecf0f1; padding: 15px; border-radius: 5px; margin: 20px 0;'>
                         <p style='margin: 5px 0;'><strong>Nomor Tiket:</strong> {$ticket->no_tiket}</p>
                         <p style='margin: 5px 0;'><strong>Kategori:</strong> {$ticket->topik_bantuan}</p>
                         <p style='margin: 5px 0;'><strong>Status:</strong> Dalam Antrian</p>
                         <p style='margin: 5px 0;'><strong>Tanggal:</strong> " . $ticket->created_at->format('d M Y H:i') . "</p>
                     </div>
-                    
+
                     <p style='margin-top: 20px; margin-bottom: 10px;'><strong>Cara Melacak Laporan Anda:</strong></p>
                     <p>Kunjungi link berikut untuk melihat status terbaru laporan Anda:</p>
                     <p><a href='{$linkTracking}' style='background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Lacak Laporan Anda</a></p>
-                    
+
                     <p style='margin-top: 20px; color: #7f8c8d; font-size: 12px;'>
                         Atau copy-paste link ini di browser: <br>
                         {$linkTracking}
                     </p>
-                    
+
                     <hr style='border: none; border-top: 1px solid #ddd; margin: 30px 0;'>
-                    
+
                     <p style='color: #7f8c8d; font-size: 12px;'>
-                        <strong>Catatan:</strong> Tim kami akan merespons laporan Anda dalam waktu yang telah ditentukan. 
+                        <strong>Catatan:</strong> Tim kami akan merespons laporan Anda dalam waktu yang telah ditentukan.
                         Jika ada pertanyaan, hubungi kami melalui WhatsApp atau email.
                     </p>
                 </div>
             </body>
         </html>
         ";
-        
+
         try {
             Mail::html($htmlBody, function ($message) use ($ticket, $subject) {
                 $message->to($ticket->email)
@@ -144,7 +144,7 @@ class PublicTicketController extends Controller
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
         return view('sukses', compact('ticket'));
     }
-    
+
     // === 1. UPDATE FUNGSI CEK ===
     public function cek(Request $request)
     {
@@ -212,16 +212,16 @@ class PublicTicketController extends Controller
         return back()->with('success', 'Pesan terkirim!');
     }
     // === 3. FUNGSI AJAX CHAT HISTORY ===
-    public function chatHistory(Request $request) 
+    public function chatHistory(Request $request)
     {
         $uuid = $request->query('uuid');
         if (!$uuid) return response()->json(['error' => 'UUID required'], 400);
 
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
-        
+
         $html = view('partials.chat_history', compact('ticket'))->render();
         $adminSudahJawab = $ticket->comments()->whereNotNull('user_id')->exists();
-        
+
         return response()->json([
             'html' => $html,
             'status' => $ticket->status,
@@ -246,13 +246,13 @@ class PublicTicketController extends Controller
     }
 
     // === 4. HANDLE TRIX ATTACHMENT UPLOAD ===
-    public function uploadTrixImage(Request $request) 
+    public function uploadTrixImage(Request $request)
     {
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('trix-attachments', 'public');
             return response()->json(['url' => asset('storage/' . $path)]);
         }
-        
+
         return response()->json(['error' => 'No file uploaded'], 400);
     }
 }

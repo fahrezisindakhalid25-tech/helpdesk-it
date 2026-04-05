@@ -4,14 +4,14 @@ namespace App\Filament\Widgets;
 
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
-use App\Models\Location;
+use App\Models\Master\Location;
 
 class TicketLocationChart extends ChartWidget
 {
     protected ?string $heading = 'Tiket per Lokasi';
     protected static ?int $sort = 5;
     protected int | string | array $columnSpan = 'full';
-    
+
     // Gunakan custom view agar ada label manualnya
     // Gunakan custom view agar ada label manualnya
     protected string $view = 'filament.widgets.chart-widget-custom';
@@ -21,7 +21,7 @@ class TicketLocationChart extends ChartWidget
     {
         // ... (data fetching logic remains same) ...
         $allLocations = Location::pluck('name')->toArray();
-        
+
         $ticketCounts = Ticket::selectRaw('lokasi, count(*) as total')
             ->groupBy('lokasi')
             ->pluck('total', 'lokasi')

@@ -7,7 +7,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
-use App\Models\Location;
+use App\Models\Master\Location;
 use App\Models\Category;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\RichEditor;
@@ -60,7 +60,7 @@ class TicketResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $halamanSaatIni = $schema->getOperation(); 
+        $halamanSaatIni = $schema->getOperation();
 
         // === MODE 1: CREATE (Saat Admin Input Manual) ===
         if ($halamanSaatIni === 'create') {
@@ -71,11 +71,11 @@ class TicketResource extends Resource
                             TextInput::make('nama_lengkap')->required()->label('Nama Pelapor'),
                             TextInput::make('email')->email()->required(),
                             TextInput::make('no_hp')->numeric()->required()->label('No WhatsApp'),
-                            
+
                             Select::make('lokasi')
                                 ->options(Location::pluck('name', 'name'))
                                 ->required()->searchable(),
-                            
+
                             Select::make('topik_bantuan')
                                 ->label('Kategori Masalah')
                                 ->options(Category::pluck('name', 'name'))
@@ -103,19 +103,19 @@ class TicketResource extends Resource
                                 TextInput::make('topik_bantuan')->disabled()->extraAttributes(['class' => 'bg-gray-100']),
                                 Textarea::make('deskripsi_umum_masalah')->rows(2)->disabled()->extraAttributes(['class' => 'font-bold text-lg mb-2']),
                                 RichEditor::make('penjelasan_lengkap')->disabled()->toolbarButtons([]),
-                                
+
                                 // TAMPILKAN GAMBAR JIKA ADA
                                 Placeholder::make('gambar_display')
                                     ->hiddenLabel()
                                     ->visible(fn ($record) => $record && $record->gambar)
                                     ->content(fn ($record) => $record && $record->gambar ? new HtmlString(
-                                        '<div class="mt-3"><p class="text-sm font-semibold text-gray-700 mb-2">Lampiran Gambar:</p><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px;">' . 
+                                        '<div class="mt-3"><p class="text-sm font-semibold text-gray-700 mb-2">Lampiran Gambar:</p><div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px;">' .
                                         collect(is_string($record->gambar) ? json_decode($record->gambar, true) : $record->gambar)->flatten()->filter()->map(fn($img) => '<img src="' . asset('storage/' . $img) . '" alt="Gambar Laporan" onclick="openAdminModal(this.src)" class="admin-thumbnail">')
-                                        ->join('') . 
+                                        ->join('') .
                                         '</div></div>'
                                     ) : '-'),
                             ])->compact(),
-                            
+
                             Placeholder::make('separator')->content(new HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
 
                             // CHAT HISTORY
@@ -164,12 +164,12 @@ class TicketResource extends Resource
                                         transform: scale(1.02);
                                     }
                                 </style>
-                                
+
                                 <!-- Admin Image Modal -->
                                 <div id="admin-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.85);backdrop-filter:blur(4px);" onclick="closeAdminModal()">
                                     <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
                                         <img id="admin-modal-image" style="max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,0.5);transform:scale(1);transition:transform 0.2s;" onclick="event.stopPropagation()">
-                                        
+
                                         <!-- Close Button -->
                                         <button onclick="closeAdminModal()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;width:40px;height:40px;border-radius:50%;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;">
                                             &times;
@@ -186,39 +186,39 @@ class TicketResource extends Resource
 
                                 <script>
                                     let adminZoomLevel = 1;
-                                    
+
                                     function openAdminModal(src) {
                                         document.getElementById("admin-modal").style.display = "block";
                                         document.getElementById("admin-modal-image").src = src;
                                         adminZoomLevel = 1;
                                         updateAdminImageZoom();
                                     }
-                                    
+
                                     function closeAdminModal() {
                                         document.getElementById("admin-modal").style.display = "none";
                                     }
-                                    
+
                                     function adminZoomIn() {
                                         adminZoomLevel += 0.2;
                                         updateAdminImageZoom();
                                     }
-                                    
+
                                     function adminZoomOut() {
                                         if (adminZoomLevel > 0.4) {
                                             adminZoomLevel -= 0.2;
                                             updateAdminImageZoom();
                                         }
                                     }
-                                    
+
                                     function adminResetZoom() {
                                         adminZoomLevel = 1;
                                         updateAdminImageZoom();
                                     }
-                                    
+
                                     function updateAdminImageZoom() {
                                         document.getElementById("admin-modal-image").style.transform = "scale(" + adminZoomLevel + ")";
                                     }
-                                    
+
                                     document.addEventListener("keydown", function(e) {
                                         if (e.key === "Escape") {
                                             closeAdminModal();
@@ -260,23 +260,23 @@ class TicketResource extends Resource
                                             'content' => $content,
                                             'attachments' => null, // Attachments sudah embed di content HTML
                                         ]);
-                                        
+
                                         $dataUpdate = ['last_reply_at' => now()];
                                         if (empty($record->replied_at)) $dataUpdate['replied_at'] = now();
-                                        
+
                                         if (!in_array($record->status, ['Solved', 'Closed'])) {
                                             $dataUpdate['status'] = 'Replied';
                                             $dataUpdate['solved_at'] = null; // Reset solved jika dibalas
-                                            $set('status', 'Replied'); 
+                                            $set('status', 'Replied');
                                         }
                                         $record->update($dataUpdate);
                                         $record->update($dataUpdate);
                                         $set('new_comment_content', '');
                                         // $set('new_comment_attachments', []); // Removed
-                                        
+
                                         // === KIRIM NOTIFIKASI KE USER ===
                                         self::sendAdminReplyNotification($record, $content);
-                                        
+
                                         Notification::make()->title('Terkirim')->success()->send();
                                     }),
                             ])->alignRight(),
@@ -296,7 +296,7 @@ class TicketResource extends Resource
                 // === KOLOM KANAN (SIDEBAR: SEKARANG ADA 2 DROPDOWN SLA) ===
                 Group::make()->columnSpan(1)->schema([
                     Section::make('Kontrol SLA')->schema([
-                        
+
                         Placeholder::make('header_custom')->content(fn ($record) => new HtmlString('
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-lg">'.substr($record->nama_lengkap ?? 'A', 0, 1).'</div>
@@ -323,7 +323,7 @@ class TicketResource extends Resource
                         // TIMER FIRST RESPONSE
                         Placeholder::make('first_response_timer')
                             ->hiddenLabel()
-                            ->content(function ($record, $get) { 
+                            ->content(function ($record, $get) {
                                 if ($record->replied_at) {
                                     $text = $record->created_at->diff($record->replied_at)->format('%ad %hh %im %ss');
                                     return new HtmlString("<div class='bg-blue-50 p-2 rounded border border-blue-200 text-center'><span class='text-blue-700 font-bold'>✓ Responded</span><div class='text-xs'>$text</div></div>");
@@ -335,8 +335,8 @@ class TicketResource extends Resource
                                 // Ambil Data SLA (Hari + Jam)
                                 $sla = Sla::find($slaId);
                                 if (!$sla) return '-';
-                                
-                                $days = (int) $sla->response_days; 
+
+                                $days = (int) $sla->response_days;
                                 $timeParts = explode(':', $sla->response_time ?? '00:00:00');
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
@@ -369,24 +369,24 @@ class TicketResource extends Resource
                         // TIMER RESOLUTION
                         Placeholder::make('resolution_timer')
                             ->hiddenLabel()
-                            ->content(function ($record, $get) { 
+                            ->content(function ($record, $get) {
                                 if ($record->status === 'Solved' || $record->status === 'Closed') {
                                     $text = $record->created_at->diff($record->solved_at ?? $record->closed_at ?? now())->format('%ad %hh %im %ss');
                                     return new HtmlString("<div class='bg-green-50 p-2 rounded border border-green-200 text-center'><span class='text-green-700 font-bold'>✓ Solved</span><div class='text-xs'>$text</div></div>");
                                 }
-                                
+
                                 $slaId = $record->resolution_sla_id ?? $get('resolution_sla_id');
                                 if (!$slaId) return new HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Resolusi -</div>');
 
                                 $sla = Sla::find($slaId);
                                 if (!$sla) return '-';
-                                
+
                                 // Gunakan response_days (karena user menggunakan field Durasi Pengerjaan yang ada)
-                                $days = (int) $sla->response_days; 
-                                
+                                $days = (int) $sla->response_days;
+
                                 // Ambil jam dari response_time
                                 $timeParts = explode(':', $sla->response_time ?? '00:00:00');
-                                
+
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
                                 return new HtmlString("
@@ -432,11 +432,11 @@ class TicketResource extends Resource
                         default => 'gray',
                     })
                     ->label('No Tiket'),
-                    
+
                 TextColumn::make('nama_lengkap')->searchable(),
                 TextColumn::make('topik_bantuan')->limit(20)->label('Kategori'),
                 // Sla Name dihapus sesuai request
-                
+
                 // === SLA FIRST RESPONSE TIMER ===
                 TextColumn::make('sla_timer')
                     ->label('SLA Respon')
@@ -462,7 +462,7 @@ class TicketResource extends Resource
                             $durasi = $record->created_at->diff($end)->format('%ad %hh %im');
                             return "<div class='text-xs text-green-600 font-bold'>✓ Solved<br><span class='font-normal text-gray-500'>$durasi</span></div>";
                         }
-                        
+
                         return '<span class="text-xs text-gray-400">-</span>';
                     }),
 
@@ -512,14 +512,14 @@ class TicketResource extends Resource
             ->filtersFormColumns(2)
             ->headerActions([])
             ->recordActions([
-                EditAction::make()->label('Detail')->icon('heroicon-m-eye'), 
+                EditAction::make()->label('Detail')->icon('heroicon-m-eye'),
                 Action::make('export_row')
                     ->label('Export')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->visible(fn () => auth()->user()->hasPermission('ticket.export'))
                     ->action(function ($record, Action $action) {
                         $record = $record ?? $action->getRecord();
-                        
+
                         if (!$record) {
                             Notification::make()
                                 ->title('Error')
@@ -559,7 +559,7 @@ class TicketResource extends Resource
     {
         // Kirim Email
         self::sendAdminReplyEmail($ticket, $replyContent);
-        
+
         // Kirim WhatsApp
         self::sendAdminReplyWhatsApp($ticket, $replyContent);
     }
@@ -616,7 +616,7 @@ class TicketResource extends Resource
         // Pastikan sla_id dan resolution_sla_id dimuat dari database
         return $data;
     }
-    
+
     public static function getRelations(): array { return []; }
     public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['sla', 'resolutionSla', 'comments.user']); }
 }

@@ -13,7 +13,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\FileUpload;
 use App\Jobs\SendWhatsAppNotification;
 use App\Models\Category;
-use App\Models\Location;
+use App\Models\Master\Location;
 use App\Models\Ticket;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -65,20 +65,20 @@ class LaporanForm extends Component implements HasForms, HasActions
                             //->readOnly()
                             ->required()
                             ->maxLength(255),
-                            
+
                         TextInput::make('no_hp')
                             ->label('No WhatsApp')
                             ->tel()
                             ->numeric()
                             ->placeholder('08...')
                             ->nullable(), // Tidak wajib
-                            
+
                         TextInput::make('email')
                             ->label('Email')
                             ->email()
                             ->nullable() // Tidak wajib
                             ->maxLength(255),
-                            
+
                         Select::make('lokasi')
                             ->label('Lokasi / Unit Kerja')
                             ->options(Location::query()->pluck('name', 'name'))

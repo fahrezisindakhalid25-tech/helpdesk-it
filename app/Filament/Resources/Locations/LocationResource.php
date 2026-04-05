@@ -12,7 +12,7 @@ use App\Filament\Resources\Locations\Pages\ListLocations;
 use App\Filament\Resources\Locations\Pages\CreateLocation;
 use App\Filament\Resources\Locations\Pages\EditLocation;
 use App\Filament\Resources\LocationResource\Pages;
-use App\Models\Location;
+use App\Models\Master\Location;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
