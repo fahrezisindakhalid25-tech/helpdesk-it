@@ -6,6 +6,7 @@ use Filament\Actions\CreateAction;
 use App\Filament\Resources\Categories\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Icons\Heroicon;
 
 class ListCategories extends ListRecords
 {
@@ -14,7 +15,9 @@ class ListCategories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->iconButton()
+                ->icon(Heroicon::PlusCircle),
         ];
     }
 }

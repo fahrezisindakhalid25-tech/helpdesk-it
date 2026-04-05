@@ -8,7 +8,10 @@ use App\Filament\Resources\Categories\Pages\EditCategory;
 use App\Filament\Resources\Categories\Pages\ListCategories;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Master\Category;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
@@ -27,21 +30,25 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
-    protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
-    protected static ?string $navigationLabel = 'Kategori Masalah';
+    protected static string | \UnitEnum | null $navigationGroup = 'Master';
+    protected static ?string $navigationLabel = 'Kategori';
+    protected static ?string $modelLabel = 'Kategori';
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make()->schema([
+            Section::make()
+            ->heading('Kategori')
+            ->description('Informasi seputar kategori')
+            ->schema([
                 TextInput::make('name')
-                    ->label('Kategori')
+                    ->label('Nama')
                     ->required()
                     ->maxLength(255),
             ]),
             Section::make()
                 ->heading('Service Level Agreements (SLA)')
-                ->description('Informasikan SLA untuk setiap kategori permasalahan')
+                ->description('Stopwatch untuk perhitungan SLA')
                 ->schema([
                     Grid::make([
                         'md' => 2,
@@ -61,15 +68,30 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Kategori')
+            ->description('Kategori permasalahan serta kaitannya dengan Service Level Agreements (SLA)')
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Masalah')
+                    ->label('Kategori')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('response_time')
+                    ->label('Response time')
+                    ->getStateUsing(fn($record) => $record->serviceLevelAgreements()->where('type', SLAType::RESPONSE)->first()?->timeunit ?? '-'),
+                TextColumn::make('resolution_time')
+                    ->label('Resolution time')
+                    ->getStateUsing(fn($record) => $record->serviceLevelAgreements()->where('type', SLAType::RESOLUTION)->first()?->timeunit ?? '-'),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
             ]);
     }
 

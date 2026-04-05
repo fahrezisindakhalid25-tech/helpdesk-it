@@ -3,23 +3,18 @@
 namespace App\Filament\Resources\Categories\Pages;
 
 use App\Enums\SLAType;
-use Filament\Actions\DeleteAction;
+use App\Filament\Pages\EditRecord;
 use App\Filament\Resources\Categories\CategoryResource;
 use App\Models\Master\Category;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
+use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
 class EditCategory extends EditRecord
 {
     protected static string $resource = CategoryResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            DeleteAction::make(),
-        ];
-    }
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
