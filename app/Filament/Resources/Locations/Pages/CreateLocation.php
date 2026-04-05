@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Locations\Pages;
 
+use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\Locations\LocationResource;
 use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
 
 class CreateLocation extends CreateRecord
 {

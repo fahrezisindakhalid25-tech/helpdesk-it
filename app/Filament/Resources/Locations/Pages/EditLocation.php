@@ -2,19 +2,12 @@
 
 namespace App\Filament\Resources\Locations\Pages;
 
-use Filament\Actions\DeleteAction;
+use App\Filament\Pages\EditRecord;
 use App\Filament\Resources\Locations\LocationResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\DeleteAction;
 
 class EditLocation extends EditRecord
 {
     protected static string $resource = LocationResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            DeleteAction::make(),
-        ];
-    }
 }

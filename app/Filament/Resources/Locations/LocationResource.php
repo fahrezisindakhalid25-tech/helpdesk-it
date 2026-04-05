@@ -13,6 +13,7 @@ use App\Filament\Resources\Locations\Pages\CreateLocation;
 use App\Filament\Resources\Locations\Pages\EditLocation;
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\Master\Location;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -22,8 +23,9 @@ class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
-    protected static string | \UnitEnum | null $navigationGroup = 'Master Data';
+    protected static string | \UnitEnum | null $navigationGroup = 'Master';
     protected static ?string $navigationLabel = 'Lokasi';
+    protected static ?string $modelLabel = 'Lokasi';
 
     public static function form(Schema $schema): Schema
     {
