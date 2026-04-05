@@ -9,8 +9,11 @@ use Filament\Widgets\ChartWidget;
 class TicketCategoryChart extends ChartWidget
 {
     protected ?string $heading = 'Tiket per Kategori';
+
     protected static ?int $sort = 3;
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
+
     protected string $view = 'filament.widgets.chart-widget-custom';
 
     // Perbesar area canvas agar batang tidak gepeng

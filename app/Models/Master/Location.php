@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use Database\Factories\Master\LocationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ class Location extends Model
 
     protected static function newFactory()
     {
-        return \Database\Factories\Master\LocationFactory::new();
+        return LocationFactory::new();
     }
 
     protected $table = 'ms_locations';

@@ -2,11 +2,11 @@
 
 namespace Database\Factories\Master;
 
+use App\Models\Master\Pelapor;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Master\Pelapor>
+ * @extends Factory<Pelapor>
  */
 class PelaporFactory extends Factory
 {

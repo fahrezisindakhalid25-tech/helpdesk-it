@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Locations\Pages;
 
 use App\Filament\Resources\Locations\LocationResource;
-use Filament\Actions;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;

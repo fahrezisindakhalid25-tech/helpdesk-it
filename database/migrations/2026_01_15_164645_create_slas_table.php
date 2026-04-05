@@ -9,20 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
-{
-    Schema::create('slas', function (Blueprint $table) {
-        $table->id();
-        $table->string('name'); 
-        $table->string('number')->nullable();
-        
-        $table->string('response_days')->nullable();
-        $table->time('response_time')->nullable(); 
-        $table->integer('resolution_days')->default(0);
+    public function up(): void
+    {
+        Schema::create('slas', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('number')->nullable();
 
-        $table->timestamps();
-    });
-}
+            $table->string('response_days')->nullable();
+            $table->time('response_time')->nullable();
+            $table->integer('resolution_days')->default(0);
+
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

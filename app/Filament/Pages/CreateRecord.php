@@ -2,9 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\CreateRecord as BaseCreateRecord;
-use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 
 class CreateRecord extends BaseCreateRecord

@@ -3,14 +3,15 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Ticket;
-use Filament\Widgets\ChartWidget;
 use Carbon\Carbon;
-use Filament\Support\RawJs;
+use Filament\Widgets\ChartWidget;
 
 class FirstResponseSlaChart extends ChartWidget
 {
     protected ?string $heading = 'SLA First Response';
+
     protected static ?int $sort = 1;
+
     protected string $view = 'filament.widgets.chart-widget-custom';
 
     protected function getData(): array
@@ -21,20 +22,22 @@ class FirstResponseSlaChart extends ChartWidget
         $onTime = 0;
         $overdue = 0;
         // Opsional: Jika ingin menghitung yang masih berjalan (belum deadline)
-        $running = 0; 
+        $running = 0;
 
         foreach ($tickets as $ticket) {
             $sla = $ticket->sla;
-            if (!$sla) continue;
+            if (! $sla) {
+                continue;
+            }
 
             // Hitung Deadline
             $slaDays = (int) $sla->response_days;
             $timeParts = explode(':', $sla->response_time ?? '00:00:00');
-            
+
             $deadline = Carbon::parse($ticket->created_at)
                 ->addDays($slaDays)
-                ->addHours((int)$timeParts[0])
-                ->addMinutes((int)$timeParts[1]);
+                ->addHours((int) $timeParts[0])
+                ->addMinutes((int) $timeParts[1]);
 
             // Cek Status
             if ($ticket->replied_at) {
@@ -59,9 +62,9 @@ class FirstResponseSlaChart extends ChartWidget
         }
 
         $total = $onTime + $overdue + $running;
-        
+
         // Helper function for percentage
-        $formatLabel = fn($label, $val) => $label . ' (' . ($total > 0 ? round(($val / $total) * 100, 1) : 0) . '% - ' . $val . ')';
+        $formatLabel = fn ($label, $val) => $label.' ('.($total > 0 ? round(($val / $total) * 100, 1) : 0).'% - '.$val.')';
 
         return [
             'datasets' => [
@@ -73,9 +76,9 @@ class FirstResponseSlaChart extends ChartWidget
                 ],
             ],
             'labels' => [
-                $formatLabel('On Time', $onTime), 
-                $formatLabel('Overdue', $overdue), 
-                $formatLabel('Dalam Proses', $running)
+                $formatLabel('On Time', $onTime),
+                $formatLabel('Overdue', $overdue),
+                $formatLabel('Dalam Proses', $running),
             ],
         ];
     }
@@ -84,7 +87,7 @@ class FirstResponseSlaChart extends ChartWidget
     {
         return 'pie';
     }
-    
+
     protected function getOptions(): array
     {
         return [

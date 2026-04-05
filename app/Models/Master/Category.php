@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $table = 'ms_categories';
+
     protected $fillable = ['name'];
 
     public function sla()

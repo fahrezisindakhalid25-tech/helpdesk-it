@@ -2,10 +2,10 @@
 
 namespace App\Exports;
 
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Illuminate\Database\Eloquent\Builder;
 
 class TicketExport implements FromQuery, WithHeadings, WithMapping
 {

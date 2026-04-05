@@ -6,46 +6,44 @@ use App\Enums\SLAType;
 use App\Filament\Resources\Categories\Pages\CreateCategory;
 use App\Filament\Resources\Categories\Pages\EditCategory;
 use App\Filament\Resources\Categories\Pages\ListCategories;
-use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Master\Category;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
-    protected static string | \UnitEnum | null $navigationGroup = 'Master';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Master';
+
     protected static ?string $navigationLabel = 'Kategori';
+
     protected static ?string $modelLabel = 'Kategori';
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             Section::make()
-            ->heading('Kategori')
-            ->description('Informasi seputar kategori')
-            ->schema([
-                TextInput::make('name')
-                    ->label('Nama')
-                    ->required()
-                    ->maxLength(255),
-            ]),
+                ->heading('Kategori')
+                ->description('Informasi seputar kategori')
+                ->schema([
+                    TextInput::make('name')
+                        ->label('Nama')
+                        ->required()
+                        ->maxLength(255),
+                ]),
             Section::make()
                 ->heading('Service Level Agreements (SLA)')
                 ->description('Stopwatch untuk perhitungan SLA')
@@ -59,9 +57,9 @@ class CategoryResource extends Resource
                             ->regex('/^(?=.*\d[dhms])(?:\d+d)?(?:\d+h)?(?:\d+m)?(?:\d+s)?$/'),
                         TextInput::make('resolution_time')
                             ->label('Resolution time'),
-                    ])
+                    ]),
                 ])
-                ->columnSpanFull()
+                ->columnSpanFull(),
         ]);
     }
 
@@ -77,10 +75,10 @@ class CategoryResource extends Resource
                     ->sortable(),
                 TextColumn::make('response_time')
                     ->label('Response time')
-                    ->getStateUsing(fn($record) => $record->serviceLevelAgreements()->where('type', SLAType::RESPONSE)->first()?->timeunit ?? '-'),
+                    ->getStateUsing(fn ($record) => $record->serviceLevelAgreements()->where('type', SLAType::RESPONSE)->first()?->timeunit ?? '-'),
                 TextColumn::make('resolution_time')
                     ->label('Resolution time')
-                    ->getStateUsing(fn($record) => $record->serviceLevelAgreements()->where('type', SLAType::RESOLUTION)->first()?->timeunit ?? '-'),
+                    ->getStateUsing(fn ($record) => $record->serviceLevelAgreements()->where('type', SLAType::RESOLUTION)->first()?->timeunit ?? '-'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -91,7 +89,7 @@ class CategoryResource extends Resource
                 ActionGroup::make([
                     EditAction::make(),
                     DeleteAction::make(),
-                ])
+                ]),
             ]);
     }
 

@@ -2,19 +2,12 @@
 
 namespace App\Livewire;
 
-use Filament\Actions\ButtonAction;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\RichEditor\ToolbarButtonGroup;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Flex;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Image;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
@@ -22,8 +15,7 @@ use Livewire\Component;
 
 class ReportForms extends Component implements HasSchemas
 {
-    use InteractsWithSchemas, InteractsWithActions;
-
+    use InteractsWithActions, InteractsWithSchemas;
 
     public ?array $data = [];
 
@@ -67,7 +59,7 @@ class ReportForms extends Component implements HasSchemas
                     ->label('Rincian Kronologi')
                     ->required()
                     ->extraInputAttributes([
-                        'class' => 'h-64'
+                        'class' => 'h-64',
                     ])
                     ->toolbarButtons([
                         ['bold', 'italic', 'underline'],
@@ -75,7 +67,7 @@ class ReportForms extends Component implements HasSchemas
                         [ToolbarButtonGroup::make('Alignment', ['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'])],
                         ['bulletList', 'orderedList'],
                         // ['table', 'attachFiles'],
-                        ['undo', 'redo']
+                        ['undo', 'redo'],
                     ])
                     ->fileAttachmentsDisk('public'),
                 FileUpload::make('gambar'),

@@ -3,9 +3,6 @@
 namespace App\Filament\Pages\Auth;
 
 use Filament\Auth\Pages\Login;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Component;
-use Illuminate\Contracts\Support\Htmlable;
 
 class CustomLogin extends Login
 {

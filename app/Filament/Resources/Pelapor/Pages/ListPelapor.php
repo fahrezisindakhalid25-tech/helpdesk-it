@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Pelapor\Pages;
 
 use App\Filament\Resources\Pelapor\PelaporResource;
-use Filament\Actions;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;

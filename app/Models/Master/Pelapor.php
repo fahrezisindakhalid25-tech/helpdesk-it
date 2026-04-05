@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use Database\Factories\Master\PelaporFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ class Pelapor extends Model
 
     protected static function newFactory()
     {
-        return \Database\Factories\Master\PelaporFactory::new();
+        return PelaporFactory::new();
     }
 
     protected $table = 'ms_pelapor';

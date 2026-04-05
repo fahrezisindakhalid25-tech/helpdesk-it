@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use Carbon\Carbon; // <--- WAJIB TAMBAH INI BUAT HITUNG WAKTU
+use Illuminate\Support\Str; // <--- WAJIB TAMBAH INI BUAT HITUNG WAKTU
 
 class Ticket extends Model
 {
@@ -31,7 +31,7 @@ class Ticket extends Model
                 $model->uuid = (string) Str::uuid();
             }
             if (empty($model->no_tiket)) {
-                $model->no_tiket = 'TICKET-' . strtoupper(Str::random(5));
+                $model->no_tiket = 'TICKET-'.strtoupper(Str::random(5));
             }
 
             // === 1. LOGIKA FIRST RESPONSE ===
@@ -63,7 +63,7 @@ class Ticket extends Model
                     // B. HITUNG DEADLINE (Rumus diperbaiki)
                     // Ambil jam & menit dari SLA
                     $timeRes = Carbon::parse($resolutionSla->response_time);
-                    
+
                     $model->resolution_due_at = now()
                         ->addDays((int) $resolutionSla->response_days)
                         ->addHours($timeRes->hour)

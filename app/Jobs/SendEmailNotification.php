@@ -2,30 +2,31 @@
 
 namespace App\Jobs;
 
-use Exception;
 use App\Models\Ticket;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendEmailNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $ticket;
+
     protected $type;
+
     protected $content;
 
     /**
      * Create a new job instance.
      *
-     * @param Ticket $ticket
-     * @param string $type ('new_ticket' or 'admin_reply')
-     * @param string|null $content (Optional content for reply)
+     * @param  string  $type  ('new_ticket' or 'admin_reply')
+     * @param  string|null  $content  (Optional content for reply)
      */
     public function __construct(Ticket $ticket, $type = 'new_ticket', $content = null)
     {
@@ -61,7 +62,7 @@ class SendEmailNotification implements ShouldQueue
                                 <p><strong>Tiket #:</strong> {$ticket->no_tiket}</p>
                                 <p><strong>Kategori:</strong> {$ticket->topik_bantuan}</p>
                                 <hr>
-                                <p>" . nl2br(e($replyContent)) . "</p>
+                                <p>".nl2br(e($replyContent))."</p>
                             </div>
                             <p>Silakan cek status laporan dan berikan balasan Anda di link berikut:</p>
                             <p><a href='{$linkTracking}' style='background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Lihat Detail Laporan</a></p>
@@ -73,7 +74,7 @@ class SendEmailNotification implements ShouldQueue
         } else {
             // === EMAIL TIKET BARU (DEFAULT) ===
             $subject = "[IT Helpdesk] Tiket Laporan Diterima - #{$ticket->no_tiket}";
-            
+
             $htmlBody = "
             <html>
                 <body style='font-family: Arial, sans-serif; color: #333;'>
@@ -105,14 +106,14 @@ class SendEmailNotification implements ShouldQueue
                 // Gunakan alamat default dari config, fallback ke dummy jika null
                 $fromAddress = config('mail.from.address') ?? 'helpdesk@ptpn4.com';
                 $fromName = config('mail.from.name') ?? 'IT Helpdesk PTPN IV';
-                
+
                 $message->to($ticket->email)
                     ->subject($subject)
                     ->from($fromAddress, $fromName);
             });
             Log::info("Email notification ($this->type) sent to {$ticket->email} for Ticket #{$ticket->no_tiket}");
         } catch (Exception $e) {
-            Log::error('Email Job Error for Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
+            Log::error('Email Job Error for Ticket #'.$ticket->no_tiket.': '.$e->getMessage());
         }
     }
 }

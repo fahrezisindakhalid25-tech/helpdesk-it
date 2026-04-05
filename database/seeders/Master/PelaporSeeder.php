@@ -3,7 +3,6 @@
 namespace Database\Seeders\Master;
 
 use App\Models\Master\Pelapor;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PelaporSeeder extends Seeder

@@ -2,19 +2,22 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Master\Location;
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
-use App\Models\Master\Location;
 
 class TicketLocationChart extends ChartWidget
 {
     protected ?string $heading = 'Tiket per Lokasi';
+
     protected static ?int $sort = 5;
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     // Gunakan custom view agar ada label manualnya
     // Gunakan custom view agar ada label manualnya
     protected string $view = 'filament.widgets.chart-widget-custom';
+
     protected ?string $maxHeight = '1200px';
 
     protected function getData(): array

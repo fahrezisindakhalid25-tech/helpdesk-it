@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Master\CategorySeeder;
+use Database\Seeders\Master\LocationSeeder;
+use Database\Seeders\Master\PelaporSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,9 +15,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            \Database\Seeders\Master\LocationSeeder::class,
-            \Database\Seeders\Master\CategorySeeder::class,
-            \Database\Seeders\Master\PelaporSeeder::class,
+            LocationSeeder::class,
+            CategorySeeder::class,
+            PelaporSeeder::class,
         ]);
     }
 }

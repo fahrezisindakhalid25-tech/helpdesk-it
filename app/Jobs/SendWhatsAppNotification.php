@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use Exception;
 use App\Models\Ticket;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -17,13 +17,13 @@ class SendWhatsAppNotification implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $ticket;
+
     protected $customMessage;
 
     /**
      * Create a new job instance.
      *
-     * @param Ticket $ticket
-     * @param string|null $customMessage Optional custom message override
+     * @param  string|null  $customMessage  Optional custom message override
      */
     public function __construct(Ticket $ticket, $customMessage = null)
     {
@@ -39,8 +39,9 @@ class SendWhatsAppNotification implements ShouldQueue
         $ticket = $this->ticket;
         $token = config('services.fonnte.token');
 
-        if (!$token) {
-            Log::warning('WA_API_TOKEN tidak ditemukan di ENV saat memproses Job Ticket #' . $ticket->no_tiket);
+        if (! $token) {
+            Log::warning('WA_API_TOKEN tidak ditemukan di ENV saat memproses Job Ticket #'.$ticket->no_tiket);
+
             return;
         }
 
@@ -48,22 +49,22 @@ class SendWhatsAppNotification implements ShouldQueue
         $phone = $this->formatPhoneNumber($ticket->no_hp);
         // Note: Route inside job might need explicit domain if running from CLI, but usually fine.
         // Better to pass full link if needed, but route() usually works if APP_URL is set.
-        
+
         if ($this->customMessage) {
             // === MODE 1: CUSTOM MESSAGE (E.g. Admin Reply) ===
             $message = $this->customMessage;
         } else {
             // === MODE 2: DEFAULT NEW TICKET MESSAGE ===
-            $linkTracking = route('laporan.cek', ['uuid' => $ticket->uuid]); 
+            $linkTracking = route('laporan.cek', ['uuid' => $ticket->uuid]);
             $message = "IT Helpdesk PTPN IV\n\n"
-                . "Halo {$ticket->nama_lengkap},\n\n"
-                . "Laporan Anda telah diterima!\n\n"
-                . "Nomor Tiket: {$ticket->no_tiket}\n"
-                . "Kategori: {$ticket->topik_bantuan}\n"
-                . "Status: Dalam Antrian\n\n"
-                . "Lacak laporan Anda di:\n"
-                . "{$linkTracking}\n\n"
-                . "Tim kami akan segera menghubungi Anda.";
+                ."Halo {$ticket->nama_lengkap},\n\n"
+                ."Laporan Anda telah diterima!\n\n"
+                ."Nomor Tiket: {$ticket->no_tiket}\n"
+                ."Kategori: {$ticket->topik_bantuan}\n"
+                ."Status: Dalam Antrian\n\n"
+                ."Lacak laporan Anda di:\n"
+                ."{$linkTracking}\n\n"
+                .'Tim kami akan segera menghubungi Anda.';
         }
 
         try {
@@ -74,16 +75,16 @@ class SendWhatsAppNotification implements ShouldQueue
                 'message' => $message,
             ]);
 
-            Log::info('WhatsApp Job Result #' . $ticket->no_tiket . ': ' . $response->body());
+            Log::info('WhatsApp Job Result #'.$ticket->no_tiket.': '.$response->body());
 
-            if (!$response->successful()) {
-                Log::error('WhatsApp Job Failed: ' . $response->body());
+            if (! $response->successful()) {
+                Log::error('WhatsApp Job Failed: '.$response->body());
                 // Optional: throw exception to retry job?
-                // throw new \Exception('Fonnte API Error'); 
+                // throw new \Exception('Fonnte API Error');
             }
 
         } catch (Exception $e) {
-            Log::error('WhatsApp Job Error for Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
+            Log::error('WhatsApp Job Error for Ticket #'.$ticket->no_tiket.': '.$e->getMessage());
             // $this->release(60); // Retry after 60s if needed
         }
     }
@@ -92,11 +93,12 @@ class SendWhatsAppNotification implements ShouldQueue
     {
         $phone = preg_replace('/\D/', '', $phone);
         if (substr($phone, 0, 1) === '0') {
-            $phone = '62' . substr($phone, 1);
+            $phone = '62'.substr($phone, 1);
         }
         if (substr($phone, 0, 2) !== '62') {
-            $phone = '62' . $phone;
+            $phone = '62'.$phone;
         }
+
         return $phone;
     }
 }

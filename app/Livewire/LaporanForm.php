@@ -2,28 +2,25 @@
 
 namespace App\Livewire;
 
-use Filament\Actions\Contracts\HasActions;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\FileUpload;
 use App\Jobs\SendWhatsAppNotification;
 use App\Models\Master\Category;
 use App\Models\Master\Location;
 use App\Models\Ticket;
-use Filament\Forms;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Illuminate\Support\Facades\Http;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Component;
-use App\Models\Master\Pelapor;
 
-class LaporanForm extends Component implements HasForms, HasActions
+class LaporanForm extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
@@ -47,7 +44,9 @@ class LaporanForm extends Component implements HasForms, HasActions
                             ->required()
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, Set $set) {
-                                if (!$state) return;
+                                if (! $state) {
+                                    return;
+                                }
                                 $karyawan = MasterLapor::where('nik', $state)->first();
                                 if ($karyawan) {
                                     $set('nama_lengkap', $karyawan->nama);
@@ -62,7 +61,7 @@ class LaporanForm extends Component implements HasForms, HasActions
 
                         TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
-                            //->readOnly()
+                            // ->readOnly()
                             ->required()
                             ->maxLength(255),
 
@@ -103,7 +102,7 @@ class LaporanForm extends Component implements HasForms, HasActions
                             ->label('Detail Kronologi')
                             ->required()
                             ->toolbarButtons([
-                                'bold', 'italic', 'underline', 'bulletList', 'orderedList', 'undo', 'redo'
+                                'bold', 'italic', 'underline', 'bulletList', 'orderedList', 'undo', 'redo',
                             ])
                             ->columnSpanFull(),
                         FileUpload::make('gambar')
@@ -121,10 +120,11 @@ class LaporanForm extends Component implements HasForms, HasActions
     public function create()
     {
         // Rate Limiter
-        $key = 'kirim-tiket:' . request()->ip();
+        $key = 'kirim-tiket:'.request()->ip();
         if (RateLimiter::tooManyAttempts($key, 1)) {
             $seconds = RateLimiter::availableIn($key);
             $this->addError('rate_limit', "Mohon tunggu $seconds detik lagi sebelum mengirim laporan baru.");
+
             return;
         }
         RateLimiter::hit($key, 60);

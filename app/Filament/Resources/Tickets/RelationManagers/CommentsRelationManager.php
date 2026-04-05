@@ -1,20 +1,20 @@
 <?php
 
 namespace App\Filament\Resources\Tickets\RelationManagers; // <--- INI WAJIB BENAR
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\Layout\Stack;
-use Filament\Tables\Columns\Layout\Split;
-use Filament\Tables\Columns\TextColumn;
+
 use Filament\Actions\CreateAction;
-use Filament\Forms;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class CommentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'comments';
+
     protected static ?string $title = 'Aktivitas & Diskusi';
 
     public function form(Schema $schema): Schema
@@ -66,6 +66,7 @@ class CommentsRelationManager extends RelationManager
                     ->modalHeading('Tulis Balasan Anda')
                     ->mutateDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();
+
                         return $data;
                     }),
             ])

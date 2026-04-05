@@ -5,11 +5,6 @@ namespace App\Filament\Resources\Categories\Pages;
 use App\Enums\SLAType;
 use App\Filament\Pages\EditRecord;
 use App\Filament\Resources\Categories\CategoryResource;
-use App\Models\Master\Category;
-use Filament\Actions;
-use Filament\Actions\DeleteAction;
-use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
 
 class EditCategory extends EditRecord

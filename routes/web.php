@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PublicTicketController;
 use App\Livewire\ReportForms;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/report-forms', ReportForms::class);
 Route::get('/', [PublicTicketController::class, 'index'])->name('home');

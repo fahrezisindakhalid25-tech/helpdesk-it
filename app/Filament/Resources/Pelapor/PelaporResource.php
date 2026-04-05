@@ -2,29 +2,29 @@
 
 namespace App\Filament\Resources\Pelapor;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\Pelapor\Pages\ListPelapor;
 use App\Filament\Resources\Pelapor\Pages\CreatePelapor;
 use App\Filament\Resources\Pelapor\Pages\EditPelapor;
+use App\Filament\Resources\Pelapor\Pages\ListPelapor;
 use App\Models\Master\Pelapor;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class PelaporResource extends Resource
 {
     protected static ?string $model = Pelapor::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Master';
+    protected static string|\UnitEnum|null $navigationGroup = 'Master';
 
     protected static ?string $navigationLabel = 'Pelapor';
 
@@ -75,7 +75,7 @@ class PelaporResource extends Resource
                             ->label('Handphone')
                             ->tel()
                             ->maxLength(14),
-                    ])
+                    ]),
             ]);
     }
 
@@ -113,7 +113,7 @@ class PelaporResource extends Resource
                 ActionGroup::make([
                     EditAction::make(),
                     DeleteAction::make(),
-                ])
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

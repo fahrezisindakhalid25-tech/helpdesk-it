@@ -3,27 +3,25 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\CustomLogin;
-use Illuminate\Support\Facades\Blade;
 use App\Filament\Pages\Dashboard;
-use Filament\Widgets\AccountWidget;
-use App\Filament\Widgets\TicketStatsWidget;
 use App\Filament\Widgets\FirstResponseSlaChart;
-use App\Filament\Widgets\TicketStatusChart;
 use App\Filament\Widgets\TicketCategoryChart;
+use App\Filament\Widgets\TicketStatsWidget;
+use App\Filament\Widgets\TicketStatusChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color; // PENTING: Import Warna
-use Filament\Widgets;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Filament\Support\Colors\Color;
+use Filament\Widgets\AccountWidget;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse; // PENTING: Import Warna
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -46,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
                 'panels::head.end',
                 fn () => Blade::render('@vite(["resources/css/app.css", "resources/js/app.js"])')
             )
-            
+
             // === BAGIAN INI YANG MENGUBAH TAMPILAN JADI BAGUS ===
             ->brandName('IT Helpdesk PTPN IV') // Mengganti tulisan "Laravel"
             ->colors([

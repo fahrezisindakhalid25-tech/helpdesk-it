@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,7 @@ return new class extends Migration
         });
 
         // Migrate Data: Copy permissions from Role to User
-        foreach (\App\Models\User::all() as $user) {
+        foreach (User::all() as $user) {
             if ($user->role && $user->role->permissions) {
                 $user->permissions = $user->role->permissions;
                 $user->save();

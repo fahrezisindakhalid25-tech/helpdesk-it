@@ -2,29 +2,29 @@
 
 namespace App\Filament\Resources\Locations;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use App\Filament\Resources\Locations\Pages\ListLocations;
 use App\Filament\Resources\Locations\Pages\CreateLocation;
 use App\Filament\Resources\Locations\Pages\EditLocation;
-use App\Filament\Resources\LocationResource\Pages;
+use App\Filament\Resources\Locations\Pages\ListLocations;
 use App\Models\Master\Location;
-use Filament\Actions\ActionGroup;
-use Filament\Forms;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class LocationResource extends Resource
 {
     protected static ?string $model = Location::class;
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
-    protected static string | \UnitEnum | null $navigationGroup = 'Master';
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map-pin';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Master';
+
     protected static ?string $navigationLabel = 'Lokasi';
+
     protected static ?string $modelLabel = 'Lokasi';
 
     public static function form(Schema $schema): Schema
@@ -36,7 +36,7 @@ class LocationResource extends Resource
                     ->placeholder('Contoh: Kantor Pusat, Pabrik A')
                     ->required()
                     ->maxLength(255),
-            ])
+            ]),
         ]);
     }
 

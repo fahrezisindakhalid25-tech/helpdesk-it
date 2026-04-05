@@ -7,10 +7,11 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class DarkModeToggle extends Page
 {
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-moon';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-moon';
+
     protected static bool $shouldRegisterNavigation = false;
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return 'Theme Settings';
     }

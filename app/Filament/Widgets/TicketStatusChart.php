@@ -4,12 +4,13 @@ namespace App\Filament\Widgets;
 
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
-use Filament\Support\RawJs;
 
 class TicketStatusChart extends ChartWidget
 {
     protected ?string $heading = 'Status Tiket';
+
     protected static ?int $sort = 2;
+
     protected string $view = 'filament.widgets.chart-widget-custom';
 
     protected function getData(): array
