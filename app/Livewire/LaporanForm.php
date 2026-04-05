@@ -21,7 +21,7 @@ use Filament\Forms\Contracts\HasForms;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Component;
-use App\Models\MasterLapor;
+use App\Models\Master\Pelapor;
 
 class LaporanForm extends Component implements HasForms, HasActions
 {
