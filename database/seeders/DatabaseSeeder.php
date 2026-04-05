@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             \Database\Seeders\Master\LocationSeeder::class,
             \Database\Seeders\Master\CategorySeeder::class,
+            \Database\Seeders\Master\PelaporSeeder::class,
         ]);
     }
 }

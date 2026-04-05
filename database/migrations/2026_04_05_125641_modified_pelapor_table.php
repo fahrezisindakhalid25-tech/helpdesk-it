@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('NIK', 16)->change();
             $table->string('nama', 80)->change();
             $table->string('email', 80)->change();
-            $table->string('no_hp', 14)->change();
+            $table->string('no_hp', 20)->change();
         });
     }
 
