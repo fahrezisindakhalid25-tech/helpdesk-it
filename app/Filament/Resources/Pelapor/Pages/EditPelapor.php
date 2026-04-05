@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\Pelapor\Pages;
 
+use App\Filament\Pages\EditRecord;
 use App\Filament\Resources\Pelapor\PelaporResource;
-use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Actions\DeleteAction;
 
-class CreateMasterLapor extends CreateRecord
+class EditPelapor extends EditRecord
 {
     protected static string $resource = PelaporResource::class;
 }

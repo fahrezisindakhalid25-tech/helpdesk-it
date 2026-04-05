@@ -2,19 +2,22 @@
 
 namespace App\Filament\Resources\Pelapor\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Resources\Pelapor\PelaporResource;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Icons\Heroicon;
 
-class EditMasterLapor extends EditRecord
+class ListPelapor extends ListRecords
 {
     protected static string $resource = PelaporResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            CreateAction::make()
+                ->iconButton()
+                ->icon(Heroicon::PlusCircle),
         ];
     }
 }
