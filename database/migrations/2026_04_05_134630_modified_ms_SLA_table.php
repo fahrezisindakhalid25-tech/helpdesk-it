@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ms_service_level_agreements', function (Blueprint $table) {
-            $table->unsignedBigInteger('category_id')->after('id');
+            $table->unsignedBigInteger('category_id')->nullable()->after('id');
             $table->string('type', 30)->after('category_id');
             $table->string('timeunit', 30)->after('type');
         });

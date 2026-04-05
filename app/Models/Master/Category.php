@@ -14,4 +14,9 @@ class Category extends Model
     {
         return $this->belongsTo(Sla::class);
     }
+
+    public function serviceLevelAgreements()
+    {
+        return $this->hasMany(Sla::class);
+    }
 }

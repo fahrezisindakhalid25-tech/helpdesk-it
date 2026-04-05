@@ -2,20 +2,25 @@
 
 namespace App\Filament\Resources\Categories;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use App\Filament\Resources\Categories\Pages\ListCategories;
+use App\Enums\SLAType;
 use App\Filament\Resources\Categories\Pages\CreateCategory;
 use App\Filament\Resources\Categories\Pages\EditCategory;
+use App\Filament\Resources\Categories\Pages\ListCategories;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Master\Category;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class CategoryResource extends Resource
@@ -29,13 +34,27 @@ class CategoryResource extends Resource
     {
         return $schema->components([
             Section::make()->schema([
-                // HANYA INPUT NAMA, HAPUS BAGIAN SELECT SLA
                 TextInput::make('name')
-                    ->label('Nama Masalah')
-                    ->placeholder('Contoh: Printer Rusak, Internet Mati')
+                    ->label('Kategori')
                     ->required()
                     ->maxLength(255),
-            ])
+            ]),
+            Section::make()
+                ->heading('Service Level Agreements (SLA)')
+                ->description('Informasikan SLA untuk setiap kategori permasalahan')
+                ->schema([
+                    Grid::make([
+                        'md' => 2,
+                    ])->schema([
+                        TextInput::make('response_time')
+                            ->label('Response time')
+                            ->required()
+                            ->regex('/^(?=.*\d[dhms])(?:\d+d)?(?:\d+h)?(?:\d+m)?(?:\d+s)?$/'),
+                        TextInput::make('resolution_time')
+                            ->label('Resolution time'),
+                    ])
+                ])
+                ->columnSpanFull()
         ]);
     }
 
