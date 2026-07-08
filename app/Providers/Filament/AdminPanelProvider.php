@@ -8,7 +8,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color; // PENTING: Import Warna
+use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -28,25 +28,19 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->spa()
             ->login(\App\Filament\Pages\Auth\CustomLogin::class)
-            // Add global CSS for Login Page Background
             ->renderHook(
                 'panels::body.end',
                 fn () => view('filament.custom-login-style')
             )
-            // Custom Logic: Inject Chart.js Plugin Registration
             ->renderHook(
                 'panels::head.end',
                 fn () => \Illuminate\Support\Facades\Blade::render('@vite(["resources/css/app.css", "resources/js/app.js"])')
             )
-            
-            // === BAGIAN INI YANG MENGUBAH TAMPILAN JADI BAGUS ===
-            ->brandName('IT Helpdesk PTPN IV') // Mengganti tulisan "Laravel"
+            ->brandName('IT Helpdesk PTPN IV')
             ->colors([
-                'primary' => Color::Green, // Mengubah tombol jadi HIJAU
+                'primary' => Color::Green,
             ])
-            ->darkMode(true) // Enable dark mode - user bisa toggle
-            // ====================================================
-
+            ->darkMode(true)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -59,7 +53,6 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\FirstResponseSlaChart::class,
                 \App\Filament\Widgets\TicketStatusChart::class,
                 \App\Filament\Widgets\TicketCategoryChart::class,
-                // \App\Filament\Widgets\ThemeSwitcher::class, // Removed
             ])
             ->middleware([
                 EncryptCookies::class,

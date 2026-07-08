@@ -17,19 +17,6 @@ return [
 
     /*
     |---------------------------------------------------------------------------
-    | Asset URL
-    |---------------------------------------------------------------------------
-    |
-    | This value sets the path to Livewire's JavaScript assets. By default,
-    | Livewire serves its assets from the root domain. However, if your
-    | app is hosted in a subdirectory, you may specify the path here.
-    |
-    */
-
-    'asset_url' => env('LIVEWIRE_ASSET_URL', null),
-
-    /*
-    |---------------------------------------------------------------------------
     | View Path
     |---------------------------------------------------------------------------
     |

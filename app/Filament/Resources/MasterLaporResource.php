@@ -16,14 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class MasterLaporResource extends Resource
 {
     protected static ?string $model = MasterLapor::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    
     protected static ?string $navigationGroup = 'Master Data';
-    
     protected static ?string $navigationLabel = 'Data Karyawan';
 
-    // === AUTHORIZATION ===
     public static function canViewAny(): bool
     {
         return auth()->user()->hasPermission('master_lapor.view') || auth()->user()->hasPermission('master_lapor.manage');

@@ -16,9 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    
     protected static ?string $navigationGroup = 'Settings';
 
     public static function form(Form $form): Form
@@ -51,7 +49,7 @@ class UserResource extends Resource
                         Forms\Components\CheckboxList::make('permissions')
                             ->label('Daftar Izin')
                             ->options([
-                                '*' => 'SUPER ADMIN (Akses Penuh)', // Wildcard
+                                '*' => 'SUPER ADMIN (Akses Penuh)',
                                 
                                 'ticket.view' => 'View Tickets',
                                 'ticket.create' => 'Create Tickets',
@@ -60,7 +58,6 @@ class UserResource extends Resource
                                 'ticket.change_sla' => 'Change Ticket SLA',
                                 'ticket.export' => 'Export Tickets',
                                 
-                                // Dashboard
                                 'dashboard.view' => 'View Dashboard Stats',
                                 
                                 'category.view' => 'View Categories',

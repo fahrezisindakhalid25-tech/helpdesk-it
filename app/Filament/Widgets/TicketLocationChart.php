@@ -11,15 +11,11 @@ class TicketLocationChart extends ChartWidget
     protected static ?string $heading = 'Tiket per Lokasi';
     protected static ?int $sort = 5;
     protected int | string | array $columnSpan = 'full';
-    
-    // Gunakan custom view agar ada label manualnya
-    // Gunakan custom view agar ada label manualnya
     protected static string $view = 'filament.widgets.chart-widget-custom';
     protected static ?string $maxHeight = '1200px';
 
     protected function getData(): array
     {
-        // ... (data fetching logic remains same) ...
         $allLocations = Location::pluck('name')->toArray();
         
         $ticketCounts = Ticket::selectRaw('lokasi, count(*) as total')
@@ -31,9 +27,6 @@ class TicketLocationChart extends ChartWidget
         foreach ($allLocations as $loc) {
             $data[$loc] = $ticketCounts[$loc] ?? 0;
         }
-        arsort($data); // Urutkan dari yang terbanyak
-
-        // Ambil Top 15 agar tidak terlalu padat jika banyak
         arsort($data);
 
         return [
@@ -41,7 +34,7 @@ class TicketLocationChart extends ChartWidget
                 [
                     'label' => 'Jumlah Tiket',
                     'data' => array_values($data),
-                    'backgroundColor' => '#ec4899', // Pink
+                    'backgroundColor' => '#ec4899',
                     'borderRadius' => 4,
                     'barPercentage' => 0.9,
                     'categoryPercentage' => 0.9,
@@ -60,7 +53,7 @@ class TicketLocationChart extends ChartWidget
     {
         return [
             'maintainAspectRatio' => false,
-            'indexAxis' => 'y', // Horizontal Bar
+            'indexAxis' => 'y',
             'plugins' => [
                 'legend' => [
                     'display' => false,

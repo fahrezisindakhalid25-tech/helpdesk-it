@@ -52,7 +52,6 @@ class LaporanForm extends Component implements HasForms
 
                         Forms\Components\TextInput::make('nama_lengkap')
                             ->label('Nama Lengkap')
-                            //->readOnly()
                             ->required()
                             ->maxLength(255),
                             
@@ -61,12 +60,12 @@ class LaporanForm extends Component implements HasForms
                             ->tel()
                             ->numeric()
                             ->placeholder('08...')
-                            ->nullable(), // Tidak wajib
+                            ->nullable(),
                             
                         Forms\Components\TextInput::make('email')
                             ->label('Email')
                             ->email()
-                            ->nullable() // Tidak wajib
+                            ->nullable()
                             ->maxLength(255),
                             
                         Forms\Components\Select::make('lokasi')
@@ -78,19 +77,13 @@ class LaporanForm extends Component implements HasForms
 
                 Forms\Components\Section::make('Detail Masalah')
                     ->schema([
-                        Forms\Components\Select::make('topik_bantuan')
-                            ->label('Kategori Masalah')
-                            ->options(Category::query()->pluck('name', 'name'))
-                            ->searchable()
-                            ->required(),
                         Forms\Components\TextInput::make('deskripsi_umum_masalah')
-                            ->label('Judul Laporan')
-                            ->placeholder('Contoh: Printer Macet di Ruang Keuangan')
+                            ->label('Ringkasan Masalah (Contoh: WiFi Putus)')
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),
                         Forms\Components\RichEditor::make('penjelasan_lengkap')
-                            ->label('Detail Kronologi')
+                            ->label('Ceritakan Detail Kendalanya')
                             ->required()
                             ->toolbarButtons([
                                 'bold', 'italic', 'underline', 'bulletList', 'orderedList', 'undo', 'redo'
@@ -101,7 +94,7 @@ class LaporanForm extends Component implements HasForms
                             ->multiple()
                             ->image()
                             ->directory('laporan-gambar')
-                            ->maxSize(5120) // 5MB
+                            ->maxSize(5120)
                             ->columnSpanFull(),
                     ]),
             ])
@@ -110,25 +103,46 @@ class LaporanForm extends Component implements HasForms
 
     public function create()
     {
-        // Rate Limiter
         $key = 'kirim-tiket:' . request()->ip();
-        if (RateLimiter::tooManyAttempts($key, 1)) {
-            $seconds = RateLimiter::availableIn($key);
-            $this->addError('rate_limit', "Mohon tunggu $seconds detik lagi sebelum mengirim laporan baru.");
-            return;
-        }
-        RateLimiter::hit($key, 60);
+        // if (RateLimiter::tooManyAttempts($key, 1)) {
+        //     $seconds = RateLimiter::availableIn($key);
+        //     $this->addError('rate_limit', "Mohon tunggu $seconds detik lagi sebelum mengirim laporan baru.");
+        //     return;
+        // }
+        // RateLimiter::hit($key, 60);
 
         $data = $this->form->getState();
 
-        // Handle file upload array to JSON
+        // Prediksi kategori otomatis via NLP
+        try {
+            $teksKeluhan = strip_tags($data['deskripsi_umum_masalah'] . '. ' . $data['penjelasan_lengkap']);
+            $daftarKategori = Category::pluck('name')->toArray();
+            
+            $setting = \App\Models\Setting::where('key', 'ai_confidence_threshold')->first();
+            $threshold = $setting ? (float)$setting->value : 0.20;
+            
+            $response = Http::timeout(30)->post('http://127.0.0.1:8000/predict', [
+                'description' => $teksKeluhan,
+                'categories' => $daftarKategori,
+                'threshold' => $threshold
+            ]);
+            
+            if ($response->successful()) {
+                $data['topik_bantuan'] = $response->json('predicted_category');
+            } else {
+                $data['topik_bantuan'] = 'Lain-lain';
+            }
+        } catch (\Exception $e) {
+            \Log::error("NLP API Connection Error: " . $e->getMessage());
+            $data['topik_bantuan'] = 'Lain-lain';
+        }
+
         if (isset($data['gambar']) && is_array($data['gambar'])) {
             $data['gambar'] = json_encode(array_values($data['gambar']));
         }
 
         $ticket = Ticket::create($data);
 
-        // Send Notifications
         \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
 
         return redirect()->route('laporan.sukses', ['uuid' => $ticket->uuid]);

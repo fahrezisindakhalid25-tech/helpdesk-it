@@ -328,7 +328,7 @@
                             xhr.send(formData);
                         }
 
-                        // === AJAX FORM SUBMISSION ===
+                        // Handle form submission via AJAX
                         const form = document.getElementById('reply-form');
                         const submitBtn = document.getElementById('submit-btn');
                         
@@ -354,23 +354,15 @@
                             .then(response => response.json())
                             .then(data => {
                                 if(data.success) {
-                                    // 1. Append new message
                                     const chatHistory = document.getElementById('chat-history');
-                                    // Remove "empty state" if exists
                                     const emptyState = chatHistory.querySelector('.opacity-60');
                                     if(emptyState) emptyState.remove();
 
                                     chatHistory.insertAdjacentHTML('beforeend', data.html);
 
-                                    // 2. Clear input
                                     document.querySelector("trix-editor").editor.loadHTML("");
                                     document.getElementById('reply-input').value = "";
-
-                                    // 3. Scroll to bottom
                                     scrollToBottom();
-
-                                    // 4. Show Toast (Using the Alpine component we added)
-                                    // Dispatch event to show toast
                                     window.dispatchEvent(new CustomEvent('show-toast', { detail: data.message }));
                                 } else {
                                     alert('Gagal mengirim pesan');
@@ -414,38 +406,32 @@
 
         function scrollToBottom() { 
             if(scrollContainer) {
-                // Gunakan scrollTop max untuk memastikan scroll sampai paling bawah (termasuk padding)
+
                 scrollContainer.scrollTop = scrollContainer.scrollHeight;
             }
         }
         
-        // Execute immediately and after small delays to account for rendering/images
+
         window.addEventListener('load', function() {
             scrollToBottom();
             setTimeout(scrollToBottom, 100);
             setTimeout(scrollToBottom, 500);
         });
         
-        // Also run now in case load already happened
+
         scrollToBottom();
         setTimeout(scrollToBottom, 300);
 
-        // === GLOBAL IMAGE CLICK HANDLER FOR TRIX CONTENT ===
+        // Klik gambar di konten trix untuk zoom
         document.addEventListener('click', function(e) {
-            // Check if clicked element is an image inside .trix-content OR trix-editor
             if (e.target.tagName === 'IMG' && (e.target.closest('.trix-content') || e.target.closest('trix-editor'))) {
-                // Prevent default behavior (e.g. if wrapped in an anchor tag)
                 e.preventDefault();
                 e.stopPropagation();
-                
-                // Open modal
                 openModal(e.target.src);
             }
-        }, true); // Use capture phase to ensure we catch it before other listeners if needed
+        }, true);
 
-        // === REAL-TIME UDPATES (POLLING) ===
-        // Poll every 10 seconds to check for new messages
-        // NOW: PURELY SILENT - No visual shaking guaranteed
+        // Polling untuk update chat real-time
         
         setInterval(function() {
             fetch('{{ route("laporan.chat-history") }}?uuid={{ $ticket->uuid }}', {
@@ -453,7 +439,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                // 1. Check Status Change
+
                 const statusBadge = document.getElementById('ticket-status-badge');
                 if (statusBadge && data.status !== statusBadge.innerText.trim()) {
                     if (data.status === 'Solved' || data.status === 'Closed') {
@@ -462,13 +448,13 @@
                     }
                     statusBadge.innerText = data.status;
                     
-                    // Update class color
+
                     statusBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide " + 
                         (data.status == 'Solved' ? 'bg-green-100 text-green-700' : 
                         (data.status == 'Closed' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'));
                 }
 
-                // 2. Check Admin Reply
+
                 @if(!$adminSudahJawab)
                     if (data.adminSudahJawab) {
                         window.location.reload();
@@ -476,22 +462,20 @@
                     }
                 @endif
 
-                // 3. Update Chat History (SMOOTH NO-FLICKER)
+                // Update chat jika ada pesan baru
                 if (data.html) {
                      const chatHistory = document.getElementById('chat-history');
                      
-                     // Helper to strip whitespace text nodes for cleaner comparison
+
                      const cleanHTML = (html) => html.replace(/>\s+</g, '><').trim();
 
-                     // Create a virtual DOM to compare
+
                      const tempDiv = document.createElement('div');
                      tempDiv.innerHTML = data.html;
                      
                      const oldChildren = Array.from(chatHistory.children);
                      const newChildren = Array.from(tempDiv.children);
 
-                     // Check for "Empty State" removal
-                     // If we currently have the "Empty State" (opacity-60) and new data has real messages
                      const hasEmptyState = chatHistory.querySelector('.opacity-60');
                      if (hasEmptyState && newChildren.length > 0 && !tempDiv.querySelector('.opacity-60')) {
                          chatHistory.innerHTML = data.html;
@@ -499,31 +483,26 @@
                          return;
                      }
 
-                     // If new data has MORE children than current, append the difference
+
                      if (newChildren.length > oldChildren.length) {
                          const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 150;
 
-                         // Append only the new nodes
+
                          for (let i = oldChildren.length; i < newChildren.length; i++) {
                              const newNode = newChildren[i].cloneNode(true);
-                             // Add slide-up animation if using tailwind
+
                              newNode.classList.add('animate-fade-in-up'); 
                              chatHistory.appendChild(newNode);
                          }
 
                          if (isAtBottom) scrollToBottom();
                      } 
-                     // Fallback: If somehow length is same but content changed (edited?), or length is smaller (deleted?)
-                     // Just replace content ONLY if strict mismatch (rare case in this system)
-                     else if (cleanHTML(chatHistory.innerHTML) !== cleanHTML(data.html)) {
-                         // Only replace if it's NOT just a new message appended (e.g. edit)
-                         // But for now, let's stick to append-only for smoothness unless lengths mismatch weirdly.
-                         // If we are strictly just waiting for new messages, the length check covers 99% cases.
-                     }
+                      else if (cleanHTML(chatHistory.innerHTML) !== cleanHTML(data.html)) {
+                      }
                 }
             })
             .catch(err => console.error('Silent poll error:', err));
-        }, 3000); // Check every 3 seconds for faster response 
+        }, 3000);
 
     </script>
 </body>

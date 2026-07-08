@@ -14,17 +14,15 @@ class PublicTicketController extends Controller
 {
     public function index()
     {
-        // AMBIL DATA DARI DATABASE (Urut Abjad)
         $locations = Location::orderBy('name', 'asc')->get();
         $categories = Category::orderBy('name', 'asc')->get();
 
-        // Kirim ke view
         return view('landing', compact('locations', 'categories'));
     }
 
     public function store(Request $request)
     {
-        // === 1. CEK BATASAN (RATE LIMITER) ===
+        // Rate limiter: 1 request per menit per IP
         $key = 'kirim-tiket:' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 1)) {
@@ -34,7 +32,6 @@ class PublicTicketController extends Controller
                 ->withErrors(['limit' => "Mohon tunggu $seconds detik lagi sebelum mengirim laporan baru."]);
         }
 
-        // === 2. VALIDASI INPUT ===
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -43,13 +40,12 @@ class PublicTicketController extends Controller
             'topik_bantuan' => 'required|string',
             'deskripsi_umum_masalah' => 'required|string|max:255',
             'penjelasan_lengkap' => 'required|string',
-            'gambar.*' => 'nullable|image|mimes:jpeg,png,gif|max:5120', // 5MB per file
+            'gambar.*' => 'nullable|image|mimes:jpeg,png,gif|max:5120',
         ]);
 
-        // === 3. CATAT KE RATE LIMITER ===
         RateLimiter::hit($key, 60);
 
-        // === 4. HANDLE UPLOAD MULTIPLE GAMBAR ===
+        // Upload gambar (multiple)
         $gambarPaths = [];
         if ($request->hasFile('gambar')) {
             foreach ($request->file('gambar') as $file) {
@@ -61,19 +57,14 @@ class PublicTicketController extends Controller
         }
         $validated['gambar'] = !empty($gambarPaths) ? json_encode($gambarPaths) : null;
 
-        // === 5. SIMPAN KE DATABASE ===
         $ticket = Ticket::create($validated);
 
-        // === 5. KIRIM EMAIL ===
         $this->sendEmailNotification($ticket);
-
-        // === 6. KIRIM WHATSAPP ===
         $this->sendWhatsAppNotification($ticket);
 
         return redirect()->route('laporan.sukses', ['uuid' => $ticket->uuid]);
     }
 
-    // === FUNGSI KIRIM EMAIL ===
     private function sendEmailNotification($ticket)
     {
         $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
@@ -129,10 +120,8 @@ class PublicTicketController extends Controller
         }
     }
 
-    // === FUNGSI KIRIM WHATSAPP (VIA QUEUE) ===
     private function sendWhatsAppNotification($ticket)
     {
-        // Dispatch Job ke Queue
         \App\Jobs\SendWhatsAppNotification::dispatch($ticket);
     }
 
@@ -142,7 +131,6 @@ class PublicTicketController extends Controller
         return view('sukses', compact('ticket'));
     }
     
-    // === 1. UPDATE FUNGSI CEK ===
     public function cek(Request $request)
     {
         $uuid = $request->query('uuid');
@@ -156,29 +144,25 @@ class PublicTicketController extends Controller
         return view('lacak', compact('ticket', 'isExpired', 'adminSudahJawab'));
     }
 
-    // === 2. UPDATE FUNGSI REPLY ===
     public function reply(Request $request, $uuid)
     {
-        // Validasi Attachment
         $request->validate([
             'isi_pesan' => 'required|string',
-            'attachments.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
+            'attachments.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         $ticket = Ticket::where('uuid', $uuid)->firstOrFail();
 
-        // Cek Expired
         if ($this->isTicketExpired($ticket)) {
              return back()->withErrors(['status' => 'Tiket ini sudah ditutup permanen dan tidak bisa dibalas lagi.']);
         }
 
-        // Cek Admin Reply
         $adminSudahJawab = $ticket->comments()->whereNotNull('user_id')->exists();
         if (!$adminSudahJawab) {
             return back()->withErrors(['status' => 'Mohon tunggu balasan dari Admin terlebih dahulu sebelum mengirim pesan.']);
         }
 
-        // Handle File Uploads
+        // Upload lampiran
         $attachmentPaths = [];
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
@@ -201,14 +185,13 @@ class PublicTicketController extends Controller
         }
 
         if ($request->wantsJson() || $request->ajax()) {
-            // Render partial view for the single new comment
             $html = view('partials.chat_single', ['comment' => $ticket->comments()->latest()->first(), 'ticket' => $ticket])->render();
             return response()->json(['success' => true, 'message' => 'Pesan terkirim!', 'html' => $html]);
         }
 
         return back()->with('success', 'Pesan terkirim!');
     }
-    // === 3. FUNGSI AJAX CHAT HISTORY ===
+
     public function chatHistory(Request $request) 
     {
         $uuid = $request->query('uuid');
@@ -227,22 +210,18 @@ class PublicTicketController extends Controller
         ]);
     }
 
-    // === HELPER: CEK KADALUARSA ===
     private function isTicketExpired($ticket)
     {
-        // Ambil SLA Resolution dari relasi (jika ada), atau default 5 hari
         $days = 5;
         if ($ticket->resolutionSla) {
             $days = (int) $ticket->resolutionSla->response_days;
         } elseif ($ticket->sla) {
-             // Fallback ke SLA First Response jika Resolution belum set (opsional, tapi aman)
              $days = (int) $ticket->sla->response_days;
         }
 
         return $ticket->created_at->copy()->addDays($days)->isPast() || $ticket->status === 'Closed';
     }
 
-    // === 4. HANDLE TRIX ATTACHMENT UPLOAD ===
     public function uploadTrixImage(Request $request) 
     {
         if ($request->hasFile('file')) {

@@ -45,7 +45,6 @@ class TicketExport implements FromQuery, WithHeadings, WithMapping
 
     public function map($row): array
     {
-        // Calculate SLA Durations (Format: 0d 0h 0m 0s)
         $firstResponseDuration = '-';
         if ($row->created_at && $row->replied_at) {
             $firstResponseDuration = $row->created_at->diff($row->replied_at)->format('%ad %hh %im %ss');
@@ -57,7 +56,6 @@ class TicketExport implements FromQuery, WithHeadings, WithMapping
             $resolutionDuration = $row->created_at->diff($end)->format('%ad %hh %im %ss');
         }
 
-        // Format Chat History
         $chatHistory = '';
         if ($row->comments && $row->comments->count() > 0) {
             foreach ($row->comments as $comment) {

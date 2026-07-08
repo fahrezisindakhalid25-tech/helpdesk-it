@@ -11,7 +11,6 @@ Route::get('/laporan/chat-history', [PublicTicketController::class, 'chatHistory
 Route::post('/laporan-reply/{uuid}', [PublicTicketController::class, 'reply'])->name('laporan.reply');
 Route::post('/laporan-upload-trix', [PublicTicketController::class, 'uploadTrixImage'])->name('laporan.upload_trix');
 
-// Fix: Redirect default 'login' route to Admin Login
 Route::name('login')->get('/login', function () {
     return redirect()->route('filament.admin.auth.login');
 });

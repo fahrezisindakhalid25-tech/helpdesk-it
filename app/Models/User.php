@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,11 +12,6 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -25,11 +19,6 @@ class User extends Authenticatable implements FilamentUser
         'password',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -41,7 +30,6 @@ class User extends Authenticatable implements FilamentUser
 
     public function hasPermission(string $permission): bool
     {
-        // Admin Full has wildcard access
         if (in_array('*', $this->permissions ?? [])) {
             return true;
         }
@@ -51,14 +39,9 @@ class User extends Authenticatable implements FilamentUser
 
     public function isAdmin(): bool
     {
-        // Check for wildcard permission
         return in_array('*', $this->permissions ?? []);
     }
 
-    /**
-     * Menentukan siapa yang bisa mengakses panel admin.
-     * Return true agar semua user yang terdaftar bisa login ke dashboard.
-     */
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

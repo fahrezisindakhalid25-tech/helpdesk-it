@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\TicketResource\RelationManagers; // <--- INI WAJIB BENAR
+namespace App\Filament\Resources\TicketResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -28,34 +28,29 @@ class CommentsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('content')
-            // KITA UBAH JADI STACK (TIMELINE VIEW)
             ->columns([
                 Tables\Columns\Layout\Stack::make([
                     Tables\Columns\Layout\Split::make([
-                        // Nama Pengirim di Kiri
                         Tables\Columns\TextColumn::make('user.name')
                             ->weight('bold')
                             ->icon('heroicon-m-user-circle')
                             ->color('primary'),
 
-                        // Waktu di Kanan
                         Tables\Columns\TextColumn::make('created_at')
                             ->dateTime('d M Y - H:i')
                             ->color('gray')
                             ->alignEnd(),
                     ]),
 
-                    // Isi Pesan di Bawahnya
                     Tables\Columns\TextColumn::make('content')
-                        ->wrap() // Agar teks panjang turun ke bawah
-                        ->extraAttributes(['class' => 'py-2']), // Kasih jarak dikit
-                ])->space(3), // Jarak antar chat
+                        ->wrap()
+                        ->extraAttributes(['class' => 'py-2']),
+                ])->space(3),
             ])
             ->contentGrid([
-                'md' => 1, // Pastikan cuma 1 kolom ke bawah
+                'md' => 1,
             ])
             ->headerActions([
-                // Tombol Balas Pesan
                 Tables\Actions\CreateAction::make()
                     ->label('Reply / Balas Pesan')
                     ->icon('heroicon-m-chat-bubble-left-right')
@@ -65,7 +60,7 @@ class CommentsRelationManager extends RelationManager
                         return $data;
                     }),
             ])
-            ->actions([]) // Hapus tombol edit/delete biar bersih
-            ->defaultSort('created_at', 'asc'); // Chat lama di atas, baru di bawah (seperti WA)
+            ->actions([])
+            ->defaultSort('created_at', 'asc');
     }
 }

@@ -31,7 +31,6 @@ class TicketResource extends Resource
     {
         $halamanSaatIni = $form->getOperation(); 
 
-        // === MODE 1: CREATE (Saat Admin Input Manual) ===
         if ($halamanSaatIni === 'create') {
             return $form->schema([
                 Forms\Components\Group::make()->columnSpanFull()->schema([
@@ -44,36 +43,30 @@ class TicketResource extends Resource
                             Forms\Components\Select::make('lokasi')
                                 ->options(\App\Models\Location::pluck('name', 'name'))
                                 ->required()->searchable(),
-                            
-                            Forms\Components\Select::make('topik_bantuan')
-                                ->label('Kategori Masalah')
-                                ->options(\App\Models\Category::pluck('name', 'name'))
-                                ->required()->searchable(),
 
-                            Forms\Components\Textarea::make('deskripsi_umum_masalah')->required()->columnSpanFull()->label('Subjek'),
-                            Forms\Components\RichEditor::make('penjelasan_lengkap')->columnSpanFull(),
+                            Forms\Components\Textarea::make('deskripsi_umum_masalah')->required()->columnSpanFull()->label('Ringkasan Masalah (Contoh: WiFi Putus)'),
+                            Forms\Components\RichEditor::make('penjelasan_lengkap')->label('Ceritakan Detail Kendalanya')->columnSpanFull(),
                         ])->columns(2),
                 ]),
             ]);
         }
 
-        // === MODE 2: DETAIL (DASHBOARD ADMIN) ===
+        // Halaman Detail / Edit
         return $form
             ->columns(3)
             ->schema([
-                // === KOLOM KIRI (CHAT & DETAIL) ===
+                // Kolom Kiri (Chat & Detail)
                 Forms\Components\Group::make()->columnSpan(2)->schema([
                     Forms\Components\Tabs::make('Aktivitas Tiket')->tabs([
                         Forms\Components\Tabs\Tab::make('Activity')
                             ->icon('heroicon-m-chat-bubble-left-right')
-                            ->extraAttributes(['wire:poll.5s' => '']) // Real-time Update (5 detik)
+                            ->extraAttributes(['wire:poll.5s' => ''])
                             ->schema([
                             Forms\Components\Section::make()->schema([
-                                Forms\Components\TextInput::make('topik_bantuan')->disabled()->extraAttributes(['class' => 'bg-gray-100']),
-                                Forms\Components\Textarea::make('deskripsi_umum_masalah')->rows(2)->disabled()->extraAttributes(['class' => 'font-bold text-lg mb-2']),
-                                Forms\Components\RichEditor::make('penjelasan_lengkap')->disabled()->toolbarButtons([]),
+                                Forms\Components\TextInput::make('topik_bantuan')->label('Kategori')->disabled()->extraAttributes(['class' => 'bg-gray-100']),
+                                Forms\Components\Textarea::make('deskripsi_umum_masalah')->label('Ringkasan Masalah')->rows(2)->disabled()->extraAttributes(['class' => 'font-bold text-lg mb-2']),
+                                Forms\Components\RichEditor::make('penjelasan_lengkap')->label('Detail Kendala')->disabled()->toolbarButtons([]),
                                 
-                                // TAMPILKAN GAMBAR JIKA ADA
                                 Forms\Components\Placeholder::make('gambar_display')
                                     ->hiddenLabel()
                                     ->visible(fn ($record) => $record && $record->gambar)
@@ -85,15 +78,15 @@ class TicketResource extends Resource
                                     ) : '-'),
                             ])->compact(),
                             
-                            Forms\Components\Placeholder::make('separator')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
+                            Forms\Components\Placeholder::make('separator')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
 
-                            // CHAT HISTORY
+                            // Riwayat Chat
                             Forms\Components\Placeholder::make('chat_history')->label('Percakapan')->content(fn ($record) => $record ? new \Illuminate\Support\HtmlString(
                                 collect($record->comments)->map(function($c) use ($record) {
                                     $senderName = $c->user ? $c->user->name : $record->nama_lengkap;
                                     $initial = substr($senderName, 0, 1);
                                     $isAdmin = (bool) $c->user_id;
-                                    $bgClass = $isAdmin ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-700'; // Green for Reporter to differentiate
+                                    $bgClass = $isAdmin ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-700';
 
                                     return '
                                     <div class="flex gap-3 mb-4">
@@ -113,10 +106,9 @@ class TicketResource extends Resource
                                 })->join('')
                             ) : '-'),
 
-                            // GLOBAL SCRIPTS & STYLES FOR ADMIN PANEL (MODAL & THUMBNAILS)
+                            // Style & Script untuk modal gambar
                             Forms\Components\Placeholder::make('admin_scripts')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('
                                 <style>
-                                    /* Thumbnail Styling */
                                     .admin-thumbnail, .admin-trix-content img, .fi-fo-rich-editor img {
                                         max-height: 200px !important;
                                         width: auto !important;
@@ -134,17 +126,14 @@ class TicketResource extends Resource
                                     }
                                 </style>
                                 
-                                <!-- Admin Image Modal -->
                                 <div id="admin-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.85);backdrop-filter:blur(4px);" onclick="closeAdminModal()">
                                     <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
                                         <img id="admin-modal-image" style="max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,0.5);transform:scale(1);transition:transform 0.2s;" onclick="event.stopPropagation()">
                                         
-                                        <!-- Close Button -->
                                         <button onclick="closeAdminModal()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;width:40px;height:40px;border-radius:50%;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;">
                                             &times;
                                         </button>
 
-                                        <!-- Zoom Controls -->
                                         <div style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:white;padding:5px;border-radius:8px;display:flex;gap:5px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
                                             <button onclick="event.stopPropagation(); adminZoomOut()" style="padding:8px 12px;border:none;background:#f3f4f6;border-radius:4px;cursor:pointer;font-weight:bold;">-</button>
                                             <button onclick="event.stopPropagation(); adminResetZoom()" style="padding:8px 12px;border:none;background:#f3f4f6;border-radius:4px;cursor:pointer;font-size:12px;">Reset</button>
@@ -194,7 +183,6 @@ class TicketResource extends Resource
                                         }
                                     });
 
-                                    // Global Click Listener for Images in Trix Editor & Content
                                     document.addEventListener("click", function(e) {
                                         if (e.target.tagName === "IMG" && (e.target.closest(".admin-trix-content") || e.target.closest(".fi-fo-rich-editor"))) {
                                             e.preventDefault();
@@ -211,10 +199,7 @@ class TicketResource extends Resource
                                 ->fileAttachmentsDirectory('comment-attachments')
                                 ->fileAttachmentsVisibility('public')
                                 ->dehydrated(false),
-                            // FileUpload dihapus karena sudah di-handle RichEditor
-                            // Forms\Components\FileUpload::make('new_comment_attachments')... (Removed)
 
-                            // TOMBOL KIRIM
                             Forms\Components\Actions::make([
                                 Forms\Components\Actions\Action::make('kirim_balasan')
                                     ->label('Post Reply')->color('primary')->icon('heroicon-m-paper-airplane')
@@ -222,12 +207,11 @@ class TicketResource extends Resource
                                     ->action(function ($record, $get, $set) {
                                         if (!$get('new_comment_content')) return;
                                         $content = $get('new_comment_content');
-                                        // $attachments = $get('new_comment_attachments'); // Tidak perlu lagi
 
                                         $record->comments()->create([
                                             'user_id' => auth()->id(),
                                             'content' => $content,
-                                            'attachments' => null, // Attachments sudah embed di content HTML
+                                            'attachments' => null,
                                         ]);
                                         
                                         $dataUpdate = ['last_reply_at' => now()];
@@ -235,15 +219,12 @@ class TicketResource extends Resource
                                         
                                         if (!in_array($record->status, ['Solved', 'Closed'])) {
                                             $dataUpdate['status'] = 'Replied';
-                                            $dataUpdate['solved_at'] = null; // Reset solved jika dibalas
+                                            $dataUpdate['solved_at'] = null;
                                             $set('status', 'Replied'); 
                                         }
                                         $record->update($dataUpdate);
-                                        $record->update($dataUpdate);
                                         $set('new_comment_content', '');
-                                        // $set('new_comment_attachments', []); // Removed
                                         
-                                        // === KIRIM NOTIFIKASI KE USER ===
                                         self::sendAdminReplyNotification($record, $content);
                                         
                                         \Filament\Notifications\Notification::make()->title('Terkirim')->success()->send();
@@ -262,21 +243,19 @@ class TicketResource extends Resource
                     ]),
                 ]),
 
-                // === KOLOM KANAN (SIDEBAR: SEKARANG ADA 2 DROPDOWN SLA) ===
+                // Kolom Kanan (Sidebar SLA & Status)
                 Forms\Components\Group::make()->columnSpan(1)->schema([
                     Forms\Components\Section::make('Kontrol SLA')->schema([
                         
-                        Forms\Components\Placeholder::make('header_custom')->content(fn ($record) => new \Illuminate\Support\HtmlString('
+                        Forms\Components\Placeholder::make('header_custom')->hiddenLabel()->content(fn ($record) => new \Illuminate\Support\HtmlString('
                             <div class="flex items-center gap-3 mb-4">
                                 <div class="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-bold text-lg">'.substr($record->nama_lengkap ?? 'A', 0, 1).'</div>
                                 <div><div class="font-bold text-gray-900">'.($record->nama_lengkap ?? '-').'</div><div class="text-xs text-gray-500">Pelapor</div></div>
                             </div>')),
 
-                        Forms\Components\Placeholder::make('separator_sla')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
+                        Forms\Components\Placeholder::make('separator_sla')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
 
-                        // ==========================================
-                        // 1. DROPDOWN KHUSUS FIRST RESPONSE
-                        // ==========================================
+                        // SLA First Response
                         Forms\Components\Select::make('sla_id')
                             ->label('SLA: First Response')
                             ->relationship('sla', 'name')
@@ -285,11 +264,10 @@ class TicketResource extends Resource
                             ->live()
                             ->disabled(fn () => !auth()->user()->hasPermission('ticket.change_sla'))
                             ->afterStateUpdated(function ($record, $state) {
-                                // Hanya update SLA ID, tanpa mengubah status
                                 $record->update(['sla_id' => $state]);
                             }),
 
-                        // TIMER FIRST RESPONSE
+                        // Timer First Response
                         Forms\Components\Placeholder::make('first_response_timer')
                             ->hiddenLabel()
                             ->content(function ($record, $get) { 
@@ -297,11 +275,9 @@ class TicketResource extends Resource
                                     $text = $record->created_at->diff($record->replied_at)->format('%ad %hh %im %ss');
                                     return new \Illuminate\Support\HtmlString("<div class='bg-blue-50 p-2 rounded border border-blue-200 text-center'><span class='text-blue-700 font-bold'>✓ Responded</span><div class='text-xs'>$text</div></div>");
                                 }
-                                // GUNAKAN $record->sla_id LANGSUNG DARI DATABASE
                                 $slaId = $record->sla_id ?? $get('sla_id');
                                 if (!$slaId) return new \Illuminate\Support\HtmlString('<div class="text-xs text-gray-400 text-center">- Pilih SLA Respon -</div>');
 
-                                // Ambil Data SLA (Hari + Jam)
                                 $sla = \App\Models\Sla::find($slaId);
                                 if (!$sla) return '-';
                                 
@@ -319,14 +295,12 @@ class TicketResource extends Resource
                                 ");
                             }),
 
-                        Forms\Components\Placeholder::make('separator_2')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
+                        Forms\Components\Placeholder::make('separator_2')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-2"></div>')),
 
-                        // ==========================================
-                        // 2. DROPDOWN SLA RESOLUSI (FINAL)
-                        // ==========================================
+                        // SLA Resolution
                         Forms\Components\Select::make('resolution_sla_id')
                             ->label('SLA: Resolution (Final)')
-                            ->relationship('sla', 'name') // Menggunakan relasi yang sama ke tabel SLAs
+                            ->relationship('sla', 'name')
                             ->placeholder('Pilih SLA Resolusi')
                             ->native(false)
                             ->live()
@@ -335,7 +309,7 @@ class TicketResource extends Resource
                                 $record->update(['resolution_sla_id' => $state]);
                             }),
 
-                        // TIMER RESOLUTION
+                        // Timer Resolution
                         Forms\Components\Placeholder::make('resolution_timer')
                             ->hiddenLabel()
                             ->content(function ($record, $get) { 
@@ -350,12 +324,8 @@ class TicketResource extends Resource
                                 $sla = \App\Models\Sla::find($slaId);
                                 if (!$sla) return '-';
                                 
-                                // Gunakan response_days (karena user menggunakan field Durasi Pengerjaan yang ada)
                                 $days = (int) $sla->response_days; 
-                                
-                                // Ambil jam dari response_time
                                 $timeParts = explode(':', $sla->response_time ?? '00:00:00');
-                                
                                 $deadline = $record->created_at->copy()->addDays($days)->addHours((int)$timeParts[0])->addMinutes((int)$timeParts[1])->timestamp * 1000;
 
                                 return new \Illuminate\Support\HtmlString("
@@ -368,9 +338,8 @@ class TicketResource extends Resource
                                 ");
                             }),
 
-                        Forms\Components\Placeholder::make('separator_3')->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
+                        Forms\Components\Placeholder::make('separator_3')->hiddenLabel()->content(new \Illuminate\Support\HtmlString('<div class="border-t border-gray-200 my-4"></div>')),
 
-                        // STATUS SELECT
                         Forms\Components\Select::make('status')
                             ->options(['Open' => 'Open', 'Replied' => 'Replied', 'Solved' => 'Solved', 'Closed' => 'Closed'])
                             ->required()->native(false)->live()
@@ -404,9 +373,7 @@ class TicketResource extends Resource
                     
                 Tables\Columns\TextColumn::make('nama_lengkap')->searchable(),
                 Tables\Columns\TextColumn::make('topik_bantuan')->limit(20)->label('Kategori'),
-                // Sla Name dihapus sesuai request
                 
-                // === SLA FIRST RESPONSE TIMER ===
                 Tables\Columns\TextColumn::make('sla_timer')
                     ->label('SLA Respon')
                     ->html()
@@ -419,12 +386,10 @@ class TicketResource extends Resource
                         return '<span class="text-xs text-gray-400">-</span>';
                     }),
 
-                // === SLA RESOLUTION TIMER (BARU) ===
                 Tables\Columns\TextColumn::make('sla_resolution_timer')
                     ->label('SLA Resolution')
                     ->html()
                     ->getStateUsing(function ($record) {
-                         // Jika sudah selesai (Solved/Closed)
                         if ($record->status === 'Solved' || $record->status === 'Closed') {
                             $end = $record->solved_at ?? $record->closed_at ?? now();
                             $end = $end instanceof \Carbon\Carbon ? $end : \Carbon\Carbon::parse($end);
@@ -464,7 +429,7 @@ class TicketResource extends Resource
                             ])->extraAttributes(['class' => 'mt-8']),
                         ]),
                     ])
-                    ->columnSpanFull() // Agar filter ini mengambil lebar penuh jika ada kolom lain
+                    ->columnSpanFull()
                     ->query(function ($query, array $data) {
                         return $query
                             ->when(
@@ -523,30 +488,21 @@ class TicketResource extends Resource
         ];
     }
 
-    // === FUNGSI KIRIM NOTIFIKASI KE USER (EMAIL & WHATSAPP) ===
     private static function sendAdminReplyNotification($ticket, $replyContent)
     {
-        // Kirim Email
         self::sendAdminReplyEmail($ticket, $replyContent);
-        
-        // Kirim WhatsApp
         self::sendAdminReplyWhatsApp($ticket, $replyContent);
     }
 
-    // === KIRIM EMAIL BALASAN ADMIN (VIA QUEUE) ===
     private static function sendAdminReplyEmail($ticket, $replyContent)
     {
-        // Dispatch Job Email (Type: admin_reply)
         \App\Jobs\SendEmailNotification::dispatch($ticket, 'admin_reply', $replyContent);
     }
 
-    // === KIRIM WHATSAPP BALASAN ADMIN ===
-    // === KIRIM WHATSAPP BALASAN ADMIN (VIA QUEUE) ===
     private static function sendAdminReplyWhatsApp($ticket, $replyContent)
     {
         $linkTracking = route('laporan.cek', [], true) . '?uuid=' . $ticket->uuid;
 
-        // Potong reply content agar tidak terlalu panjang di WA (max 1024 char)
         $shortReply = substr($replyContent, 0, 200);
         if (strlen($replyContent) > 200) {
             $shortReply .= '...';
@@ -562,11 +518,9 @@ class TicketResource extends Resource
             . "{$linkTracking}\n\n"
             . "Terima kasih atas kesabaran Anda.";
 
-        // Dispatch ke Queue dengan pesan kustom
         \App\Jobs\SendWhatsAppNotification::dispatch($ticket, $message);
     }
 
-    // === HELPER: FORMAT NOMOR TELEPON ===
     private static function formatPhoneNumber($phone)
     {
         $phone = preg_replace('/\D/', '', $phone);
@@ -579,10 +533,8 @@ class TicketResource extends Resource
         return $phone;
     }
 
-    // === LOAD DATA SLA DARI DATABASE KE FORM ===
     public static function mutateFormDataBeforeFill(array $data): array
     {
-        // Pastikan sla_id dan resolution_sla_id dimuat dari database
         return $data;
     }
     

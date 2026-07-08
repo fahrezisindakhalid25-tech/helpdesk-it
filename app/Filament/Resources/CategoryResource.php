@@ -21,7 +21,6 @@ class CategoryResource extends Resource
     {
         return $form->schema([
             Forms\Components\Section::make()->schema([
-                // HANYA INPUT NAMA, HAPUS BAGIAN SELECT SLA
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Masalah')
                     ->placeholder('Contoh: Printer Rusak, Internet Mati')

@@ -18,21 +18,12 @@ class SendWhatsAppNotification implements ShouldQueue
     protected $ticket;
     protected $customMessage;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param Ticket $ticket
-     * @param string|null $customMessage Optional custom message override
-     */
     public function __construct(Ticket $ticket, $customMessage = null)
     {
         $this->ticket = $ticket;
         $this->customMessage = $customMessage;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $ticket = $this->ticket;
@@ -43,16 +34,11 @@ class SendWhatsAppNotification implements ShouldQueue
             return;
         }
 
-        // Format nomor ke 62 (Indonesia)
         $phone = $this->formatPhoneNumber($ticket->no_hp);
-        // Note: Route inside job might need explicit domain if running from CLI, but usually fine.
-        // Better to pass full link if needed, but route() usually works if APP_URL is set.
         
         if ($this->customMessage) {
-            // === MODE 1: CUSTOM MESSAGE (E.g. Admin Reply) ===
             $message = $this->customMessage;
         } else {
-            // === MODE 2: DEFAULT NEW TICKET MESSAGE ===
             $linkTracking = route('laporan.cek', ['uuid' => $ticket->uuid]); 
             $message = "IT Helpdesk PTPN IV\n\n"
                 . "Halo {$ticket->nama_lengkap},\n\n"
@@ -77,13 +63,10 @@ class SendWhatsAppNotification implements ShouldQueue
 
             if (!$response->successful()) {
                 Log::error('WhatsApp Job Failed: ' . $response->body());
-                // Optional: throw exception to retry job?
-                // throw new \Exception('Fonnte API Error'); 
             }
 
         } catch (\Exception $e) {
             Log::error('WhatsApp Job Error for Ticket #' . $ticket->no_tiket . ': ' . $e->getMessage());
-            // $this->release(60); // Retry after 60s if needed
         }
     }
 

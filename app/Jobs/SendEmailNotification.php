@@ -19,13 +19,6 @@ class SendEmailNotification implements ShouldQueue
     protected $type;
     protected $content;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param Ticket $ticket
-     * @param string $type ('new_ticket' or 'admin_reply')
-     * @param string|null $content (Optional content for reply)
-     */
     public function __construct(Ticket $ticket, $type = 'new_ticket', $content = null)
     {
         $this->ticket = $ticket;
@@ -33,16 +26,12 @@ class SendEmailNotification implements ShouldQueue
         $this->content = $content;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         $ticket = $this->ticket;
         $linkTracking = route('laporan.cek', ['uuid' => $ticket->uuid]);
 
         if ($this->type === 'admin_reply') {
-            // === EMAIL BALASAN ADMIN ===
             $subject = "[IT Helpdesk] Balasan Atas Laporan Anda - #{$ticket->no_tiket}";
             $replyContent = $this->content;
 
@@ -70,7 +59,6 @@ class SendEmailNotification implements ShouldQueue
             </html>";
 
         } else {
-            // === EMAIL TIKET BARU (DEFAULT) ===
             $subject = "[IT Helpdesk] Tiket Laporan Diterima - #{$ticket->no_tiket}";
             
             $htmlBody = "
@@ -101,7 +89,6 @@ class SendEmailNotification implements ShouldQueue
 
         try {
             Mail::html($htmlBody, function ($message) use ($ticket, $subject) {
-                // Gunakan alamat default dari config, fallback ke dummy jika null
                 $fromAddress = config('mail.from.address') ?? 'helpdesk@ptpn4.com';
                 $fromName = config('mail.from.name') ?? 'IT Helpdesk PTPN IV';
                 
