@@ -1,0 +1,12 @@
+Aktual \ Prediksi,Network,Hardware,Software,Database,Server,Storage,CCTV & Security Systems,Web & Intranet Portal,Keamanan & Virus,Peripheral,Lain-lain
+Network,8,2,0,0,0,0,0,1,0,0,1
+Hardware,0,7,0,0,0,1,0,0,0,0,4
+Software,0,0,11,1,0,0,0,0,0,0,0
+Database,0,0,0,12,0,0,0,0,0,0,0
+Server,2,3,5,1,0,1,0,0,0,0,0
+Storage,0,1,0,7,0,4,0,0,0,0,0
+CCTV & Security Systems,1,1,0,1,0,0,8,0,0,0,1
+Web & Intranet Portal,2,0,2,1,0,0,0,3,0,0,4
+Keamanan & Virus,2,2,4,1,0,0,0,2,0,0,1
+Peripheral,1,3,1,5,0,0,1,0,0,0,1
+Lain-lain,0,0,0,0,0,0,0,0,0,0,0

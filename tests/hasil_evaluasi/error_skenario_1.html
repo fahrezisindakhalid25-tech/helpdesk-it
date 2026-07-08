@@ -1,0 +1,1011 @@
+<!DOCTYPE html><html lang="id"><head><style type="text/css" data-tag-name="trix-editor">trix-editor {
+    display: block;
+}
+
+trix-editor:empty::before {
+    content: attr(placeholder);
+    color: graytext;
+    cursor: text;
+    pointer-events: none;
+    white-space: pre-line;
+}
+
+trix-editor a[contenteditable=false] {
+    cursor: text;
+}
+
+trix-editor img {
+    max-width: 100%;
+    height: auto;
+}
+
+trix-editor [data-trix-attachment] figcaption textarea {
+    resize: none;
+}
+
+trix-editor [data-trix-attachment] figcaption textarea.trix-autoresize-clone {
+    position: absolute;
+    left: -9999px;
+    max-height: 0px;
+}
+
+trix-editor [data-trix-attachment] figcaption[data-trix-placeholder]:empty::before {
+    content: attr(data-trix-placeholder);
+    color: graytext;
+}
+
+trix-editor [data-trix-cursor-target] {
+    display: inline-block !important;
+    width: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+}
+
+trix-editor [data-trix-cursor-target=left] {
+    vertical-align: top !important;
+    margin-left: -1px !important;
+}
+
+trix-editor [data-trix-cursor-target=right] {
+    vertical-align: bottom !important;
+    margin-right: -1px !important;
+}</style><style type="text/css" data-tag-name="trix-toolbar">trix-toolbar {
+  display: block;
+}
+
+trix-toolbar {
+  white-space: nowrap;
+}
+
+trix-toolbar [data-trix-dialog] {
+  display: none;
+}
+
+trix-toolbar [data-trix-dialog][data-trix-active] {
+  display: block;
+}
+
+trix-toolbar [data-trix-dialog] [data-trix-validate]:invalid {
+  background-color: #ffdddd;
+}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Laporan - IT Helpdesk PTPN IV</title>
+    <!-- Fonts Local / System Fallback -->
+    
+    <script>
+        const theme = localStorage.getItem('user-theme') ?? 'system';
+        if (
+            theme === 'dark' ||
+            (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+    <link href="http://127.0.0.1:8001/css/filament/forms/forms.css?v=3.3.47.0" rel="stylesheet" data-navigate-track="">
+                <link href="http://127.0.0.1:8001/css/filament/support/support.css?v=3.3.47.0" rel="stylesheet" data-navigate-track="">
+    
+<style>
+    :root {
+         --danger-50:254, 242, 242;  --danger-100:254, 226, 226;  --danger-200:254, 202, 202;  --danger-300:252, 165, 165;  --danger-400:248, 113, 113;  --danger-500:239, 68, 68;  --danger-600:220, 38, 38;  --danger-700:185, 28, 28;  --danger-800:153, 27, 27;  --danger-900:127, 29, 29;  --danger-950:69, 10, 10;  --gray-50:250, 250, 250;  --gray-100:244, 244, 245;  --gray-200:228, 228, 231;  --gray-300:212, 212, 216;  --gray-400:161, 161, 170;  --gray-500:113, 113, 122;  --gray-600:82, 82, 91;  --gray-700:63, 63, 70;  --gray-800:39, 39, 42;  --gray-900:24, 24, 27;  --gray-950:9, 9, 11;  --info-50:239, 246, 255;  --info-100:219, 234, 254;  --info-200:191, 219, 254;  --info-300:147, 197, 253;  --info-400:96, 165, 250;  --info-500:59, 130, 246;  --info-600:37, 99, 235;  --info-700:29, 78, 216;  --info-800:30, 64, 175;  --info-900:30, 58, 138;  --info-950:23, 37, 84;  --primary-50:255, 251, 235;  --primary-100:254, 243, 199;  --primary-200:253, 230, 138;  --primary-300:252, 211, 77;  --primary-400:251, 191, 36;  --primary-500:245, 158, 11;  --primary-600:217, 119, 6;  --primary-700:180, 83, 9;  --primary-800:146, 64, 14;  --primary-900:120, 53, 15;  --primary-950:69, 26, 3;  --success-50:240, 253, 244;  --success-100:220, 252, 231;  --success-200:187, 247, 208;  --success-300:134, 239, 172;  --success-400:74, 222, 128;  --success-500:34, 197, 94;  --success-600:22, 163, 74;  --success-700:21, 128, 61;  --success-800:22, 101, 52;  --success-900:20, 83, 45;  --success-950:5, 46, 22;  --warning-50:255, 251, 235;  --warning-100:254, 243, 199;  --warning-200:253, 230, 138;  --warning-300:252, 211, 77;  --warning-400:251, 191, 36;  --warning-500:245, 158, 11;  --warning-600:217, 119, 6;  --warning-700:180, 83, 9;  --warning-800:146, 64, 14;  --warning-900:120, 53, 15;  --warning-950:69, 26, 3;     }
+</style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+<!-- Livewire Styles --><style>[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}dialog#livewire-error::backdrop {background-color: rgba(0, 0, 0, .6);}</style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-\[-10\%\]{bottom:-10%}.left-0{left:0px}.left-\[-10\%\]{left:-10%}.right-\[-10\%\]{right:-10%}.top-0{top:0px}.top-\[-10\%\]{top:-10%}.z-0{z-index:0}.z-10{z-index:10}.z-40{z-index:40}.col-\[--col-span-default\]{grid-column:var(--col-span-default)}.row-start-2{grid-row-start:2}.mx-auto{margin-left:auto;margin-right:auto}.mb-6{margin-bottom:1.5rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-1\.5{height:0.375rem}.h-16{height:4rem}.h-5{height:1.25rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-\[40\%\]{height:40%}.h-full{height:100%}.min-h-\[theme\(spacing\.48\)\]{min-height:12rem}.min-h-full{min-height:100%}.min-h-screen{min-height:100vh}.w-5{width:1.25rem}.w-\[40\%\]{width:40%}.w-auto{width:auto}.w-full{width:100%}.min-w-0{min-width:0px}.min-w-\[theme\(spacing\.8\)\]{min-width:2rem}.max-w-full{max-width:100%}.max-w-none{max-width:none}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-default{cursor:default}.cursor-pointer{cursor:pointer}.auto-cols-fr{grid-auto-columns:minmax(0, 1fr)}.grid-cols-\[--cols-default\]{grid-template-columns:var(--cols-default)}.grid-rows-\[1fr_auto_1fr\]{grid-template-rows:1fr auto 1fr}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.justify-items-center{justify-items:center}.gap-3{gap:0.75rem}.gap-6{gap:1.5rem}.gap-x-1{column-gap:0.25rem}.gap-x-3{column-gap:0.75rem}.gap-y-1{row-gap:0.25rem}.gap-y-2{row-gap:0.5rem}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.overflow-x-hidden{overflow-x:hidden}.break-words{overflow-wrap:break-word}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.\!border-none{border-style:none !important}.border-none{border-style:none}.border-gray-100{--tw-border-opacity:1;border-color:rgb(243 244 246 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-200\/50{border-color:rgb(229 231 235 / 0.5)}.border-transparent{border-color:transparent}.bg-\[\#F3F4F6\]{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-blue-400\/30{background-color:rgb(96 165 250 / 0.3)}.bg-gray-950\/50{background-color:rgb(3 7 18 / 0.5)}.bg-indigo-400\/30{background-color:rgb(129 140 248 / 0.3)}.bg-transparent{background-color:transparent}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/0{background-color:rgb(255 255 255 / 0)}.bg-white\/80{background-color:rgb(255 255 255 / 0.8)}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.\!bg-none{background-image:none !important}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-500{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-indigo-500{--tw-gradient-to:rgb(99 102 241 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #6366f1 var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-indigo-600{--tw-gradient-to:#4f46e5 var(--tw-gradient-to-position)}.to-purple-500{--tw-gradient-to:#a855f7 var(--tw-gradient-to-position)}.p-2\.5{padding:0.625rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pe-3{padding-inline-end:0.75rem}.ps-3{padding-inline-start:0.75rem}.text-center{text-align:center}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-6{line-height:1.5rem}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.text-gray-950{--tw-text-opacity:1;color:rgb(3 7 18 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-500{--tw-text-opacity:1;color:rgb(234 179 8 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.ring-1{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.ring-gray-950\/10{--tw-ring-color:rgb(3 7 18 / 0.1)}.ring-gray-950\/5{--tw-ring-color:rgb(3 7 18 / 0.05)}.blur-\[100px\]{--tw-blur:blur(100px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.drop-shadow-md{--tw-drop-shadow:drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-75{transition-duration:75ms}.placeholder\:text-gray-400::placeholder{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.hover\:-translate-y-0\.5:hover{--tw-translate-y:-0.125rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-gray-50:hover{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.hover\:bg-white:hover{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.hover\:from-blue-700:hover{--tw-gradient-from:#1d4ed8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(29 78 216 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-indigo-700:hover{--tw-gradient-to:#4338ca var(--tw-gradient-to-position)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-0:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}.focus\:ring-offset-2:focus{--tw-ring-offset-width:2px}.focus-visible\:bg-gray-50:focus-visible{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.focus-visible\:outline-none:focus-visible{outline:2px solid transparent;outline-offset:2px}.disabled\:text-gray-500:disabled{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.disabled\:\[-webkit-text-fill-color\:theme\(colors\.gray\.500\)\]:disabled{-webkit-text-fill-color:#6b7280}.disabled\:placeholder\:\[-webkit-text-fill-color\:theme\(colors\.gray\.400\)\]:disabled::placeholder{-webkit-text-fill-color:#9ca3af}.dark\:block:is(.dark *){display:block}.dark\:hidden:is(.dark *){display:none}.dark\:border-gray-700\/50:is(.dark *){border-color:rgb(55 65 81 / 0.5)}.dark\:border-white\/10:is(.dark *){border-color:rgb(255 255 255 / 0.1)}.dark\:bg-blue-600\/20:is(.dark *){background-color:rgb(37 99 235 / 0.2)}.dark\:bg-gray-800\/80:is(.dark *){background-color:rgb(31 41 55 / 0.8)}.dark\:bg-gray-800\/90:is(.dark *){background-color:rgb(31 41 55 / 0.9)}.dark\:bg-gray-900:is(.dark *){--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.dark\:bg-gray-950\/75:is(.dark *){background-color:rgb(3 7 18 / 0.75)}.dark\:bg-indigo-600\/20:is(.dark *){background-color:rgb(79 70 229 / 0.2)}.dark\:bg-white\/5:is(.dark *){background-color:rgb(255 255 255 / 0.05)}.dark\:text-blue-400:is(.dark *){--tw-text-opacity:1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.dark\:text-gray-200:is(.dark *){--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.dark\:text-gray-400:is(.dark *){--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.dark\:text-gray-500:is(.dark *){--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.dark\:text-white:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.dark\:ring-white\/10:is(.dark *){--tw-ring-color:rgb(255 255 255 / 0.1)}.dark\:ring-white\/20:is(.dark *){--tw-ring-color:rgb(255 255 255 / 0.2)}.dark\:placeholder\:text-gray-500:is(.dark *)::placeholder{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.dark\:hover\:bg-gray-700:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.dark\:hover\:bg-white\/5:hover:is(.dark *){background-color:rgb(255 255 255 / 0.05)}.dark\:focus-visible\:bg-white\/5:focus-visible:is(.dark *){background-color:rgb(255 255 255 / 0.05)}.dark\:disabled\:text-gray-400:disabled:is(.dark *){--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.dark\:disabled\:\[-webkit-text-fill-color\:theme\(colors\.gray\.400\)\]:disabled:is(.dark *){-webkit-text-fill-color:#9ca3af}.dark\:disabled\:placeholder\:\[-webkit-text-fill-color\:theme\(colors\.gray\.500\)\]:disabled:is(.dark *)::placeholder{-webkit-text-fill-color:#6b7280}@media (min-width: 640px){.sm\:mx-auto{margin-left:auto;margin-right:auto}.sm\:w-full{width:100%}.sm\:max-w-2xl{max-width:42rem}.sm\:grid-cols-\[--cols-sm\]{grid-template-columns:var(--cols-sm)}.sm\:grid-rows-\[1fr_auto_3fr\]{grid-template-rows:1fr auto 3fr}.sm\:rounded-2xl{border-radius:1rem}.sm\:px-0{padding-left:0px;padding-right:0px}.sm\:px-10{padding-left:2.5rem;padding-right:2.5rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:leading-6{line-height:1.5rem}}@media (min-width: 1024px){.lg\:px-8{padding-left:2rem;padding-right:2rem}}.\[\&\.trix-active\]\:bg-gray-50.trix-active{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.dark\:\[\&\.trix-active\]\:bg-white\/5.trix-active:is(.dark *){background-color:rgb(255 255 255 / 0.05)}.\[\&\:not\(\:has\(\.fi-ac-action\:focus\)\)\]\:focus-within\:ring-2:focus-within:not(:has(.fi-ac-action:focus)){--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.\[\&_\.filepond--root\]\:font-sans .filepond--root{font-family:Inter, sans-serif}</style><style>/* Make clicks pass-through */
+
+    #nprogress {
+      pointer-events: none;
+    }
+
+    #nprogress .bar {
+      background: var(--livewire-progress-bar-color, #29d);
+
+      position: fixed;
+      z-index: 1031;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 2px;
+    }
+
+    /* Fancy blur effect */
+    #nprogress .peg {
+      display: block;
+      position: absolute;
+      right: 0px;
+      width: 100px;
+      height: 100%;
+      box-shadow: 0 0 10px var(--livewire-progress-bar-color, #29d), 0 0 5px var(--livewire-progress-bar-color, #29d);
+      opacity: 1.0;
+
+      -webkit-transform: rotate(3deg) translate(0px, -4px);
+          -ms-transform: rotate(3deg) translate(0px, -4px);
+              transform: rotate(3deg) translate(0px, -4px);
+    }
+
+    /* Remove these to get rid of the spinner */
+    #nprogress .spinner {
+      display: block;
+      position: fixed;
+      z-index: 1031;
+      top: 15px;
+      right: 15px;
+    }
+
+    #nprogress .spinner-icon {
+      width: 18px;
+      height: 18px;
+      box-sizing: border-box;
+
+      border: solid 2px transparent;
+      border-top-color: var(--livewire-progress-bar-color, #29d);
+      border-left-color: var(--livewire-progress-bar-color, #29d);
+      border-radius: 50%;
+
+      -webkit-animation: nprogress-spinner 400ms linear infinite;
+              animation: nprogress-spinner 400ms linear infinite;
+    }
+
+    .nprogress-custom-parent {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .nprogress-custom-parent #nprogress .spinner,
+    .nprogress-custom-parent #nprogress .bar {
+      position: absolute;
+    }
+
+    @-webkit-keyframes nprogress-spinner {
+      0%   { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    @keyframes nprogress-spinner {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    </style></head>
+<body class="bg-[#F3F4F6] dark:bg-gray-900 transition-colors duration-300 relative overflow-x-hidden">
+    
+    <!-- Background Gradients -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/30 dark:bg-blue-600/20 rounded-full blur-[100px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-400/30 dark:bg-indigo-600/20 rounded-full blur-[100px] animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative z-10 animate-fade-in-up">
+        
+        <div class="sm:mx-auto sm:w-full sm:max-w-2xl px-4 sm:px-0 mb-6">
+            <div class="flex justify-between items-start">
+                <div class="flex items-center space-x-4">
+                    <!-- Brand Icon -->
+                    <div class="flex-shrink-0">
+                        <!-- Logo Updated -->
+                        <img src="http://127.0.0.1:8001/img/logo-ptpn.png" alt="PTPN Logo" class="h-16 w-auto drop-shadow-md transition-transform hover:scale-105">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+                            IT Helpdesk
+                        </h2>
+                        <p class="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                            PTPN IV
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Theme Toggle Button -->
+                <button type="button" onclick="toggleTheme()" class="p-2.5 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 transition-all focus:outline-none backdrop-blur-sm" title="Ganti Tema">
+                    <!-- Sun Icon -->
+                    <svg class="hidden dark:block w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <!-- Moon Icon -->
+                    <svg class="block dark:hidden w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <p class="mt-4 text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
+                Ada kendala teknis? silahkan isi form di bawah ini dan kami akan segera membantu Anda.
+            </p>
+        </div>
+
+        <div class="mt-2 sm:mx-auto sm:w-full sm:max-w-2xl">
+            <div class="bg-white/90 dark:bg-gray-800/90 glass-effect py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100 dark:border-gray-700/50 relative overflow-hidden">
+                <!-- Decorative Top Border -->
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+
+                <!-- Panggil Livewire Component -->
+                <div wire:snapshot="{&quot;data&quot;:{&quot;data&quot;:[{&quot;nik&quot;:&quot;10001&quot;,&quot;nama_lengkap&quot;:&quot;M FAHREZI SINDA KHALID&quot;,&quot;no_hp&quot;:&quot;082276295875&quot;,&quot;email&quot;:&quot;fahrezisindakhalid25@gmail.com&quot;,&quot;lokasi&quot;:null,&quot;deskripsi_umum_masalah&quot;:null,&quot;penjelasan_lengkap&quot;:null,&quot;gambar&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}]},{&quot;s&quot;:&quot;arr&quot;}],&quot;componentFileAttachments&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;areFormStateUpdateHooksDisabledForTesting&quot;:false,&quot;mountedFormComponentActions&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;mountedFormComponentActionsArguments&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;mountedFormComponentActionsData&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}],&quot;mountedFormComponentActionsComponents&quot;:[[],{&quot;s&quot;:&quot;arr&quot;}]},&quot;memo&quot;:{&quot;id&quot;:&quot;mSvDT6skfFSQrH8zK9Rq&quot;,&quot;name&quot;:&quot;laporan-form&quot;,&quot;path&quot;:&quot;\/&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;release&quot;:&quot;a-a-a&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;en&quot;},&quot;checksum&quot;:&quot;41d1d16559ac141fc13f429b6d1654e8257733ebcd5697e166eb99fba98a0bc3&quot;}" wire:effects="{&quot;returns&quot;:[]}" wire:id="mSvDT6skfFSQrH8zK9Rq">
+    <form wire:submit="create">
+        <div style="--cols-default: repeat(1, minmax(0, 1fr));" class="grid grid-cols-[--cols-default] fi-fo-component-ctn gap-6" x-data="{}" x-on:form-validation-error.window="if ($event.detail.livewireId !== 'mSvDT6skfFSQrH8zK9Rq') {
+                return
+            }
+
+            $nextTick(() =&gt; {
+                let error = $el.querySelector('[data-validation-error]')
+
+                if (! error) {
+                    return
+                }
+
+                let elementToExpand = error
+
+                while (elementToExpand) {
+                    elementToExpand.dispatchEvent(new CustomEvent('expand'))
+
+                    elementToExpand = elementToExpand.parentNode
+                }
+
+                setTimeout(
+                    () =&gt;
+                        error.closest('[data-field-wrapper]').scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                            inline: 'start',
+                        }),
+                    200,
+                )
+        })" data-has-alpine-state="true">
+    <!--[if BLOCK]><![endif]-->        
+        <div style="--col-span-default: 1 / -1;" class="col-[--col-span-default]">
+    <!--[if BLOCK]><![endif]-->                <section x-data="{
+        isCollapsed:  false ,
+    }" class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10" id="data.informasi-pelapor" data-has-alpine-state="true">
+    <!--[if BLOCK]><![endif]-->        <header class="fi-section-header flex flex-col gap-3 px-6 py-4">
+            <div class="flex items-center gap-3">
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]-->                    <div class="grid flex-1 gap-y-1">
+                        <!--[if BLOCK]><![endif]-->                            <h3 class="fi-section-header-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+    Informasi Pelapor
+</h3>
+                        <!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]-->                            <p class="fi-section-header-description overflow-hidden break-words text-sm text-gray-500 dark:text-gray-400">
+    Masukkan NIK Anda untuk melengkapi data otomatis.
+</p>
+                        <!--[if ENDBLOCK]><![endif]-->                    </div>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+
+            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->        </header>
+    <!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-section-content-ctn border-t border-gray-200 dark:border-white/10">
+        <div class="fi-section-content p-6">
+            <div style="--cols-default: repeat(1, minmax(0, 1fr)); --cols-sm: repeat(2, minmax(0, 1fr));" class="grid grid-cols-[--cols-default] sm:grid-cols-[--cols-sm] fi-fo-component-ctn gap-6">
+    <!--[if BLOCK]><![endif]-->        
+        <div style="--col-span-default: span 1 / span 1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.nik.Filament\Forms\Components\TextInput">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.nik">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        NIK<!--[if BLOCK]><![endif]--><sup class="text-danger-600 dark:text-danger-400 font-medium">*</sup>
+        <!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-text-input overflow-hidden">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <input class="fi-input block w-full border-none py-1.5 text-base text-gray-950 transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0 ps-3 pe-3" id="data.nik" required="required" type="text" wire:model.blur="data.nik" readonly="" style="">
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: span 1 / span 1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.nama_lengkap.Filament\Forms\Components\TextInput">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.nama_lengkap">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        Nama Lengkap<!--[if BLOCK]><![endif]--><sup class="text-danger-600 dark:text-danger-400 font-medium">*</sup>
+        <!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-text-input overflow-hidden">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <input class="fi-input block w-full border-none py-1.5 text-base text-gray-950 transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0 ps-3 pe-3" id="data.nama_lengkap" maxlength="255" required="required" type="text" wire:model="data.nama_lengkap" readonly="" style="">
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: span 1 / span 1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.no_hp.Filament\Forms\Components\TextInput">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.no_hp">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        No WhatsApp<!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-text-input overflow-hidden">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <input class="fi-input block w-full border-none py-1.5 text-base text-gray-950 transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0 ps-3 pe-3" id="data.no_hp" inputmode="decimal" placeholder="08..." step="any" type="number" wire:model="data.no_hp" readonly="" style="">
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: span 1 / span 1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.email.Filament\Forms\Components\TextInput">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.email">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        Email<!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-text-input overflow-hidden">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <input class="fi-input block w-full border-none py-1.5 text-base text-gray-950 transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0 ps-3 pe-3" id="data.email" maxlength="255" type="email" wire:model="data.email" readonly="" style="">
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: span 1 / span 1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.lokasi.Filament\Forms\Components\Select">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.lokasi">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        Lokasi / Unit Kerja<!--[if BLOCK]><![endif]--><sup class="text-danger-600 dark:text-danger-400 font-medium">*</sup>
+        <!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-select">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <!--[if BLOCK]><![endif]-->            <div class="hidden" x-data="{
+                    isDisabled: false,
+                    init: function () {
+                        const container = $el.nextElementSibling
+                        container.dispatchEvent(
+                            new CustomEvent('set-select-property', {
+                                detail: { isDisabled: this.isDisabled },
+                            }),
+                        )
+                    },
+                }" data-has-alpine-state="true"></div>
+            <div x-load="" x-load-src="http://127.0.0.1:8001/js/filament/forms/components/select.js?v=3.3.47.0" x-data="selectFormComponent({
+                            canSelectPlaceholder: true,
+                            isHtmlAllowed: false,
+                            getOptionLabelUsing: async () =&gt; {
+                                return await $wire.getFormSelectOptionLabel('data.lokasi')
+                            },
+                            getOptionLabelsUsing: async () =&gt; {
+                                return await $wire.getFormSelectOptionLabels('data.lokasi')
+                            },
+                            getOptionsUsing: async () =&gt; {
+                                return await $wire.getFormSelectOptions('data.lokasi')
+                            },
+                            getSearchResultsUsing: async (search) =&gt; {
+                                return await $wire.getFormSelectSearchResults('data.lokasi', search)
+                            },
+                            isAutofocused: false,
+                            isMultiple: false,
+                            isSearchable: true,
+                            livewireId: 'mSvDT6skfFSQrH8zK9Rq',
+                            hasDynamicOptions: false,
+                            hasDynamicSearchResults: false,
+                            loadingMessage: 'Loading...',
+                            maxItems: null,
+                            maxItemsMessage: 'Only  can be selected.',
+                            noSearchResultsMessage: 'No options match your search.',
+                            options: JSON.parse('[{\u0022label\u0022:\u0022kantor pusatt\u0022,\u0022value\u0022:\u0022kantor pusatt\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022ladang\u0022,\u0022value\u0022:\u0022ladang\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022divisi pemasaran\u0022,\u0022value\u0022:\u0022divisi pemasaran\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Lobby Utama\u0022,\u0022value\u0022:\u0022Kantor Pusat - Lobby Utama\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Ruang Meeting Besar\u0022,\u0022value\u0022:\u0022Kantor Pusat - Ruang Meeting Besar\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Ruang Server\u0022,\u0022value\u0022:\u0022Kantor Pusat - Ruang Server\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Divisi HRD\u0022,\u0022value\u0022:\u0022Kantor Pusat - Divisi HRD\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Divisi Keuangan\u0022,\u0022value\u0022:\u0022Kantor Pusat - Divisi Keuangan\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Divisi Tanaman\u0022,\u0022value\u0022:\u0022Kantor Pusat - Divisi Tanaman\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Divisi Teknik\u0022,\u0022value\u0022:\u0022Kantor Pusat - Divisi Teknik\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Divisi Pengadaan (Procurement)\u0022,\u0022value\u0022:\u0022Kantor Pusat - Divisi Pengadaan (Procurement)\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantor Pusat - Ruang Arsip\u0022,\u0022value\u0022:\u0022Kantor Pusat - Ruang Arsip\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik Kelapa Sawit (PKS) - Kantor\u0022,\u0022value\u0022:\u0022Pabrik Kelapa Sawit (PKS) - Kantor\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik - Ruang Control Room\u0022,\u0022value\u0022:\u0022Pabrik - Ruang Control Room\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik - Laboratorium\u0022,\u0022value\u0022:\u0022Pabrik - Laboratorium\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik - Gudang Sparepart\u0022,\u0022value\u0022:\u0022Pabrik - Gudang Sparepart\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik - Workshop\\\/Bengkel\u0022,\u0022value\u0022:\u0022Pabrik - Workshop\\\/Bengkel\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik - Pos Security\u0022,\u0022value\u0022:\u0022Pabrik - Pos Security\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pabrik - Area Timbangan\u0022,\u0022value\u0022:\u0022Pabrik - Area Timbangan\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Afdeling I - Kantor Asisten\u0022,\u0022value\u0022:\u0022Afdeling I - Kantor Asisten\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Afdeling I - Gudang Pupuk\u0022,\u0022value\u0022:\u0022Afdeling I - Gudang Pupuk\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Afdeling II - Kantor Asisten\u0022,\u0022value\u0022:\u0022Afdeling II - Kantor Asisten\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Afdeling II - Perumahan Staff\u0022,\u0022value\u0022:\u0022Afdeling II - Perumahan Staff\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Afdeling III - Kantor Asisten\u0022,\u0022value\u0022:\u0022Afdeling III - Kantor Asisten\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Afdeling IV - Kantor Asisten\u0022,\u0022value\u0022:\u0022Afdeling IV - Kantor Asisten\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Gudang Sentral\u0022,\u0022value\u0022:\u0022Gudang Sentral\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Poliklinik Kebun\u0022,\u0022value\u0022:\u0022Poliklinik Kebun\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Mess Tamu \\\/ Guest House\u0022,\u0022value\u0022:\u0022Mess Tamu \\\/ Guest House\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Pos Satpam Utama (Gerbang Depan)\u0022,\u0022value\u0022:\u0022Pos Satpam Utama (Gerbang Depan)\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Unit Transportasi \\u0026 Alat Berat\u0022,\u0022value\u0022:\u0022Unit Transportasi \\u0026 Alat Berat\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Koperasi Karyawan\u0022,\u0022value\u0022:\u0022Koperasi Karyawan\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Kantin \\u0026 Area Istirahat\u0022,\u0022value\u0022:\u0022Kantin \\u0026 Area Istirahat\u0022,\u0022disabled\u0022:false},{\u0022label\u0022:\u0022Area Pembibitan (Nursery)\u0022,\u0022value\u0022:\u0022Area Pembibitan (Nursery)\u0022,\u0022disabled\u0022:false}]'),
+                            optionsLimit: 50,
+                            placeholder: 'Select an option',
+                            position: null,
+                            searchDebounce: 1000,
+                            searchingMessage: 'Searching...',
+                            searchPrompt: 'Start typing to search...',
+                            searchableOptionFields: JSON.parse('[\u0022label\u0022]'),
+                            state: $wire.$entangle('data.lokasi', false),
+                            statePath: 'data.lokasi',
+                        })" wire:ignore="" wire:key="mSvDT6skfFSQrH8zK9Rq.data.lokasi.Filament\Forms\Components\Select.a8cf63fecab3eb3edf6760bc02f258a6" x-on:keydown.esc="select.dropdown.isActive &amp;&amp; $event.stopPropagation()" x-on:set-select-property="$event.detail.isDisabled ? select.disable() : select.enable()" class="">
+                <div class="choices" data-type="select-one" tabindex="0" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false"><div class="choices__inner"><select x-ref="input" class="h-9 w-full rounded-lg border-none bg-transparent !bg-none choices__input" id="data.lokasi" hidden="" tabindex="-1" data-choice="active"><option value="ladang" data-custom-properties="[object Object]">ladang</option></select><div class="choices__list choices__list--single"><div class="choices__item choices__item--selectable" data-item="" data-id="1" data-value="ladang" data-custom-properties="[object Object]" aria-selected="true" data-deletable="">ladang<button type="button" class="choices__button" aria-label="Remove item: 'ladang'" data-button="">Remove item</button></div></div></div><div class="choices__list choices__list--dropdown" aria-expanded="false"><input type="search" name="search_terms" class="choices__input choices__input--cloned" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" aria-label="Select an option" placeholder="Start typing to search..." style="" aria-activedescendant="choices--datalokasi-item-choice-2"><div class="choices__list" role="listbox"><div id="choices--datalokasi-item-choice-1" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="1" data-value="kantor pusatt" data-select-text="" data-choice-selectable="">kantor pusatt</div><div id="choices--datalokasi-item-choice-2" class="choices__item choices__item--choice is-selected choices__item--selectable is-highlighted" role="option" data-choice="" data-id="2" data-value="ladang" data-select-text="" data-choice-selectable="" aria-selected="true">ladang</div><div id="choices--datalokasi-item-choice-3" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="3" data-value="divisi pemasaran" data-select-text="" data-choice-selectable="">divisi pemasaran</div><div id="choices--datalokasi-item-choice-4" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="4" data-value="Kantor Pusat - Lobby Utama" data-select-text="" data-choice-selectable="">Kantor Pusat - Lobby Utama</div><div id="choices--datalokasi-item-choice-5" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="5" data-value="Kantor Pusat - Ruang Meeting Besar" data-select-text="" data-choice-selectable="">Kantor Pusat - Ruang Meeting Besar</div><div id="choices--datalokasi-item-choice-6" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="6" data-value="Kantor Pusat - Ruang Server" data-select-text="" data-choice-selectable="">Kantor Pusat - Ruang Server</div><div id="choices--datalokasi-item-choice-7" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="7" data-value="Kantor Pusat - Divisi HRD" data-select-text="" data-choice-selectable="">Kantor Pusat - Divisi HRD</div><div id="choices--datalokasi-item-choice-8" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="8" data-value="Kantor Pusat - Divisi Keuangan" data-select-text="" data-choice-selectable="">Kantor Pusat - Divisi Keuangan</div><div id="choices--datalokasi-item-choice-9" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="9" data-value="Kantor Pusat - Divisi Tanaman" data-select-text="" data-choice-selectable="">Kantor Pusat - Divisi Tanaman</div><div id="choices--datalokasi-item-choice-10" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="10" data-value="Kantor Pusat - Divisi Teknik" data-select-text="" data-choice-selectable="">Kantor Pusat - Divisi Teknik</div><div id="choices--datalokasi-item-choice-11" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="11" data-value="Kantor Pusat - Divisi Pengadaan (Procurement)" data-select-text="" data-choice-selectable="">Kantor Pusat - Divisi Pengadaan (Procurement)</div><div id="choices--datalokasi-item-choice-12" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="12" data-value="Kantor Pusat - Ruang Arsip" data-select-text="" data-choice-selectable="">Kantor Pusat - Ruang Arsip</div><div id="choices--datalokasi-item-choice-13" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="13" data-value="Pabrik Kelapa Sawit (PKS) - Kantor" data-select-text="" data-choice-selectable="">Pabrik Kelapa Sawit (PKS) - Kantor</div><div id="choices--datalokasi-item-choice-14" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="14" data-value="Pabrik - Ruang Control Room" data-select-text="" data-choice-selectable="">Pabrik - Ruang Control Room</div><div id="choices--datalokasi-item-choice-15" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="15" data-value="Pabrik - Laboratorium" data-select-text="" data-choice-selectable="">Pabrik - Laboratorium</div><div id="choices--datalokasi-item-choice-16" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="16" data-value="Pabrik - Gudang Sparepart" data-select-text="" data-choice-selectable="">Pabrik - Gudang Sparepart</div><div id="choices--datalokasi-item-choice-17" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="17" data-value="Pabrik - Workshop/Bengkel" data-select-text="" data-choice-selectable="">Pabrik - Workshop/Bengkel</div><div id="choices--datalokasi-item-choice-18" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="18" data-value="Pabrik - Pos Security" data-select-text="" data-choice-selectable="">Pabrik - Pos Security</div><div id="choices--datalokasi-item-choice-19" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="19" data-value="Pabrik - Area Timbangan" data-select-text="" data-choice-selectable="">Pabrik - Area Timbangan</div><div id="choices--datalokasi-item-choice-20" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="20" data-value="Afdeling I - Kantor Asisten" data-select-text="" data-choice-selectable="">Afdeling I - Kantor Asisten</div><div id="choices--datalokasi-item-choice-21" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="21" data-value="Afdeling I - Gudang Pupuk" data-select-text="" data-choice-selectable="">Afdeling I - Gudang Pupuk</div><div id="choices--datalokasi-item-choice-22" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="22" data-value="Afdeling II - Kantor Asisten" data-select-text="" data-choice-selectable="">Afdeling II - Kantor Asisten</div><div id="choices--datalokasi-item-choice-23" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="23" data-value="Afdeling II - Perumahan Staff" data-select-text="" data-choice-selectable="">Afdeling II - Perumahan Staff</div><div id="choices--datalokasi-item-choice-24" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="24" data-value="Afdeling III - Kantor Asisten" data-select-text="" data-choice-selectable="">Afdeling III - Kantor Asisten</div><div id="choices--datalokasi-item-choice-25" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="25" data-value="Afdeling IV - Kantor Asisten" data-select-text="" data-choice-selectable="">Afdeling IV - Kantor Asisten</div><div id="choices--datalokasi-item-choice-26" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="26" data-value="Gudang Sentral" data-select-text="" data-choice-selectable="">Gudang Sentral</div><div id="choices--datalokasi-item-choice-27" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="27" data-value="Poliklinik Kebun" data-select-text="" data-choice-selectable="">Poliklinik Kebun</div><div id="choices--datalokasi-item-choice-28" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="28" data-value="Mess Tamu / Guest House" data-select-text="" data-choice-selectable="">Mess Tamu / Guest House</div><div id="choices--datalokasi-item-choice-29" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="29" data-value="Pos Satpam Utama (Gerbang Depan)" data-select-text="" data-choice-selectable="">Pos Satpam Utama (Gerbang Depan)</div><div id="choices--datalokasi-item-choice-30" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="30" data-value="Unit Transportasi &amp; Alat Berat" data-select-text="" data-choice-selectable="">Unit Transportasi &amp; Alat Berat</div><div id="choices--datalokasi-item-choice-31" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="31" data-value="Koperasi Karyawan" data-select-text="" data-choice-selectable="">Koperasi Karyawan</div><div id="choices--datalokasi-item-choice-32" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="32" data-value="Kantin &amp; Area Istirahat" data-select-text="" data-choice-selectable="">Kantin &amp; Area Istirahat</div><div id="choices--datalokasi-item-choice-33" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="33" data-value="Area Pembibitan (Nursery)" data-select-text="" data-choice-selectable="">Area Pembibitan (Nursery)</div></div></div></div>
+            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+    <!--[if ENDBLOCK]><![endif]-->
+</div>
+        </div>
+
+        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->    </div>
+</section>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: 1 / -1;" class="col-[--col-span-default]">
+    <!--[if BLOCK]><![endif]-->                <section x-data="{
+        isCollapsed:  false ,
+    }" class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10" id="data.detail-masalah" data-has-alpine-state="true">
+    <!--[if BLOCK]><![endif]-->        <header class="fi-section-header flex flex-col gap-3 px-6 py-4">
+            <div class="flex items-center gap-3">
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]-->                    <div class="grid flex-1 gap-y-1">
+                        <!--[if BLOCK]><![endif]-->                            <h3 class="fi-section-header-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+    Detail Masalah
+</h3>
+                        <!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->                    </div>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+
+            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->        </header>
+    <!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-section-content-ctn border-t border-gray-200 dark:border-white/10">
+        <div class="fi-section-content p-6">
+            <div style="--cols-default: repeat(1, minmax(0, 1fr));" class="grid grid-cols-[--cols-default] fi-fo-component-ctn gap-6">
+    <!--[if BLOCK]><![endif]-->        
+        <div style="--col-span-default: 1 / -1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.deskripsi_umum_masalah.Filament\Forms\Components\TextInput">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.deskripsi_umum_masalah">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        Ringkasan Masalah (Contoh: WiFi Putus)<!--[if BLOCK]><![endif]--><sup class="text-danger-600 dark:text-danger-400 font-medium">*</sup>
+        <!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-text-input overflow-hidden">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <input class="fi-input block w-full border-none py-1.5 text-base text-gray-950 transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:theme(colors.gray.500)] disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.400)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:theme(colors.gray.400)] dark:disabled:placeholder:[-webkit-text-fill-color:theme(colors.gray.500)] sm:text-sm sm:leading-6 bg-white/0 ps-3 pe-3" id="data.deskripsi_umum_masalah" maxlength="255" required="required" type="text" wire:model="data.deskripsi_umum_masalah" readonly="" style="">
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: 1 / -1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.penjelasan_lengkap.Filament\Forms\Components\RichEditor">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <label class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" for="data.penjelasan_lengkap">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        Ceritakan Detail Kendalanya<!--[if BLOCK]><![endif]--><sup class="text-danger-600 dark:text-danger-400 font-medium">*</sup>
+        <!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</label>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <!--[if BLOCK]><![endif]-->        <div class="fi-input-wrp flex rounded-lg shadow-sm ring-1 transition duration-75 bg-white dark:bg-white/5 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-2 ring-gray-950/10 dark:ring-white/20 [&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-600 dark:[&amp;:not(:has(.fi-ac-action:focus))]:focus-within:ring-primary-500 fi-fo-rich-editor max-w-full overflow-x-auto">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="fi-input-wrp-input min-w-0 flex-1">
+        <div x-load="" x-load-src="http://127.0.0.1:8001/js/filament/forms/components/rich-editor.js?v=3.3.47.0" x-data="richEditorFormComponent({
+                            state: $wire.$entangle('data.penjelasan_lengkap', false),
+                        })" x-on:trix-attachment-add="
+                    if (! $event.attachment.file) return
+
+                    let attachment = $event.attachment
+
+                    $wire.upload(
+                        `componentFileAttachments.data.penjelasan_lengkap`,
+                        attachment.file,
+                        () =&gt; {
+                            $wire
+                                .getFormComponentFileAttachmentUrl('data.penjelasan_lengkap')
+                                .then((url) =&gt; {
+                                    attachment.setAttributes({
+                                        url: url,
+                                        href: url,
+                                    })
+                                })
+                        },
+                    )
+                " x-on:trix-change="
+                    let value = $event.target.value
+
+                    $nextTick(() =&gt; {
+                        if (! $refs.trix) {
+                            return
+                        }
+
+                        state = value
+                    })
+                " x-on:trix-file-accept="$event.preventDefault()" data-has-alpine-state="true">
+                <input id="trix-value-data.penjelasan_lengkap" x-ref="trixValue" type="hidden" value="&lt;p&gt;Sejak pagi wifi putus nyambung dan tidak bisa buat buka internet.&lt;/p&gt;" readonly="" style="">
+
+                <trix-toolbar id="trix-toolbar-data.penjelasan_lengkap" class="fi-fo-rich-editor-toolbar relative flex flex-col gap-x-3 border-b border-gray-100 px-2.5 py-2 dark:border-white/10">
+                    <div class="flex gap-x-3 overflow-x-auto">
+                        <!--[if BLOCK]><![endif]-->                            <div class="flex gap-x-1" data-trix-button-group="text-tools">
+    <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-attribute="bold" data-trix-key="b" title="Bold" tabindex="-1">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path fill-rule="evenodd" d="M4 3a1 1 0 0 1 1-1h6a4.5 4.5 0 0 1 3.274 7.587A4.75 4.75 0 0 1 11.25 18H5a1 1 0 0 1-1-1V3Zm2.5 5.5v-4H11a2 2 0 1 1 0 4H6.5Zm0 2.5v4.5h4.75a2.25 2.25 0 0 0 0-4.5H6.5Z" clip-rule="evenodd"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-attribute="italic" data-trix-key="i" title="Italic" tabindex="-1">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path fill-rule="evenodd" d="M8 2.75A.75.75 0 0 1 8.75 2h7.5a.75.75 0 0 1 0 1.5h-3.215l-4.483 13h2.698a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3.215l4.483-13H8.75A.75.75 0 0 1 8 2.75Z" clip-rule="evenodd"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-attribute="underline" data-trix-key="u" title="Underline" tabindex="-1">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path fill-rule="evenodd" d="M4.75 2a.75.75 0 0 1 .75.75V9a4.5 4.5 0 1 0 9 0V2.75a.75.75 0 0 1 1.5 0V9A6 6 0 0 1 4 9V2.75A.75.75 0 0 1 4.75 2ZM2 17.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+</div>
+                        <!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]-->                            <div class="flex gap-x-1" data-trix-button-group="block-tools">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-attribute="bullet" title="Bullet list" tabindex="-1">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path fill-rule="evenodd" d="M6 4.75A.75.75 0 0 1 6.75 4h10.5a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 4.75ZM6 10a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 10Zm0 5.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H6.75a.75.75 0 0 1-.75-.75ZM1.99 4.75a1 1 0 0 1 1-1H3a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1v-.01ZM1.99 15.25a1 1 0 0 1 1-1H3a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1v-.01ZM1.99 10a1 1 0 0 1 1-1H3a1 1 0 0 1 1 1v.01a1 1 0 0 1-1 1h-.01a1 1 0 0 1-1-1V10Z" clip-rule="evenodd"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-attribute="number" title="Numbered list" tabindex="-1">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path d="M3 1.25a.75.75 0 0 0 0 1.5h.25v2.5a.75.75 0 0 0 1.5 0V2A.75.75 0 0 0 4 1.25H3ZM2.97 8.654a3.5 3.5 0 0 1 1.524-.12.034.034 0 0 1-.012.012L2.415 9.579A.75.75 0 0 0 2 10.25v1c0 .414.336.75.75.75h2.5a.75.75 0 0 0 0-1.5H3.927l1.225-.613c.52-.26.848-.79.848-1.371 0-.647-.429-1.327-1.193-1.451a5.03 5.03 0 0 0-2.277.155.75.75 0 0 0 .44 1.434ZM7.75 3a.75.75 0 0 0 0 1.5h9.5a.75.75 0 0 0 0-1.5h-9.5ZM7.75 9.25a.75.75 0 0 0 0 1.5h9.5a.75.75 0 0 0 0-1.5h-9.5ZM7.75 15.5a.75.75 0 0 0 0 1.5h9.5a.75.75 0 0 0 0-1.5h-9.5ZM2.625 13.875a.75.75 0 0 0 0 1.5h1.5a.125.125 0 0 1 0 .25H3.5a.75.75 0 0 0 0 1.5h.625a.125.125 0 0 1 0 .25h-1.5a.75.75 0 0 0 0 1.5h1.5a1.625 1.625 0 0 0 1.37-2.5 1.625 1.625 0 0 0-1.37-2.5h-1.5Z"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+</div>
+                        <!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                        <!--[if BLOCK]><![endif]-->                            <div class="flex gap-x-1" data-trix-button-group="history-tools">
+    <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-action="undo" data-trix-key="z" title="Undo" tabindex="-1">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path fill-rule="evenodd" d="M7.793 2.232a.75.75 0 0 1-.025 1.06L3.622 7.25h10.003a5.375 5.375 0 0 1 0 10.75H10.75a.75.75 0 0 1 0-1.5h2.875a3.875 3.875 0 0 0 0-7.75H3.622l4.146 3.957a.75.75 0 0 1-1.036 1.085l-5.5-5.25a.75.75 0 0 1 0-1.085l5.5-5.25a.75.75 0 0 1 1.06.025Z" clip-rule="evenodd"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+                                <!--[if BLOCK]><![endif]-->                                    <button class="fi-fo-rich-editor-toolbar-btn flex h-8 min-w-[theme(spacing.8)] cursor-pointer items-center justify-center rounded-lg text-sm font-semibold text-gray-700 transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:text-gray-200 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 [&amp;.trix-active]:bg-gray-50 [&amp;.trix-active]:text-primary-600 dark:[&amp;.trix-active]:bg-white/5 dark:[&amp;.trix-active]:text-primary-400" type="button" data-trix-action="redo" data-trix-key="shift+z" title="Redo" tabindex="-1" disabled="">
+    <!--[if BLOCK]><![endif]-->    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+  <path fill-rule="evenodd" d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z" clip-rule="evenodd"></path>
+</svg><!--[if ENDBLOCK]><![endif]-->
+</button>
+                                <!--[if ENDBLOCK]><![endif]-->
+</div>
+                        <!--[if ENDBLOCK]><![endif]-->                    </div>
+
+                    <div data-trix-dialogs="" class="trix-dialogs">
+                        <div data-trix-dialog="href" data-trix-dialog-attribute="href" class="trix-dialog trix-dialog--link">
+                            <div class="trix-dialog__link-fields">
+                                <input aria-label="URL" data-trix-input="" disabled="" name="href" placeholder="Enter a URL" required="" type="text" inputmode="url" class="trix-input trix-input--dialog" readonly="" style="">
+
+                                <div class="trix-button-group">
+                                    <input data-trix-method="setAttribute" type="button" value="Link" class="trix-button trix-button--dialog" readonly="" style="">
+
+                                    <input data-trix-method="removeAttribute" type="button" value="Unlink" class="trix-button trix-button--dialog" readonly="" style="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </trix-toolbar>
+
+                <trix-editor id="data.penjelasan_lengkap" input="trix-value-data.penjelasan_lengkap" placeholder="" toolbar="trix-toolbar-data.penjelasan_lengkap" x-ref="trix" wire:ignore="" wire:key="mSvDT6skfFSQrH8zK9Rq.data.penjelasan_lengkap.Filament\Forms\Components\RichEditor.a8cf63fecab3eb3edf6760bc02f258a6" class="fi-fo-rich-editor-editor prose min-h-[theme(spacing.48)] max-w-none !border-none px-3 py-1.5 text-base text-gray-950 dark:prose-invert focus-visible:outline-none dark:text-white sm:text-sm sm:leading-6" contenteditable="" role="textbox" connected="" style=""><p><!--block-->Sejak pagi wifi putus nyambung dan tidak bisa buat buka internet.</p></trix-editor>
+            </div>
+    </div>
+
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]--></div>
+    <!--[if ENDBLOCK]><![endif]-->
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+            
+        <div style="--col-span-default: 1 / -1;" class="col-[--col-span-default]" wire:key="mSvDT6skfFSQrH8zK9Rq.data.gambar.Filament\Forms\Components\FileUpload">
+    <!--[if BLOCK]><![endif]-->                <div data-field-wrapper="" class="fi-fo-field-wrp">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div class="grid gap-y-2">
+        <!--[if BLOCK]><![endif]-->            <div class="flex items-center gap-x-3 justify-between ">
+                <!--[if BLOCK]><![endif]-->                    <div class="fi-fo-field-wrp-label inline-flex items-center gap-x-3" id="data.gambar-label">
+    
+
+    <span class="text-sm font-medium leading-6 text-gray-950 dark:text-white">
+        
+        Foto Langsung / Upload Bukti (Opsional)<!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->    </span>
+
+    
+</div>
+                <!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->
+        <!--[if BLOCK]><![endif]-->            <div class="grid auto-cols-fr gap-y-2">
+                <div x-load="" x-load-src="http://127.0.0.1:8001/js/filament/forms/components/file-upload.js?v=3.3.47.0" x-data="fileUploadFormComponent({
+                    acceptedFileTypes: JSON.parse('[\u0022image\\\/*\u0022]'),
+                    imageEditorEmptyFillColor: null,
+                    imageEditorMode: 1,
+                    imageEditorViewportHeight: null,
+                    imageEditorViewportWidth: null,
+                    deleteUploadedFileUsing: async (fileKey) =&gt; {
+                        return await $wire.deleteUploadedFile('data.gambar', fileKey)
+                    },
+                    getUploadedFilesUsing: async () =&gt; {
+                        return await $wire.getFormUploadedFiles('data.gambar')
+                    },
+                    hasImageEditor: false,
+                    hasCircleCropper: false,
+                    canEditSvgs: true,
+                    isSvgEditingConfirmed: false,
+                    confirmSvgEditingMessage: 'Editing SVG files is not recommended as it can result in quality loss when scaling.\\n Are you sure you want to continue?',
+                    disabledSvgEditingMessage: 'Editing SVG files is disabled as it can result in quality loss when scaling.',
+                    imageCropAspectRatio: null,
+                    imagePreviewHeight: null,
+                    imageResizeMode: null,
+                    imageResizeTargetHeight: null,
+                    imageResizeTargetWidth: null,
+                    imageResizeUpscale: true,
+                    isAvatar: false,
+                    isDeletable: true,
+                    isDisabled: false,
+                    isDownloadable: false,
+                    isMultiple: true,
+                    isOpenable: false,
+                    isPasteable: true,
+                    isPreviewable: true,
+                    isReorderable: false,
+                    itemPanelAspectRatio: null,
+                    loadingIndicatorPosition: 'right',
+                    locale: 'en',
+                    panelAspectRatio: null,
+                    panelLayout: 'compact',
+                    placeholder: null,
+                    maxFiles: null,
+                    maxSize: '5120KB',
+                    minSize: null,
+                    mimeTypeMap: [],
+                    maxParallelUploads: null,
+                    removeUploadedFileUsing: async (fileKey) =&gt; {
+                        return await $wire.removeFormUploadedFile('data.gambar', fileKey)
+                    },
+                    removeUploadedFileButtonPosition: 'left',
+                    reorderUploadedFilesUsing: async (files) =&gt; {
+                        return await $wire.reorderFormUploadedFiles('data.gambar', files)
+                    },
+                    shouldAppendFiles: false,
+                    shouldOrientImageFromExif: true,
+                    shouldTransformImage: false,
+                    state: $wire.$entangle('data.gambar', false),
+                    uploadButtonPosition: 'right',
+                    uploadingMessage: 'Uploading file...',
+                    uploadProgressIndicatorPosition: 'right',
+                    uploadUsing: (fileKey, file, success, error, progress) =&gt; {
+                        $wire.upload(
+                            `data.gambar.${fileKey}`,
+                            file,
+                            () =&gt; {
+                                success(fileKey)
+                            },
+                            error,
+                            (progressEvent) =&gt; {
+                                progress(true, progressEvent.detail.progress, 100)
+                            },
+                        )
+                    },
+                })" wire:ignore="" wire:key="mSvDT6skfFSQrH8zK9Rq.data.gambar.Filament\Forms\Components\FileUpload.a8cf63fecab3eb3edf6760bc02f258a6" class="fi-fo-file-upload flex flex-col gap-y-2 [&amp;_.filepond--root]:font-sans items-start" aria-labelledby="data.gambar-label" id="data.gambar" role="group">
+        <div class="h-full w-full">
+            <div class="filepond--root filepond--hopper" data-style-panel-layout="compact" data-style-button-remove-item-position="left" data-style-button-process-item-position="right" data-style-load-indicator-position="right" data-style-progress-indicator-position="right" data-style-button-remove-item-align="false" data-style-image-edit-button-edit-item-position="bottom center" style="height: 76px;"><input class="filepond--browser" type="file" id="filepond--browser-t17xd4pqu" name="filepond" aria-controls="filepond--assistant-t17xd4pqu" aria-labelledby="filepond--drop-label-t17xd4pqu" accept="image/*" multiple="" style=""><div class="filepond--drop-label" style="transform: translate3d(0px, 0px, 0px); opacity: 1;"><label for="filepond--browser-t17xd4pqu" id="filepond--drop-label-t17xd4pqu">Drag &amp; Drop your files or <span class="filepond--label-action" tabindex="0"> Browse </span></label></div><div class="filepond--list-scroller" style="transform: translate3d(0px, 76px, 0px);"><ul class="filepond--list" role="list"></ul></div><div class="filepond--panel filepond--panel-root" data-scalable="true"><div class="filepond--panel-top filepond--panel-root"></div><div class="filepond--panel-center filepond--panel-root" style="transform: translate3d(0px, 8px, 0px) scale3d(1, 0.6, 1);"></div><div class="filepond--panel-bottom filepond--panel-root" style="transform: translate3d(0px, 68px, 0px);"></div></div><span class="filepond--assistant" id="filepond--assistant-t17xd4pqu" role="alert" aria-live="polite" aria-relevant="additions"></span><fieldset class="filepond--data"><legend>Files</legend></fieldset><div class="filepond--drip"></div></div>
+        </div>
+
+        <div x-show="error" x-text="error" class="text-sm text-danger-600 dark:text-danger-400" style="display: none;"></div>
+
+        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->    </div>
+
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->            </div>
+        <!--[if ENDBLOCK]><![endif]-->    </div>
+</div>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+    <!--[if ENDBLOCK]><![endif]-->
+</div>
+        </div>
+
+        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->    </div>
+</section>
+
+            <!--[if ENDBLOCK]><![endif]-->
+</div>
+    <!--[if ENDBLOCK]><![endif]-->
+</div>
+
+
+        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+        <div class="mt-6">
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-0.5" disabled="">
+                🚀 Kirim Laporan
+            </button>
+        </div>
+    </form>
+    
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+<!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+<!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+<!--[if BLOCK]><![endif]-->    
+    <form wire:submit.prevent="callMountedFormComponentAction">
+        <div aria-modal="true" role="dialog" x-data="{
+        isOpen: false,
+
+        livewire: null,
+
+        close: function () {
+            this.isOpen = false
+
+            this.$refs.modalContainer.dispatchEvent(
+                new CustomEvent('modal-closed', { detail: { id: 'mSvDT6skfFSQrH8zK9Rq-form-component-action' } }),
+            )
+        },
+
+        open: function () {
+            this.$nextTick(() =&gt; {
+                this.isOpen = true
+
+                
+                this.$refs.modalContainer.dispatchEvent(
+                    new CustomEvent('modal-opened', { detail: { id: 'mSvDT6skfFSQrH8zK9Rq-form-component-action' } }),
+                )
+            })
+        },
+    }" x-on:close-modal.window="if ($event.detail.id === 'mSvDT6skfFSQrH8zK9Rq-form-component-action') close()" x-on:open-modal.window="if ($event.detail.id === 'mSvDT6skfFSQrH8zK9Rq-form-component-action') open()" data-fi-modal-id="mSvDT6skfFSQrH8zK9Rq-form-component-action" x-trap.noscroll="isOpen" x-bind:class="{
+        'fi-modal-open': isOpen,
+    }" class="fi-modal block" data-has-alpine-state="true">
+    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+    <div x-show="isOpen" style="display: none;">
+        <div aria-hidden="true" x-show="isOpen" x-transition.duration.300ms.opacity="" class="fi-modal-close-overlay fixed inset-0 z-40 bg-gray-950/50 dark:bg-gray-950/75" style="display: none;"></div>
+
+        <div class="fixed inset-0 z-40 overflow-y-auto cursor-pointer">
+            <div x-ref="modalContainer" x-on:click.self="
+                        document.activeElement.selectionStart === undefined &amp;&amp;
+                            document.activeElement.selectionEnd === undefined &amp;&amp;
+                            $dispatch('close-modal', { id: 'mSvDT6skfFSQrH8zK9Rq-form-component-action' })
+                    " class="relative grid min-h-full grid-rows-[1fr_auto_1fr] justify-items-center sm:grid-rows-[1fr_auto_3fr] p-4" x-on:modal-closed.stop="if (!$event.detail?.id?.startsWith('mSvDT6skfFSQrH8zK9Rq-')) {
+                    return
+                }
+
+                const mountedFormComponentActionShouldOpenModal = false
+
+
+                if (mountedFormComponentActionShouldOpenModal) {
+                    $wire.unmountFormComponentAction(false, false)
+                }">
+                <div x-data="{ isShown: false }" x-init="
+                        $nextTick(() =&gt; {
+                            isShown = isOpen
+                            $watch('isOpen', () =&gt; (isShown = isOpen))
+                        })
+                    " x-on:keydown.window.escape="$dispatch('close-modal', { id: 'mSvDT6skfFSQrH8zK9Rq-form-component-action' })" x-show="isShown" x-transition:enter="duration-300" x-transition:leave="duration-300" x-transition:enter-start="scale-95 opacity-0" x-transition:enter-end="scale-100 opacity-100" x-transition:leave-start="scale-100 opacity-100" x-transition:leave-end="scale-95 opacity-0" wire:key="mSvDT6skfFSQrH8zK9Rq.modal.mSvDT6skfFSQrH8zK9Rq-form-component-action.window" class="fi-modal-window pointer-events-auto relative row-start-2 flex w-full cursor-default flex-col bg-white shadow-xl ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 mx-auto rounded-xl hidden max-w-sm" style="display: none;" data-has-alpine-state="true">
+                    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </form>
+
+    <!--[if ENDBLOCK]><![endif]--></div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                    © 2026 IT Helpdesk PTPN IV.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Theme Toggle -->
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('user-theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('user-theme', 'dark');
+            }
+        }
+    </script>
+
+    <!-- Filament Scripts -->
+    <script>
+        window.filamentData = []    </script>
+
+            
+            <script src="http://127.0.0.1:8001/js/filament/notifications/notifications.js?v=3.3.47.0"></script>
+        
+                
+            <script src="http://127.0.0.1:8001/js/filament/support/support.js?v=3.3.47.0"></script>
+        
+    
+<style>
+    :root {
+            }
+</style>
+    
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.hook('request', ({ uri, options, payload, respond, succeed, fail }) => {
+                fail(({ status, content, preventDefault }) => {
+                    if (status === 419 || status === 404) {
+                        alert('Maaf, sesi Anda telah berakhir atau terjadi kesalahan koneksi. Halaman akan dimuat ulang untuk memperbarui data.');
+                        window.location.reload();
+                        preventDefault();
+                    }
+                })
+            })
+        });
+    </script>
+<!-- Livewire Scripts -->
+<script src="/livewire/livewire.js?id=0f6341c0" data-csrf="W1xhAjBudjykYLyc9bpJonBNmP0ibjIMc5Eqrtmo" data-update-uri="/livewire/update" data-navigate-once="true"></script>
+
+</body></html>

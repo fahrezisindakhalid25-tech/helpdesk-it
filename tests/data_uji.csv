@@ -1,0 +1,121 @@
+id,teks_keluhan,kategori_ground_truth,urgensi_ground_truth
+1,"Koneksi internet kantor putus nyambung dari pagi, meeting zoom saya sering disconnect.",Network,Tinggi
+2,"Ping ke server internal timeout terus, tidak bisa akses layanan intranet.",Network,Tinggi
+3,"Wifi di area lobby sangat lambat, tamu komplain gabisa buka website.",Network,Sedang
+4,"Kabel LAN di meja saya putus, tidak bisa dipakai internetan sama sekali.",Network,Sedang
+5,"IP address laptop conflict, muncul notifikasi IP address already in use.",Network,Rendah
+6,"Tidak bisa akses web eksternal sama sekali, tapi buka web internal lancar.",Network,Sedang
+7,"Kecepatan download cuma 10kbps, padahal harus narik data laporan penting.",Network,Sedang
+8,"Router di lantai 3 lampu indikatornya merah terus, sepertinya mati total.",Network,Tinggi
+9,"Apakah password wifi ruang meeting sudah diganti? Saya gabisa konek pakai pw lama.",Network,Rendah
+10,"Koneksi ke sistem ERP lambat, ada tulisan network latency high.",Network,Tinggi
+11,"Bisa minta tolong reset switch hub di divisi keuangan? Sepertinya nge-hang.",Network,Sedang
+12,"VPN dari rumah tidak bisa tersambung, selalu muncul error remote server timeout.",Network,Tinggi
+13,"Layar monitor tiba-tiba mati dan tidak bisa nyala meskipun tombol power sudah ditekan.",Hardware,Tinggi
+14,"Keyboard huruf A dan S kadang macet, sangat mengganggu saat mengetik laporan.",Hardware,Sedang
+15,"Komputer PC di meja 12 mengeluarkan suara mendengung kasar dari bagian CPU.",Hardware,Sedang
+16,"Touchpad laptop saya gabisa digerakkan, sepertinya rusak.",Hardware,Sedang
+17,"Lampu indikator baterai laptop kedap-kedip merah padahal sedang di-charge.",Hardware,Rendah
+18,"Hardisk komputer internal sepertinya bad sector, buka windows lemot dan sering blue screen.",Hardware,Tinggi
+19,"RAM kurang besar, setiap buka banyak tab excel langsung hang. Tolong upgrade.",Hardware,Rendah
+20,"Motherboard pc berbunyi beep panjang tiga kali saat dinyalakan.",Hardware,Tinggi
+21,"Kipas pendingin (fan) prosesor mati, komputer jadi sangat panas dan sering restart sendiri.",Hardware,Tinggi
+22,"Port USB di laptop sebelah kanan tidak bisa baca flashdisk sama sekali.",Hardware,Sedang
+23,"Layar laptop bergaris-garis warna warni, gambar jadi tidak jelas.",Hardware,Sedang
+24,"Baterai laptop sudah drop banget, dicabut dari charger langsung mati.",Hardware,Rendah
+25,"Aplikasi Microsoft Word selalu crash tiap kali mau disave, file penting jadi hilang.",Software,Tinggi
+26,"Adobe Acrobat minta update lisensi terus, padahal kemarin baru diperpanjang.",Software,Sedang
+27,"Windows update stuck di 30% dari dua jam yang lalu, laptop tidak bisa digunakan.",Software,Tinggi
+28,"Aplikasi ERP lama tidak bisa di-install di Windows 11 saya, muncul incompatibility error.",Software,Sedang
+29,"Excel jadi not responding kalau buka file dengan macro vba yang kompleks.",Software,Sedang
+30,"Bisa tolong installkan aplikasi Visio di komputer saya? Butuh untuk buat flow chart besok.",Software,Rendah
+31,"Zoom meeting tidak bisa mendeteksi virtual camera, padahal softwarenya sudah terinstall.",Software,Rendah
+32,"Browser Chrome error ERR_CONNECTION_REFUSED hanya saat buka aplikasi tertentu.",Software,Sedang
+33,"Aplikasi SAP gabisa dibuka, loading screennya muter-muter aja.",Software,Tinggi
+34,"Antivirusnya bentrok sama aplikasi akuntansi, jadi gabisa jalan aplikasinya.",Software,Tinggi
+35,"Saya lupa pw login aplikasi HR, tolong bantu resetkan segera.",Software,Sedang
+36,"Software desain grafis sering force close sendiri kalau render file ukuran besar.",Software,Sedang
+37,"Tidak bisa query data absensi karyawan, muncul pesan error ORA-01033.",Database,Tinggi
+38,"Koneksi SQL Server terputus secara tiba-tiba saat lagi narik laporan bulanan.",Database,Tinggi
+39,"Tolong buatkan view baru di database production untuk tabel transaksi penjualan.",Database,Rendah
+40,"Proses sinkronisasi data antar cabang lambat sekali, sepertinya ada deadlock di tabel master.",Database,Tinggi
+41,"Password user database aplikasi keuangan sudah expired, butuh reset secepatnya.",Database,Tinggi
+42,"Ada error table is corrupted di database MySQL saat buka dashboard.",Database,Tinggi
+43,"Bisa minta tolong restore data dari backup database kemarin jam 10 pagi? Ada data terhapus.",Database,Tinggi
+44,"Query select ke tabel customer sangat lambat butuh waktu 5 menit, perlu ditambah index.",Database,Sedang
+45,"Kapasitas tablespace untuk database log hampir penuh (95%), tolong segera ditambah.",Database,Sedang
+46,"Saya butuh akses select ke schema HRD untuk keperluan audit, tolong di-grant aksesnya.",Database,Rendah
+47,"Pesan error connection to database failed muncul di semua halaman website intranet.",Database,Tinggi
+48,"Integrasi API gagal karena format data di database tidak sesuai standar.",Database,Sedang
+49,"Server utama aplikasi ERP down! Seluruh user tidak bisa akses sistem.",Server,Tinggi
+50,"Penggunaan CPU di server aplikasi melonjak sampai 100% dan membuat sistem hang.",Server,Tinggi
+51,"Tolong restart service apache di server web utama karena halamannya nge-blank.",Server,Sedang
+52,"Bisa bantu alokasikan VM baru untuk keperluan testing aplikasi QA?",Server,Rendah
+53,"Server mail sepertinya mengalami gangguan, email keluar masuk tertunda.",Server,Tinggi
+54,"Ada notifikasi alarm suhu tinggi dari ruang server, tolong segera di-check AC-nya.",Server,Tinggi
+55,"Memory server penuh, proses batch harian gagal dieksekusi tadi malam.",Server,Tinggi
+56,"Tolong tambahkan resource RAM pada virtual machine server akuntansi menjadi 16GB.",Server,Sedang
+57,"Sertifikat SSL di server API sudah mau expired 3 hari lagi, mohon diperbarui.",Server,Sedang
+58,"Kita butuh migrasi aplikasi lama ke server baru yang OS-nya Windows Server 2022.",Server,Sedang
+59,"Koneksi SSH ke server linux ditolak (connection refused), saya gabisa remote.",Server,Tinggi
+60,"Hardisk server aplikasi berbunyi aneh, seperti disk failure. Takut server crash.",Server,Tinggi
+61,"Kapasitas NAS (Network Attached Storage) divisi marketing sudah habis, gabisa simpan file video.",Storage,Tinggi
+62,"Shared folder Z: tidak bisa diakses, pesannya network path was not found.",Storage,Tinggi
+63,"Tolong bantu buatkan folder baru di server storage untuk project akhir tahun.",Storage,Rendah
+64,"Kecepatan transfer file ke storage server melambat drastis, biasanya hitungan detik ini menit.",Storage,Sedang
+65,"File presentasi penting yang disimpan di cloud storage tiba-tiba corrupt dan hilang.",Storage,Tinggi
+66,"Hardisk eksternal backup perusahaan tidak terbaca sama sekali di PC server.",Storage,Sedang
+67,"Tolong beri hak akses read-write untuk user saya ke folder storage keuangan.",Storage,Rendah
+68,"Notifikasi quota storage email saya penuh (100%), tidak bisa menerima email baru.",Storage,Tinggi
+69,"Bisa tolong jalankan proses backup manual ke tape storage hari ini? Ada pemeliharaan listrik.",Storage,Sedang
+70,"Data arsip tahun 2020 di storage lama tidak bisa dibuka, file format is unsupported.",Storage,Sedang
+71,"Mohon alokasikan LUN baru sebesar 500GB dari SAN storage ke server database.",Storage,Rendah
+72,"Proses sinkronisasi file ke cloud storage gagal dengan error sync quota exceeded.",Storage,Sedang
+73,"Kamera CCTV di lorong lantai 2 mati total, layarnya gelap di ruang kontrol.",CCTV & Security Systems,Tinggi
+74,"Rekaman DVR dari CCTV parkiran hari minggu lalu tidak bisa di-playback.",CCTV & Security Systems,Sedang
+75,"Pintu masuk dengan akses fingerprint tidak merespon sidik jari karyawan baru.",CCTV & Security Systems,Tinggi
+76,"Alarm kebakaran di ruang arsip sempat berbunyi palsu, tolong di-check sensornya.",CCTV & Security Systems,Sedang
+77,"Kamera CCTV luar gerbang gambarnya kabur dan bersemut jika malam hari.",CCTV & Security Systems,Sedang
+78,"Mesin absensi wajah (face recognition) di lobby error, tidak bisa absen masuk.",CCTV & Security Systems,Tinggi
+79,"Bisa tolong daftarkan kartu akses pintu (RFID) untuk pegawai magang divisi IT?",CCTV & Security Systems,Rendah
+80,"Kamera IP PTZ di area pabrik tidak bisa di-rotate dari ruang kontrol.",CCTV & Security Systems,Sedang
+81,"Monitor utama CCTV di pos security blank screen, padahal DVR nyala.",CCTV & Security Systems,Tinggi
+82,"Aplikasi viewer CCTV di laptop manajer selalu force close saat dibuka.",CCTV & Security Systems,Sedang
+83,"Jam pada rekaman CCTV telat 1 jam, tidak sinkron dengan waktu nyata.",CCTV & Security Systems,Rendah
+84,"Smart door lock ruang direksi kehabisan baterai, pintu tidak bisa dikunci.",CCTV & Security Systems,Tinggi
+85,"Halaman utama intranet portal error 500 saat diakses, semua pengumuman tidak terlihat.",Web & Intranet Portal,Tinggi
+86,"Tautan untuk download slip gaji di web portal tidak berfungsi, link is broken.",Web & Intranet Portal,Sedang
+87,"Tampilan halaman portal kacau jika dibuka pakai hp (tidak responsive).",Web & Intranet Portal,Rendah
+88,"Saya mau submit form pengajuan cuti di intranet tapi selalu muncul form validation error.",Web & Intranet Portal,Sedang
+89,"Banner pengumuman di website tidak mau loading gambarnya, cuma text aja.",Web & Intranet Portal,Rendah
+90,"Website company profile di-hack! Tampilannya berubah jadi aneh tolong segera di-takedown.",Web & Intranet Portal,Tinggi
+91,"Fitur pencarian dokumen di intranet portal tidak menemukan apa-apa meski kata kuncinya benar.",Web & Intranet Portal,Sedang
+92,"Tolong update konten artikel di web berita perusahaan, CMS-nya error saat saya save.",Web & Intranet Portal,Sedang
+93,"Web portal terasa sangat lambat pas jam istirahat, loadingnya lama banget.",Web & Intranet Portal,Sedang
+94,"Ada pesan SSL certificate error saat buka website portal hrd.",Web & Intranet Portal,Tinggi
+95,"Bisa bantu buatkan menu baru di halaman utama intranet untuk aplikasi baru?",Web & Intranet Portal,Rendah
+96,"User login ke web portal gagal terus padahal username & pw sudah benar.",Web & Intranet Portal,Tinggi
+97,"Komputer saya tiba-tiba terserang ransomware, semua file berubah ekstensi dan gabisa dibuka!",Keamanan & Virus,Tinggi
+98,"Antivirus mendeteksi ada Trojan Horse di folder download, file sudah di-quarantine otomatis.",Keamanan & Virus,Tinggi
+99,"Banyak karyawan yang mendapat email phising mencurigakan mengaku dari divisi HRD.",Keamanan & Virus,Tinggi
+100,"Browser saya selalu membuka tab iklan aneh (adware) sendiri setiap beberapa menit.",Keamanan & Virus,Sedang
+101,"Akun email saya sepertinya disusupi, karena ada email keluar yang tidak saya kirim.",Keamanan & Virus,Tinggi
+102,"Flashdisk vendor yang baru dicolok rupanya membawa virus shortcut, tolong bersihkan komputer saya.",Keamanan & Virus,Tinggi
+103,"Firewall kantor memblokir akses ke web aplikasi internal yang saya butuhkan, muncul pesan Access Denied by Policy.",Keamanan & Virus,Sedang
+104,"Mohon bantuan instalasi ulang antivirus di PC saya, karena lisensinya kadaluarsa.",Keamanan & Virus,Rendah
+105,"Ada login mencurigakan ke akun server dari IP luar negeri, mohon diinvestigasi.",Keamanan & Virus,Tinggi
+106,"Komputer sangat lambat dan CPU usage selalu 100%, curiga ada virus crypto miner.",Keamanan & Virus,Tinggi
+107,"Tolong update rule firewall untuk mengizinkan port aplikasi baru ke public.",Keamanan & Virus,Sedang
+108,"Web browser mendeteksi situs intranet perusahaan sebagai situs tidak aman (malicious).",Keamanan & Virus,Tinggi
+109,"Printer ruang rapat tidak mau menarik kertas walau tintanya penuh.",Peripheral,Sedang
+110,"Scanner dokumen ADF selalu macet kertasnya di tengah jalan.",Peripheral,Sedang
+111,"Tinta printer Epson hitam sepertinya habis, hasil cetakan bergaris dan pudar.",Peripheral,Rendah
+112,"Proyektor di ruang meeting warnanya jadi agak kuning, kabel VGA mungkin bermasalah.",Peripheral,Sedang
+113,"Speaker conference untuk video call mati sebelah, suara lawan bicara tidak jelas.",Peripheral,Rendah
+114,"Headset usb mikrofonnya ga fungsi, jadi orang ga bisa denger suara saya pas zoom.",Peripheral,Sedang
+115,"Mouse wireless saya kursornya lompat-lompat sendiri dan tidak responsif.",Peripheral,Rendah
+116,"Barcode scanner di bagian gudang tidak mau membaca label dengan cepat, harus diulang berkali-kali.",Peripheral,Sedang
+117,"Mesin fotokopi jaringan error code E000, indikator merah menyala terus.",Peripheral,Tinggi
+118,"Lampu indikator printer kedip bergantian, minta reset waste ink pad.",Peripheral,Sedang
+119,"Kabel HDMI proyektor sepertinya putus, tidak nyambung ke layar laptop.",Peripheral,Sedang
+120,"Pen tablet untuk divisi desain tidak merespon tekanan (pressure sensitivity hilang).",Peripheral,Sedang
